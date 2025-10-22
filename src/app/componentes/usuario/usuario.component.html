@@ -1,0 +1,389 @@
+<p-toast key="usuario" [baseZIndex]="99999"></p-toast>
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h3>
+        <span > LISTA DE PERSONAL <br> <hr style="margin: 4px; border: 1px solid #148b7e;">
+          {{this.usuarioContexto.empresa}} - REGIONAL {{this.usuarioContexto.departamento}} </span>
+      </h3>
+      <!--<h5>Visualización, adición, edición y eliminación</h5>-->
+
+        
+      
+      
+      
+      <p-table 
+        #tablaUsuarios  
+        class="tabla-centrada" 
+        [value]="empleados" 
+        [columns]="columnas" 
+        styleClass="p-datatable-gridlines" 
+        responsiveLayout="scroll"
+        selectionMode="single" 
+        [rows]="25" 
+        [paginator]="true" 
+        [rowsPerPageOptions]="[5,10,20,25,30]">
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Buscar..." (input)="buscadorPerfil(tablaUsuarios, $event)"
+                  class="w-full sm:w-auto" />
+              </span>
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <button pButton pRipple label="Agregar Empleado" icon="pi pi-user-plus" (click)=" abrirNuevoEmpleado()"
+                  class="p-button-success mr-2"></button>
+              </span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="usuario">Matricula<p-sortIcon field="usuario"></p-sortIcon></th>
+              <th pSortableColumn="nombres">Nombres<p-sortIcon field="nombres"></p-sortIcon></th>
+              <th pSortableColumn="apellidos">Apellidos<p-sortIcon field="apellidos"></p-sortIcon></th>
+              <th pSortableColumn="numeroDocumento">CI<p-sortIcon field="numeroDocumento"></p-sortIcon></th>
+              <th pSortableColumn="fechaNacimiento">Fecha de Nacimiento<p-sortIcon field="fechaNacimiento"></p-sortIcon>
+              </th>
+              <th pSortableColumn="aseCargo">Cargo<p-sortIcon field="aseCargo"></p-sortIcon></th>
+              <th pSortableColumn="aseHaber">Salario<p-sortIcon field="aseHaber"></p-sortIcon></th>
+              <th pSortableColumn="estadoUsuario">Estado<p-sortIcon field="estadoUsuario"></p-sortIcon></th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-usuario>
+            <tr>
+              <td>{{ usuario.aseMatTit }}</td>
+              <td>{{ usuario.aseNom }}</td>
+              <td>{{ usuario.aseApat+" "+usuario.aseAmat}}</td>
+              <td>{{ usuario.aseCi }}</td>
+              <td>{{ usuario.fechaNac }}</td>
+              <td>{{ usuario.aseCargo }}</td>
+              <td>{{ usuario.aseHaber | number : '1.2-2' }} Bs</td>
+              <td>{{ usuario.aseEstado }}</td>
+              <td>
+                <div style="display: flex; justify-content: space-between;">
+
+                  <button 
+                pButton 
+                pRipple 
+                label="Editar" 
+                style="padding: 3px; width: 100%; border-radius: 0;"
+                class="p-button p-button-sm p-button-warning"
+              
+                (click)="abrirEditarUsuario(usuario)"></button>
+                
+                <!-- <button pButton pRipple icon="pi pi-user" class="p-button p-button mr-2"
+                  (click)="abrirRestriccionesUsuario(usuario)"></button> -->
+                <button 
+                pButton 
+                pRipple 
+                icon="pi pi-trash" 
+                (click)="mostrarDialogoEliminar(usuario)"
+                style="padding: 3px; width: 100%; border-radius: 0;"
+                class="p-button p-button-danger"></button> 
+                <!-- <p-splitButton label="Acciones" icon="pi pi-file-edit" [model]="items" styleClass="p-button-info mr-2 mb-2" appendTo="body"></p-splitButton> -->
+
+                </div>
+                
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+ 
+      <p-dialog [(visible)]="guardarEmpleadoDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+          <span>Desea registrar los datos del Empleado!!!!</span>
+        </div>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"
+            (click)="guardarEmpleadoDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si"
+            (click)="confirmarGuardadoEmpleado()"></button>
+        </ng-template>
+      </p-dialog>
+      <p-dialog [(visible)]="guardarEditarUsuarioDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+          <span>Desea Guardar Los Cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"
+            (click)="guardarEditarUsuarioDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si"
+            (click)="guardarEditarUsuario()"></button>
+        </ng-template>
+      </p-dialog>
+      <p-dialog [(visible)]="eliminarUsuarioDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+          <span *ngIf="usuario">Esta seguro que desea Eliminar <b>{{usuario.nombres}}</b>? No podra deshacer los
+            cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"
+            (click)="eliminarUsuarioDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si"
+            (click)="confirmarEliminarUsuario()"></button>
+        </ng-template>
+      </p-dialog>
+      <form novalidate [formGroup]="personaForm">
+        <p-dialog [(visible)]="editarUsuarioDialogo" [style]="{width: '80%',height:'58%' }" header="Editar Asegurado"
+          [modal]="true" class="p-fluid" (onHide)="cerrarNuevoEmpleado()">
+          <br>
+          <ng-template pTemplate="content">
+            <div class="flex flex-column h-12rem">
+              <div class="grid formgrid">
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <input type="text" formControlName="aseNom" pInputText>
+                    <label for="float-input">Nombres*</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <input type="text" formControlName="aseApat" pInputText>
+                    <label for="float-input">Primer Apellido*</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <input type="text" formControlName="aseAmat" pInputText>
+                    <label for="float-input">Segundo Apellido*</label>
+                  </span>
+                </div>
+              </div>
+              <hr>
+              <div class="grid formgrid">
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <p-calendar [iconDisplay]="'input'"
+                      [showIcon]="true"
+                      formControlName="aseFecNac"
+                      appendTo="body"
+                      dateFormat="dd/mm/yy"></p-calendar>
+                    <label for="float-input">Fecha Nacimiento*</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <input type="text" formControlName="aseCi" pInputText>
+                    <label for="float-input">No. Documento*</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                  <span class="p-float-label">
+                    <input type="text" formControlName="aseCiCom" pInputText>
+                    <label for="float-input">Complemento</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                  <span class="p-float-label">
+                    <p-dropdown [options]="listaExpedicion"
+                      formControlName="aseCiext"
+                      optionValue="identificadorClasificadorDetalle"
+                      optionLabel="nombreClasificadorDetalle"
+                      appendTo="body"
+                      [showClear]="true"></p-dropdown>
+                    <label for="float-input">Expedicion</label>
+                  </span>
+                </div>
+              </div>
+              <hr>
+              <div class="grid formgrid">
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <p-calendar [showIcon]="true"
+                      formControlName="aseFiniEmp"
+                      dateFormat="dd/mm/yy"
+                      appendTo="body"
+                      inputId="icon"></p-calendar>
+                    <label for="float-input">Fecha de Incorporación (dd/mm/aaaa)*</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                  <span class="p-float-label">
+                    <input type="text" formControlName="aseCargo" pInputText>
+                    <label for="float-input">Cargo Empleado</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                  <span class="p-float-label">
+                    <p-inputNumber mode="decimal" [showButtons]="false" [min]="0" [max]="30000"
+                      formControlName="aseHaber">
+                    </p-inputNumber>
+                    <label for="float-input">Total Ganado</label>
+                  </span>
+                </div>
+                <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                  <span class="p-float-label">
+                    <p-dropdown [options]="listaGenero" formControlName="aseSexo"
+                      optionValue="identificadorClasificadorDetalle"
+                      optionLabel="nombreClasificadorDetalle"
+                      appendTo="body"
+                      [showClear]="true"></p-dropdown>
+                    <label for="float-input">Genero</label>
+                  </span>
+                </div>
+              </div>
+              <hr>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <button pButton pRipple type="button" label="Cancelar" (click)="cerrarEditarUsuario()" icon="pi pi-times"
+              class="p-button-text"></button>
+            <button pButton pRipple type="submit" [disabled]="personaForm.invalid" (click)="confirmarEditarUsuario()"
+              label="Guardar" icon="pi pi-check" class="p-button-text"></button>
+          </ng-template>
+        </p-dialog>
+      </form>
+      <p-dialog [(visible)]="nuevoEmpleadoDialog" [style]="{width: '50%',height:'62%' }" header="Agregar/Empleado"
+        [modal]="true" class="p-fluid">
+        <br>
+        <form validate [formGroup]="segipForm">
+          <div class="grid formgrid">
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="text" formControlName="documentoSegip" pInputText>
+                <label for="float-input">No. Documento</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="text" formControlName="complementoSegip" pInputText>
+                <label for="float-input">Complemento</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <p-calendar [iconDisplay]="'input'" [showIcon]="true" formControlName="fechaNacSegip"
+                  dateFormat="dd/mm/yy"></p-calendar>
+                <label for="float-input">Fecha Nacimiento</label>
+              </span>
+            </div>
+          </div>
+          <br>
+          <div class="grid formgrid">
+            <div class="col-12 mb-2 lg:col-8 lg:mb-0"></div>
+            <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+              <button pButton pRipple icon="pi pi-search" label="Buscar" (click)="manejarClick()"
+                [disabled]="segipForm.invalid"></button>
+            </div>
+            <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+              <button pButton pRipple icon="pi pi-check" class="p-button-danger" label="Limpiar"
+                (click)="resetForm()"></button>
+            </div>
+          </div>
+          <!-- <h6>Habilitar registro manual</h6> -->
+          <!-- <p-inputSwitch formControlName="valSwitch" [disabled]="true"></p-inputSwitch> -->
+        </form>
+        <hr>
+        <form novalidate [formGroup]="personaForm" (ngSubmit)="mostrarDialogoUsuarioGuardar()">
+          <div class="flex flex-column h-12rem">
+            <div class="grid formgrid">
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <input type="text" formControlName="aseNom" pInputText>
+                  <label for="float-input">Nombres*</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <input type="text" formControlName="aseApat" pInputText>
+                  <label for="float-input">Primer Apellido*</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <input type="text" formControlName="aseAmat" pInputText>
+                  <label for="float-input">Segundo Apellido*</label>
+                </span>
+              </div>
+            </div>
+            <hr>
+            <div class="grid formgrid">
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <p-calendar [iconDisplay]="'input'"
+                    [showIcon]="true"
+                    formControlName="aseFecNac"
+                    appendTo="body"
+                    dateFormat="dd/mm/yy"></p-calendar>
+                  <label for="float-input">Fecha Nacimiento*</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <input type="text" formControlName="aseCi" pInputText>
+                  <label for="float-input">No. Documento*</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                <span class="p-float-label">
+                  <input type="text" formControlName="aseCiCom" pInputText>
+                  <label for="float-input">Complemento</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                <span class="p-float-label">
+                  <p-dropdown [options]="listaExpedicion"
+                    formControlName="aseCiext"
+                    optionValue="identificadorClasificadorDetalle"
+                    optionLabel="nombreClasificadorDetalle"
+                    appendTo="body"
+                    [showClear]="true"></p-dropdown>
+                  <label for="float-input">Expedicion</label>
+                </span>
+              </div>
+            </div>
+            <hr>
+            <div class="grid formgrid">
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <p-calendar [showIcon]="true"
+                    formControlName="aseFiniEmp"
+                    dateFormat="dd/mm/yy"
+                    appendTo="body"
+                    inputId="icon"></p-calendar>
+                  <label for="float-input">Fecha de Incorporación (dd/mm/aaaa)*</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <input type="text" formControlName="aseCargo" pInputText>
+                  <label for="float-input">Cargo Empleado</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                <span class="p-float-label">
+                  <p-inputNumber mode="decimal" [showButtons]="false" [min]="0" [max]="30000"
+                    formControlName="aseHaber">
+                  </p-inputNumber>
+                  <label for="float-input">Total Ganado</label>
+                </span>
+              </div>
+              <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                <span class="p-float-label">
+                  <p-dropdown [options]="listaGenero" formControlName="aseSexo"
+                    optionValue="identificadorClasificadorDetalle"
+                    optionLabel="nombreClasificadorDetalle"
+                    appendTo="body"
+                    [showClear]="true"></p-dropdown>
+                  <label for="float-input">Genero</label>
+                </span>
+              </div>
+            </div>
+            <hr>
+          </div>
+
+        </form>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple type="button" label="Cancelar" (click)="cerrarNuevoEmpleado()" icon="pi pi-times"
+            class="p-button-text"></button>
+          <button pButton pRipple type="button" [disabled]="personaForm.invalid" label="Guardar" icon="pi pi-check"
+            class="p-button-text" (click)="mostrarDialogoUsuarioGuardar()"></button>
+        </ng-template>
+      </p-dialog>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,147 @@
+<p-toast key="recurso" [baseZIndex]="99999"></p-toast>
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h3>Lista de Recursos</h3>
+      <h5>Visualización, adición, edición y eliminación</h5>
+      <div class="card">
+        <p-table #tablaRecursos [value]="recursosSistemas" [columns]="columnas" [tableStyle]="{ 'min-width': '50rem' }" responsiveLayout="scroll" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Buscar..." (input)="buscadorRecursos(tablaRecursos, $event)" class="w-full sm:w-auto"/>
+            </span>
+                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                  <button pButton pRipple label="Nuevo Recurso" icon="pi pi-plus"
+                  class="p-button-success mr-2" (click)="abrirNuevoRecurso();"></button>
+                </span>
+            </div>
+        </ng-template>
+          <ng-template pTemplate="header">
+              <tr>
+                  <th pSortableColumn="idRecurso">ID<p-sortIcon
+                    field="idRecurso"></p-sortIcon></th>
+                  <th pSortableColumn="nombreRecurso">Recurso<p-sortIcon
+                    field="nombreRecurso"></p-sortIcon></th>
+                  <th pSortableColumn="nombreRecursoPadre">Recurso Padre<p-sortIcon
+                    field="nombreRecursoPadre"></p-sortIcon></th>
+                  <th pSortableColumn="descripcionRecurso">Descripción<p-sortIcon
+                    field="descripcionRecurso"></p-sortIcon></th>
+                  <th pSortableColumn="nombreTipoRecurso">Tipo<p-sortIcon
+                    field="nombreTipoRecurso"></p-sortIcon></th>
+                  <th>Acciones</th>
+              </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-recursoSistema>
+              <tr>
+                  <td>{{ recursoSistema.idRecurso }}</td>
+                  <td>{{ recursoSistema.nombreRecurso  }}</td>
+                  <td>{{ recursoSistema.nombreRecursoPadre  }}</td>
+                  <td>{{ recursoSistema.descripcionRecurso  }}</td>
+                  <td>{{ recursoSistema.nombreTipoRecurso  }}</td>
+                  <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="abrirEditarRecurso(recursoSistema)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="mostrarDialogoEliminar(recursoSistema)"></button>
+                  </td>
+              </tr>
+          </ng-template>
+      </p-table>
+      </div>
+      <p-dialog [(visible)]="guardarRecursoDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+            <span>Desea Guardar Los Cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="guardarRecursoDialogo= false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarGuardadoRecurso()"></button>
+        </ng-template>
+    </p-dialog>
+    <p-dialog [(visible)]="eliminarRecursoDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+          <span *ngIf="recurso">Esta seguro que desea Eliminar  <b>{{recurso.nombreRecurso}}</b>? No podra deshacer los cambios</span>
+      </div>
+      <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="eliminarRecursoDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarEliminarRecurso()"></button>
+      </ng-template>
+  </p-dialog>
+      <form novalidate [formGroup]="recursoForm" (ngSubmit)="mostrarDialogoRecursoGuardar()">
+      <p-dialog [(visible)]="nuevoRecursoDialog"  [style]="{width: '80%',height:'58%' }" header="Agregar/editar Recurso" [modal]="true" class="p-fluid" (onHide)="cerrarNuevoRecurso()">
+        <br>
+        <ng-template pTemplate="content">
+          <div class="grid formgrid">
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <p-dropdown [options]="tiposRecursos" optionValue="idTipoRecurso" formControlName="idTipoRecurso" optionLabel="nombreTipoRecurso" [showClear]="true"></p-dropdown>
+                <label for="float-input">Seleccionar Tipo</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="text" pInputText formControlName="nombreRecurso"/>
+                <label for="float-input">Tipo Recurso</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <textarea pInputTextarea formControlName="descripcionRecurso" required rows="3" cols="20"></textarea>
+                <label for="float-input">Descripción Recurso</label>
+              </span>
+            </div>
+          </div>
+          <hr>
+          <div class="grid formgrid">
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="number" pInputText formControlName="idRecursoSuperior"/>
+                <label for="float-input">Recurso Superior</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <p-dropdown [options]="listaSistemas" optionValue="idSistema" formControlName="idSistema" optionLabel="identificadorSistema" [showClear]="true"></p-dropdown>
+                <label for="float-input">Seleccionar Sistema</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="text" pInputText formControlName="uri"/>
+                <label for="float-input">URL</label>
+              </span>
+            </div>
+          </div>
+          <hr>
+          <div class="grid formgrid">
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="number" pInputText formControlName="orden"/>
+                <label for="float-input">Orden</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <p-autoComplete  [suggestions]="listaIconos" formControlName="icono" (completeMethod)="filtrarIconos($event)" field="name" [dropdown]="true">
+                </p-autoComplete>
+                <label for="float-input">Icono</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <div class="field-checkbox">
+                <p-checkbox name="group1" formControlName="esVisible" [(ngModel)]="esVisible" [binary]="true"></p-checkbox>
+                <label for="ny">¿Es visible?</label>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple type="button"  label="Cancelar" (click)="cerrarNuevoRecurso()" icon="pi pi-times" class="p-button-text"></button>
+          <button pButton pRipple type="submit" [disabled]="recursoForm.invalid"  label="Guardar" icon="pi pi-check"  class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+  </form>
+    </div>
+  </div>
+</div>

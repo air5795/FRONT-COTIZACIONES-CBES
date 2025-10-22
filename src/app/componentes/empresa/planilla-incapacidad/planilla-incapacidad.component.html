@@ -1,0 +1,368 @@
+<p-toast key="planilla-incapacidad" [baseZIndex]="99999"></p-toast>
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h3>
+                <span > PLANILLAS DE INCAPACIDAD  <br> <hr style="margin: 4px; border: 1px solid #148b7e;">
+                  {{this.usuarioContexto.empresa}} - REGIONAL {{this.usuarioContexto.departamento}} </span>
+              </h3>
+          
+           
+                <p-table 
+                #tablaIncapacidades 
+                [value]="planillaIncapacidad" 
+                [columns]="columnas"
+                class="tabla-centrada" 
+                styleClass="p-datatable-gridlines" 
+                responsiveLayout="scroll" 
+                [rows]="25" 
+                [paginator]="true"
+                [rowsPerPageOptions]="[5,10,20,25,30]">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <!-- FILTROS -->
+                            <div class="flex flex-column md:flex-row md:gap-3">
+                              <span class="p-float-label">
+                                <p-dropdown [options]="listaTipoIncapacidad" [(ngModel)]="tipoIncapacidadSelect"
+                                    optionValue="idTipoIncapacidad" optionLabel="nombre"
+                                    (onChange)="listaIncapacidadSelect()" [showClear]="true"></p-dropdown>
+                                <label for="float-input">Lista de Incapacidades</label>
+                              </span>
+                              <span class="p-float-label">
+                                <p-calendar [iconDisplay]="'input'" [showIcon]="true" [(ngModel)]="fechaInicio"
+                                    dateFormat="dd/mm/yy" (ngModelChange)="listaIncapacidadSelect()"></p-calendar>
+                                <label for="float-input">Fecha Inicio</label>
+                              </span>
+                              <span class="p-float-label">
+                                <p-calendar [iconDisplay]="'input'" [showIcon]="true" [(ngModel)]="fechaFin"
+                                    dateFormat="dd/mm/yy" (ngModelChange)="listaIncapacidadSelect()"></p-calendar>
+                                <label for="float-input">Fecha Fin</label>
+                              </span>
+                            </div>
+                          
+                            <!-- BOTONES -->
+                            <div class="flex flex-column md:flex-row md:gap-3 md:ml-auto">
+                              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <button 
+                                pButton 
+                                pRipple 
+                                label="ADICIONAR" 
+                                icon="pi pi-plus" 
+                                class="p-button-success mr-2"
+                                (click)="abrirNuevoEmpleado()">
+                                </button>
+                              </span>
+                              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <button 
+                                pButton 
+                                pRipple 
+                                label="Generar Reporte" 
+                                icon="pi pi-print" 
+                                class="p-button-success mr-2"
+                                (click)="abrirDialogoReporte()">
+                                </button>
+                              </span>
+                              
+                            </div>
+                          </div>
+
+                          <p-dialog 
+                        header="Generar Reporte de Planilla de Incapacidad" 
+                        [(visible)]="dialogoReporteVisible" 
+                        [modal]="true" 
+                        [style]="{ width: '500px', height: 'auto' }" 
+                        [closable]="true"
+                        [dismissableMask]="true">
+                        <div class="p-fluid" style="padding: 5px;">
+                            <div class="p-field">
+                            <span class="p-float-label">
+                                <p-dropdown
+                                [style]="{ display: 'none' }"
+                                ></p-dropdown>
+                                <p-calendar 
+                                [iconDisplay]="'input'" 
+                                [showIcon]="true" 
+                                [(ngModel)]="fechaInicioReporte"
+                                dateFormat="dd/mm/yy"
+                                appendTo="body" 
+                                ></p-calendar>
+                                <label for="float-input">Fecha Inicio</label>
+                            </span>
+                            </div>
+                            <div class="p-field mt-3">
+                            <span class="p-float-label">
+                                <p-calendar 
+                                [iconDisplay]="'input'" 
+                                [showIcon]="true" 
+                                [(ngModel)]="fechaFinReporte"
+                                dateFormat="dd/mm/yy"
+                                appendTo="body" 
+                                ></p-calendar>
+                                <label for="float-input">Fecha Fin</label>
+                            </span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button 
+                            pButton 
+                            pRipple 
+                            label="GENERAR REPORTE" 
+                            icon="pi pi-print" 
+                            class="p-button-success" 
+                            [style]="{ width: '100%' }"
+                            (click)="generarReporte()">
+                            </button>
+                        </div>
+                        </p-dialog>
+
+
+                        
+                          
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th rowspan="2" pFrozenColumn>ID</th>
+                            <th rowspan="2">Nº Carnet</th>
+                            <th rowspan="2">Nº Matricula</th>
+                            <th rowspan="2">Nombre Completo</th>
+                            <th colspan="2" style="text-align: center;">Médica</th>
+                            <th rowspan="2" style="
+                                writing-mode: vertical-rl;
+                                transform: rotate(180deg);
+                                " pSortableColumn="nombreTipoRecurso">Días Incapacidad</th>
+                            <th colspan="2" style="text-align: center;">Fecha de Cotización</th>
+                            <th rowspan="2">Días</th>
+                            <th rowspan="2">Días CBES</th>
+                            <th rowspan="2">Total Ganado</th>
+                            <th rowspan="2">Total Día</th>
+                            <th rowspan="2">Total</th>
+                            <th rowspan="2">Porcentaje a cubrir</th>
+                            <th rowspan="2">Estado</th>
+                            <th rowspan="2">Observación</th>
+                            <th rowspan="2">Acciones</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: center;">Baja Médica</th>
+                            <th style="text-align: center;">Alta Médica</th>
+                            <th style="text-align: center;">Del</th>
+                            <!-- Subcolumna para la fecha inicial -->
+                            <th style="text-align: center;">Al</th>
+                            <!-- Subcolumna para la fecha final -->
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-planillaIncapacidad>
+                        <tr>
+                            <td pFrozenColumn alignFrozen="right">{{ planillaIncapacidad.idPlanillaIncapacidad }}</td>
+                            <td>{{ planillaIncapacidad.aseCi }}</td>
+                            <td>{{ planillaIncapacidad.matricula }}</td>
+                            <td>{{ planillaIncapacidad.nombreCompleto }}</td>
+                            <td class="table-centered">{{ planillaIncapacidad.bajaMedicaIni }}</td>
+                            <td class="table-centered">{{ planillaIncapacidad.bajaMedicaFin }}</td>
+                            <td >{{ planillaIncapacidad.diasIncapacidadInicial | number}}</td>
+                            <td>{{ planillaIncapacidad.fechaCotizacionDel }}</td>
+                            <td>{{ planillaIncapacidad.fechaCotizacionAl }}</td>
+                            <td style="text-align: center;">{{ planillaIncapacidad.dia | number}}</td>
+                            <td style="text-align: center;">{{ planillaIncapacidad.diaCbes | number }}</td>
+                            <td style="text-align: right; padding-right: 5px;">{{ planillaIncapacidad.totalGanadoMensual | number : '1.2-2' }}</td>
+                            <td style="text-align: right; padding-right: 5px;">{{ planillaIncapacidad.totalDia | number : '1.2-2' }}</td>
+                            <td style="text-align: right; padding-right: 5px;">{{ planillaIncapacidad.total | number : '1.2-2'}}</td>
+                            <td style="text-align: right; background-color: #f5fff7; padding-right: 5px;" >{{ planillaIncapacidad.totalPorcentajeCubrir | number : '1.2-2' }}</td>
+                            <td>{{ planillaIncapacidad.estado }}</td>
+                            <td>{{ planillaIncapacidad.observacion }}</td>
+                            <td>
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"></button>
+                                <button pButton pRipple icon="pi pi-trash"
+                                    class="p-button-rounded p-button-danger"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <tr>
+                          <td colspan="14" style="text-align: right; font-weight: bold;">
+                            Total:
+                          </td>
+                          <td style="text-align: right; background-color: #d1ffd6; font-weight: bold;">
+                            {{ totalGeneral | number: '1.2-2' }}
+                          </td>
+                          <td colspan="4"></td>
+                        </tr>
+                      </ng-template>
+                </p-table>
+          
+            <p-dialog [(visible)]="guardarIncapacidadDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+                    <span>Desea Guardar Los Cambios</span>
+                </div>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"
+                        (click)="guardarIncapacidadDialog= false"></button>
+                    <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si"
+                        (click)="confirmarGuardadoEmpleado()"></button>
+                </ng-template>
+            </p-dialog>
+            <p-dialog header="Confirm" [modal]="true" [style]="{width:'450px'}">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+                </div>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"></button>
+                    <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger"
+                        label="Si"></button>
+                </ng-template>
+            </p-dialog>
+            <!--/***FORMULARIO REGISTRO DE INCAPACIDAD***/-->
+            <p-dialog [(visible)]="nuevoEmpleadoDialog" [style]="{width: '70%',height:'50%' }"
+                header="Registro de Incapacidad" [modal]="true" class="p-fluid">
+                <br>
+                <form novalidate [formGroup]="empleadoForm">
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-4 lg:col-4 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="listaTipoIncapacidad" optionValue="idTipoIncapacidad"
+                                    optionLabel="nombre" formControlName="identificadorIncapacidad"
+                                    [showClear]="true"></p-dropdown>
+                                <label for="float-input">Tipo de Incapacidad</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-autoComplete [(ngModel)]="idEmpleadoSelect" [suggestions]="carnetsFiltrados"
+                                    (onSelect)="onEmpleadoSelected($event)" (completeMethod)="filterCountry($event)"
+                                    field="aseMatTit" [dropdown]="true" inputId="float-input" formControlName="matricula">
+                                </p-autoComplete>
+                                <label for="float-input">Matrícula</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-2 lg:mb-0">
+                            <span class="p-float-label">
+                                <input type="text" formControlName="aseCi" pInputText>
+                                <label for="float-input">Carnet de Identidad</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                            <span class="p-float-label">
+                                <input type="text" formControlName="nombreCompleto" pInputText>
+                                <label for="float-input">Nombre Completo</label>
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-calendar 
+                                    [showIcon]="true" 
+                                    inputId="icon"
+                                    dateFormat="dd/mm/yy"
+                                    appendTo="body"
+                                    formControlName="bajaMedicaIni"
+                                    ></p-calendar>
+                                <label for="float-input">Baja Médica (dd/mm/aaaa)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-1 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-calendar  
+                                    [iconDisplay]="'input'" 
+                                    [showIcon]="true" 
+                                    [timeOnly]="true" 
+                                    inputId="templatedisplay"
+                                    formControlName= "bajaMedicaHora">
+                                        <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                            <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                        </ng-template>
+                                </p-calendar>
+                                <label for="float-input">Hora</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-calendar [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy" appendTo="body"
+                                    formControlName="bajaMedicaFin" (onSelect)="calculaDiasBaja()"></p-calendar>
+                                <label for="float-input">Alta Médica (dd/mm/aaaa)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-inputNumber
+                                formControlName="diasIncapacidadInicial"
+                                />
+                                <label for="float-input">Días de Incapacidad Inicial</label>
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-calendar [disabled]="true" [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy"
+                                    formControlName="fechaCotizacionDel"></p-calendar>
+                                <label for="float-input">Fecha de Cotización del: (dd/mm/aaaa)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-calendar [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy"
+                                    formControlName="fechaCotizacionAl"
+                                ></p-calendar>
+                                <label for="float-input">fecha de Cotizacion al: (dd/mm/aaaa)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <input type="text" pInputText formControlName="dia">
+                                <label for="float-input">Día</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <input type="text" pInputText formControlName="diaCbes">
+                                <label for="float-input">Día CBES</label>
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-inputNumber formControlName="totalGanadoMensual" inputId="totalGanadoMensual"
+                                    mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" />
+                                <label for="float-input">Total Ganado Mensual (Bs)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-inputNumber formControlName="totalDia" inputId="totalGanadoMensual" mode="decimal"
+                                    [minFractionDigits]="2" [maxFractionDigits]="5" />
+                                <label for="float-input">Total Día (Bs)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-inputNumber formControlName="total" inputId="totalGanadoMensual" mode="decimal"
+                                    [minFractionDigits]="2" [maxFractionDigits]="5" />
+                                <label for="float-input">Total (Bs)</label>
+                            </span>
+                        </div>
+                        <div class="col-12 mb-2 lg:col-3 lg:mb-0">
+                            <span class="p-float-label">
+                                <p-inputNumber formControlName="totalPorcentajeCubrir" inputId="totalPorcentajeCubrir"
+                                    mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" />
+                                <label for="float-input">Total a Cubrir (Bs)
+                                    <b>{{this.porcentajeIncapacidadLaboral}}%</b></label>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple type="button" label="Cancelar" (click)="cerrarRegistroIncapacidad()"
+                        icon="pi pi-times" class="p-button-text"></button>
+                    <button pButton pRipple type="button" [disabled]="empleadoForm.invalid" label="Guardar"
+                        icon="pi pi-check" class="p-button-text" (click)="mostrarDialogoIncapacidadGuardar()"></button>
+                </ng-template>
+            </p-dialog>
+        </div>
+    </div>
+</div>

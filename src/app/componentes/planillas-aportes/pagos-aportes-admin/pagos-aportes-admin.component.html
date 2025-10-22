@@ -1,0 +1,260 @@
+
+<div class="header pagos-aportes-admin">
+  <div class="header-left">
+    <h2 style="font-size: 30px;">  GESTOR PAGOS APORTES</h2>
+    <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+    <span class="numero-patronal">Control Historico de Pagos </span>
+  </div>
+  <div class="header-right">
+    <div class="button-container">
+       <button 
+      pButton 
+      type="button" 
+      label="Ver Aportes Por mes y año "
+      icon="pi pi-file-pdf"
+      [style]="{backgroundColor: '#42ab7f', color: 'white', borderRadius: '5px'}"
+      (click)="showHistorialDialog()"
+    ></button> 
+    </div>
+  </div>
+</div>
+  
+
+<p-table 
+  #tablaPlanillasAportes
+  class="tabla-centrada"
+  [value]="pagos"
+  [paginator]="true" 
+  [rows]="10"
+  responsiveLayout="scroll"
+  [rowsPerPageOptions]="[5,10,20,25,30]"
+  styleClass="p-datatable-gridlines"
+  [loading]="loading"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+      <span class="block mt-2 md:mt-0 p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          (input)="onGlobalFilter($event)"
+          placeholder="Buscar..."
+          class="w-full sm:w-auto"
+        />
+      </span>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="header" >
+    <tr style="font-size: 13px;">
+      <th style="width: 350px; text-align: center;">Empresa</th>
+      <th style="width: 20px; text-align: center;">N° Recibo</th>
+      <th style="width: 150px; text-align: center;">N° Comprobante de Formulario</th>
+      
+      <th>Fecha Planilla</th>
+      <th>Fecha Pago</th>
+      <th style="width: 150px; text-align: center;">Comprobante de Pago</th>
+      <th style="width: 150px; text-align: center;">Monto Pagado</th>
+      <th style="width: 150px; text-align: center;">Demasia</th>
+      <th>Metodo de pago</th>
+      <th>Observaciones</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-pago>
+    <tr style="font-size: 13px;">
+      <td style="text-align: left; padding-left: 5px;">{{ pago.empresa }}</td>
+      <td>{{ pago.numero_recibo }}</td>
+      <td>form - {{ pago.com_nro }}</td>
+      
+      <td>{{ pago.fecha_planilla }}</td>
+      <td>{{ pago.fecha_pago }}</td>
+      <td>{{ pago.comprobante_pago }}</td>
+      <td style="background-color: #dbffe7;">
+        <span>{{ pago.monto_pagado | currency:'BOB':'symbol':'1.2-2' }}</span>
+      </td>
+      <td style="background-color: #faffdb;">
+        <span>{{ pago.monto_demasia | currency:'BOB':'symbol':'1.2-2' }}</span>
+      </td>
+      <td>{{ pago.metodo_pago }}</td>
+      <td>{{ pago.observaciones }}</td>
+      <td>
+        <div class="action-buttons-container">
+          <button 
+            *ngIf="puedeEditarYDescargar"
+            class="action-btn btn-download"
+            [disabled]="showLoadingRecibo"
+            (click)="Recibo(pago.id_planilla_aportes)">
+            <i class="pi pi-download"></i>
+            <span>Descargar</span>
+          </button>
+          <button 
+            class="action-btn btn-view"
+            [disabled]="!pago.foto_comprobante" 
+            (click)="openImageDialog(pago)">
+            <i class="pi pi-eye"></i>
+            <span>Ver</span>
+          </button>
+          <button 
+            *ngIf="puedeEditarYDescargar"
+            class="action-btn btn-edit"
+            (click)="editarObservaciones(pago)">
+            <i class="pi pi-pencil"></i>
+            <span>Editar</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="8">No se encontraron pagos.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+
+<!-- Modal para mostrar la imagen o PDF -->
+<p-dialog 
+  #imageDialog 
+  
+  [(visible)]="displayImageDialog" 
+  [modal]="true" 
+  [style]="{ width: '850px' }" 
+  [closable]="true"
+  (onHide)="selectedImageUrl = ''"
+>
+  <div class="image-container">
+    <!-- Verificación alternativa para PDFs -->
+    <iframe 
+      *ngIf="selectedImageUrl && selectedImageUrl.endsWith('.pdf')" 
+      [src]="selectedImageUrl | safeUrl" 
+      style="width: 800px; height: 600px; border: none;" 
+      type="application/pdf" 
+      frameborder="0"
+      (error)="onIframeError($event)"
+    ></iframe>
+    <div *ngIf="selectedImageUrl && selectedImageUrl.endsWith('.pdf') && !isPdfLoaded" class="pdf-error">
+      <p>No se pudo cargar el PDF. <a [href]="selectedImageUrl" target="_blank">Haga clic aquí para descargarlo</a>.</p>
+    </div>
+    <img 
+      *ngIf="selectedImageUrl && !selectedImageUrl.endsWith('.pdf')" 
+      [src]="selectedImageUrl" 
+      style="width: 800px; height: auto; max-height: 600px; object-fit: contain;" 
+      alt="Comprobante"
+    >
+  </div>
+
+</p-dialog>
+
+
+
+
+
+
+
+
+<p-dialog 
+  header="Generar Reporte de Historial" 
+  [(visible)]="displayHistorialDialog" 
+  [modal]="true" 
+  [style]="{width: '400px' , height: '500px'}"
+>
+  <div class="p-fluid">
+    <div class="p-field">
+      <label for="mes">Mes</label>
+      <p-dropdown 
+        id="mes" 
+        [options]="meses" 
+        [(ngModel)]="mes" 
+        placeholder="Seleccione un mes" 
+        optionLabel="label" 
+        optionValue="value"
+      ></p-dropdown>
+    </div>
+    <div class="p-field">
+      <label for="gestion">Año</label>
+      <p-dropdown 
+        id="gestion" 
+        [options]="gestiones" 
+        [(ngModel)]="gestion" 
+        placeholder="Seleccione un año"
+      ></p-dropdown>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button 
+      pButton 
+      type="button" 
+      label="Cancelar" 
+      class="p-button-secondary" 
+      (click)="displayHistorialDialog = false"
+    ></button>
+    <button 
+      pButton 
+      type="button" 
+      label="Generar Reporte" 
+      (click)="generarReporteHistorial()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Nuevo diálogo para editar observaciones -->
+<p-dialog 
+  header="Editar Observaciones" 
+  [(visible)]="displayObservacionesDialog" 
+  [modal]="true" 
+  [style]="{width: '500px'}"
+  [closable]="true"
+  (onHide)="cerrarDialogObservaciones()"
+>
+  <div class="p-fluid">
+    <div class="p-field">
+      <label for="observaciones">Observaciones</label>
+      <textarea 
+        id="observaciones"
+        pInputTextarea 
+        [(ngModel)]="nuevaObservacion" 
+        rows="4" 
+        cols="50"
+        placeholder="Ingrese las observaciones..."
+        style="resize: vertical; min-height: 100px;"
+      ></textarea>
+    </div>
+    
+    <div *ngIf="selectedPago" class="p-field" style="margin-top: 15px;">
+      <small class="p-text-secondary">
+        <strong>Pago ID:</strong> {{ selectedPago.id }} |  
+        <strong>Monto:</strong> {{ selectedPago.monto_pagado | currency:'BOB':'symbol':'1.2-2' }}
+      </small>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button 
+      pButton 
+      type="button" 
+      label="Cancelar" 
+      class="p-button-secondary" 
+      (click)="cerrarDialogObservaciones()"
+    ></button>
+    <button 
+      pButton 
+      type="button" 
+      label="Guardar" 
+      class="p-button-primary"
+      (click)="guardarObservaciones()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Loading overlay para generar recibo -->
+<app-loading-componente 
+  *ngIf="showLoadingRecibo"
+  [progress]="loadingProgress"
+  [message]="loadingMessage">
+</app-loading-componente>

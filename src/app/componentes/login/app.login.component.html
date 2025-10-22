@@ -1,0 +1,135 @@
+
+<div class="total">
+    <div class="log">
+      <div class="login-panel p-fluid">
+        <div class="container">
+          <div class="header" style="text-align: center; color: white;">
+            <img src="../../../assets/demo/images/galleria/logo-text2.png" class="logo">
+            <h4>SISTEMA - COTIZACIONES</h4>
+            <hr>
+          </div>
+          
+          <form novalidate (ngSubmit)="verificarUsuario()" [formGroup]="usuario">
+            <div class="form-field">
+              <label for="usuario" style="color: white;">Usuario</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-user"></i>
+                </span>
+                <input id="usuario" type="text" class="p-inputtext-lg" formControlName="usuario" pInputText />
+              </div>
+            </div>
+            
+            <div class="form-field">
+              <label for="contrasenia" style="color: white;">Contraseña</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-lock"></i>
+                </span>
+                <input id="contrasenia" type="password" class="p-inputtext-lg" formControlName="contrasenia" pInputText />
+              </div>
+            </div>
+            
+            <div class="button-container">
+              <button 
+                pButton 
+                type="submit" 
+                [disabled]="usuario.invalid" 
+                label="Ingresar Sistema" 
+                icon="pi pi-sign-in"
+                class="login-button"
+              ></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.total {
+  width: 100%;
+  min-height: 100vh;
+  background: url('../../../assets/demo/images/galleria/FONDO15.png') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+}
+
+.log {
+  background-color: rgba(255, 255, 255, 0.16);
+  padding: clamp(20px, 5vw, 50px);
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 450px;
+  margin-right: clamp(20px, 10vw, 150px);
+}
+
+.logo {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+}
+
+.form-field {
+  margin-bottom: 1.5rem;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.login-button {
+  background: #1c5546b8 !important;
+  color: white !important;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .total {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .log {
+    margin-right: 0;
+    max-width: 100%;
+  }
+
+  .logo {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .log {
+    padding: 15px;
+  }
+
+  .header h4 {
+    font-size: 1.2rem;
+  }
+
+  .form-field {
+    margin-bottom: 1rem;
+  }
+
+  .login-button {
+    padding: 0.5rem;
+  }
+}
+</style> 

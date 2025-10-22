@@ -1,0 +1,111 @@
+<p-dialog 
+  [(visible)]="visible" 
+  (onHide)="onHide()"
+  [modal]="true" 
+  [style]="{width: '600px'}"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false">
+  
+  <ng-template pTemplate="header">
+    <div class="dialog-header-custom">
+      <i class="pi pi-upload" style="margin-right: 10px; color: #007ad9;"></i>
+      <span class="dialog-title">Subir Archivo de Denuncia</span>
+    </div>
+  </ng-template>
+
+  <div class="upload-container">
+    <!-- Área de selección de archivo -->
+    <div class="upload-section" *ngIf="!archivoSeleccionado">
+      <p-fileUpload 
+        mode="basic" 
+        name="archivo_denuncia"
+        accept="image/*,.pdf"
+        [maxFileSize]="5242880"
+        [auto]="false"
+        chooseLabel="Seleccionar Archivo"
+        (onSelect)="onFileSelect($event)"
+        [disabled]="cargando">
+      </p-fileUpload>
+      
+      <div class="upload-info">
+        <p><i class="pi pi-info-circle"></i> Formatos permitidos: JPG, PNG, PDF</p>
+        <p><i class="pi pi-info-circle"></i> Tamaño máximo: 5 MB</p>
+      </div>
+    </div>
+
+    <!-- Previsualización del archivo -->
+    <div class="preview-section" *ngIf="archivoSeleccionado && previsualizacion">
+      <h4><i class="pi pi-eye"></i> Previsualización del Archivo</h4>
+      
+      <div class="file-preview-card">
+        <!-- Previsualización de imagen -->
+        <div class="image-preview" *ngIf="previsualizacion.url">
+          <img [src]="previsualizacion.url" alt="Previsualización" />
+        </div>
+        
+        <!-- Icono para PDF -->
+        <div class="pdf-preview" *ngIf="!previsualizacion.url && previsualizacion.tipo === 'application/pdf'">
+          <i class="pi pi-file-pdf" style="font-size: 4rem; color: #dc3545;"></i>
+        </div>
+        
+        <!-- Información técnica del archivo -->
+        <div class="file-info">
+          <div class="info-row">
+            <span class="info-label"><i class="pi pi-file"></i> Nombre:</span>
+            <span class="info-value">{{ previsualizacion.nombre }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><i class="pi pi-tag"></i> Tipo:</span>
+            <span class="info-value">{{ previsualizacion.extension }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><i class="pi pi-database"></i> Tamaño:</span>
+            <span class="info-value">{{ previsualizacion.tamano }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="action-buttons">
+        <button 
+          pButton 
+          type="button" 
+          label="Cambiar Archivo" 
+          icon="pi pi-refresh" 
+          class="p-button-secondary"
+          (click)="archivoSeleccionado = null; previsualizacion = null"
+          [disabled]="cargando">
+        </button>
+        
+        <button 
+          pButton 
+          type="button" 
+          label="Subir Archivo" 
+          icon="pi pi-upload" 
+          class="p-button-success"
+          (click)="subirArchivo()"
+          [loading]="cargando">
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de carga -->
+    <div class="loading-section" *ngIf="cargando">
+      <p-progressSpinner></p-progressSpinner>
+      <p>Subiendo archivo...</p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button 
+      pButton 
+      type="button" 
+      label="Cancelar" 
+      icon="pi pi-times" 
+      class="p-button-text"
+      (click)="cerrarModal()"
+      [disabled]="cargando">
+    </button>
+  </ng-template>
+</p-dialog>

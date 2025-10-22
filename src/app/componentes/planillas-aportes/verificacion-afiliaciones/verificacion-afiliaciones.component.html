@@ -1,0 +1,210 @@
+
+<!-- verificacion-afiliaciones.component.html -->
+<div class="verificacion-afiliaciones-container">
+  <!-- Loading Component -->
+  <app-loading-componente 
+    *ngIf="loading || descargandoReporte"
+    [progress]="descargandoReporte ? progresoDescarga : progresoVerificacion"
+    [message]="descargandoReporte ? mensajeDescarga : mensajeProgreso"
+    class="loading-overlay">
+  </app-loading-componente>
+
+  <!-- Control Section (Full Width, Hidden After Verification) -->
+  <div class="card control-card" *ngIf="!loading && !descargandoReporte && !verificacionCompleta">
+    <div class="card-header">
+      <h5 class="card-title">
+        <i class="pi pi-search"></i> Verificación de Afiliaciones
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="verification-controls">
+        <i class="pi pi-search info-icon" style="font-size: 4rem; color: #009688;"></i>
+        <h4>Verificar Afiliaciones</h4>
+        <p class="text-muted">
+          Comprueba si los {{ infoPlanilla?.total_trabaj || 'N/A' }} trabajadores están registrados.
+        </p>
+        <div class="button-group">
+          <button 
+            pButton 
+            type="button" 
+            label="Iniciar Verificación" 
+            icon="pi pi-play" 
+            class="p-button-primary"
+            [disabled]="loading || !infoPlanilla || descargandoReporte"
+            (click)="iniciarVerificacion()">
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Grid (Two Columns) -->
+  <div class="results-grid" *ngIf="verificacionCompleta && !loading && !descargandoReporte">
+    <!-- Verification Summary (Left Column) -->
+    <div class="cards-section">
+      <div class="card summary-card" *ngIf="resumenVerificacion">
+        <div class="card-header">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            
+            <span style="font-weight: 600; color: #00796b; font-size: 0.9rem;"> Resumen de Verificación</span>
+            
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="stat-grid">
+            <div class="stat-card total">
+              <div style="padding: 15px; text-align: center;">
+                <i class="pi pi-users stat-icon"></i>
+                <div class="stat-content">
+                  <div style="font-size: 2.5rem; color: #00695c;">
+                    {{ resumenVerificacion.total_consultados }}
+                  </div>
+                  <div style="color: #616161;  margin-top: 5px;">Total Consultados</div>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card success">
+              <div style="padding: 15px; text-align: center;">
+                <i class="pi pi-check-circle stat-icon"></i>
+                <div class="stat-content">
+                  <div style="font-size: 2.5rem; color: #00695c;">
+                    {{ resumenVerificacion.encontrados_en_afiliaciones }}
+                  </div>
+                  <div style="color: #616161;  margin-top: 5px;">
+                    Encontrados {{ resumenVerificacion.porcentaje_encontrados }}
+                
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card warning">
+              <div style="padding: 15px; text-align: center;">
+                <i class="pi pi-exclamation-circle stat-icon"></i>
+                <div class="stat-content">
+                  <div style="font-size: 2.5rem; color: #00695c;">
+                    {{ resumenVerificacion.no_encontrados_en_afiliaciones }}
+                  </div>
+                  <div style="color: #616161;  margin-top: 5px;">No Encontrados</div>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card error">
+              <div style="padding: 15px; text-align: center;">
+                <i class="pi pi-times-circle stat-icon"></i>
+                <div class="stat-content">
+                  <div style="font-size: 2.5rem; color: #00695c;">
+                    {{ resumenVerificacion.consultas_con_error }}
+                  </div>
+                  <div style="color: #616161;  margin-top: 5px;">Errores</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Problems Table or Success Message (Right Column) -->
+    <div class="data-container">
+      <div class="card result-card">
+        <!-- Problems Table -->
+        <div *ngIf="resultadosNoEncontrados.length > 0; else successMessage">
+          <div class="card-header">
+                <div style="display: flex; align-items: center;">
+                    <span style="font-weight: 600; color: #00796b; font-size: 0.9rem;">
+                    Trabajadores con Problemas ({{ resultadosNoEncontrados.length }}) 
+                    </span>
+                    <button 
+                    pButton 
+                    type="button" 
+                    label="Descargar Reporte" 
+                    icon="pi pi-download" 
+                    class="p-button-success"
+                    style="margin-left: auto;"
+                    [disabled]="descargandoReporte"
+                    (click)="descargarReporte()">
+                    </button>
+                </div>
+                </div>
+          <div class="card-body">
+            <p-table 
+              [value]="resultadosNoEncontrados" 
+              [paginator]="true" 
+              [rows]="5"
+              [showCurrentPageReport]="true"
+              currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+              [rowsPerPageOptions]="[5, 10, 25]"
+              styleClass="p-datatable-striped p-datatable-sm">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 60px;">Nro.</th>
+                  <th>CI</th>
+                  <th>Nombre</th>
+                  
+                  <th>Observaciones</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-resultado let-i="rowIndex">
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td class="font-weight-bold">{{ resultado.ci }}</td>
+                  <td>{{ resultado.nombre_completo }}</td>
+
+                  <td class="text-muted" style="background-color: #fdd3db;">{{ resultado.mensaje }}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="5" class="text-center">
+                    <div class="empty-state">
+                      <i class="pi pi-check-circle"></i>
+                      <h5>¡Excelente!</h5>
+                      <p>Todos los trabajadores están registrados.</p>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+
+          </div>
+        </div>
+
+
+
+
+
+        <!-- Success Message -->
+        <ng-template #successMessage>
+          <div class="card-body">
+            <div class="success-state">
+              <i class="pi pi-check-circle icon-large"></i>
+              <h4>¡Verificación Exitosa!</h4>
+              <p class="text-muted">
+                Todos los {{ resumenVerificacion?.encontrados_en_afiliaciones || 'N/A' }} trabajadores están registrados.
+              </p>
+              <div class="button-group">
+                <button 
+                  pButton 
+                  type="button" 
+                  label="Descargar Reporte" 
+                  icon="pi pi-download" 
+                  class="p-button-success"
+                  [disabled]="descargandoReporte"
+                  (click)="descargarReporte()">
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Toast for Messages -->
+  <p-toast></p-toast>
+</div>
+
+

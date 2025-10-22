@@ -1,0 +1,347 @@
+<div class="container">
+    <div style="display: flex; align-items: center; justify-content: space-between;  background-color: #e3e3e3; padding: 5px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="pi pi-money-bill" style="color: #2f7a3f; font-size: 1.5rem;"></i>
+          <span style="font-size: 1.25rem; font-weight: bold; color: #5f5f5f;">Pagos Mensuales</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button 
+          pButton 
+          style="border: 1px;" 
+          label="Subir Pago" 
+          class="p-button-outlined p-button-primary mr-2" 
+          icon="pi pi-plus" 
+          (click)="openCreatePagoDialog()"
+          [disabled]="pagos.length > 0">
+      </button>
+          <button pButton type="button" class="p-button p-button-sm" style="display: flex; align-items: center; gap: 15px; padding: 7px 10px; font-size: large; background-color: #007d00;">
+            <i class="pi pi-wallet"></i> <span> {{totalRecords}}</span>
+          </button>
+          
+        </div>
+      </div>
+    
+  
+<div class="container">
+
+  
+    <!-- Tabla PrimeNG -->
+    <p-table
+      [value]="pagos"
+      [paginator]="true"
+      [rows]="limite"
+      [totalRecords]="totalRecords"
+      [loading]="loading"
+      [rowsPerPageOptions]="[5, 10, 15, 20, -1]"
+      [pageLinks]="5"
+      [lazy]="true"
+      responsiveLayout="scroll"
+      styleClass="p-datatable-sm p-datatable-striped"
+      [style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+      (onLazyLoad)="loadPagos($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando registros del {first} al {last} de un total de {totalRecords} registros"
+    >
+
+      <ng-template pTemplate="header">
+        <tr style="background-color: #f8f9fa;">
+          
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha Pago</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Monto Pagado</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Método Pago</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Comprobante</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Observaciones</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Foto Comprobante</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-pago let-i="rowIndex">
+        <tr style="background-color: #d5ffe9;">
+         
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ pago.fecha_pago | formatFecha }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ pago.monto_pagado }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ pago.metodo_pago }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ pago.comprobante_pago }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ pago.observaciones }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">
+            <button 
+              pButton 
+              label="Ver comprobante"
+              icon="pi pi-eye" 
+              class="p-button p-button-primary" 
+              [disabled]="!pago.foto_comprobante" 
+              style="width: 100%;"
+              (click)="openImageDialog(pago)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <!-- Template para cuando no hay datos -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 20px; background-color: #fff;">
+            <div class="no-data-message">
+              <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+              <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No tiene pagos realizados para esta planilla de aportes</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  
+
+  
+
+  </div>
+    <!-- Modal para crear pago -->
+<p-messages></p-messages>
+
+<p-dialog 
+  #createPagoDialog 
+  header="Crear Nuevo Pago" 
+  [(visible)]="displayDialog" 
+  [modal]="true" 
+  [style]="{ width: '90vw', height: '90vh' }" 
+  [closable]="true"
+  (onHide)="onDialogHide()"
+>
+  <form [formGroup]="pagoForm" (ngSubmit)="onSubmit()" class="p-fluid">
+    <!-- Campo para seleccionar la fecha de pago -->
+    <div class="p-field">
+      <label for="fecha_pago">Fecha de Pago</label>
+      <input 
+        pInputText 
+        type="datetime-local" 
+        id="fecha_pago" 
+        formControlName="fecha_pago" 
+        required
+      >
+      <small *ngIf="pagoForm.get('fecha_pago')?.invalid && pagoForm.get('fecha_pago')?.touched" class="p-error">
+        La fecha de pago es obligatoria.
+      </small>
+    </div>
+
+    <!-- Botón para calcular o recalcular -->
+    <div class="p-field">
+      <button 
+        pButton 
+        type="button" 
+        [label]="calculoDetalles ? 'Recalcular Pago' : 'Calcular Pago'" 
+        (click)="calcularTotalACancelar()" 
+        [disabled]="pagoForm.get('fecha_pago')?.invalid || calculating"
+        [loading]="calculating"
+        class="p-button-primary"
+      ></button>
+    </div>
+
+    <!-- Mostrar la tabla con los detalles del cálculo -->
+    <div *ngIf="calculoDetalles" class="container">
+      <h3>Detalles del Cálculo</h3>
+      <p-table 
+        [value]="[calculoDetalles]" 
+        styleClass="p-datatable-striped"
+        [style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr style="padding: 30px;">
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">SALARIO COTIZABLE</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">APORTE AP=10% AV=3%</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">UFV DIA OBLIG. FORMAL</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">UFV DIA PRESENTACION</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">FECHA PRESENTACION OFICIAL</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">FECHA DE DEPOSITO O PRESENTACION</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">AP. PATRONAL ACTUALIZADO</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">MONTO ACTUALIZADO</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">1% MULTA POR LA NO PRESENTACION PLANILLA</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">DIAS DE RETRASO</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">INTERES</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">MULTAS S/INT.10%</th>
+            <th style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">TOTAL PARCIAL</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-detalles>
+          <tr>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.total_importe === 0 ? 'red' : 'inherit'}">
+              {{ detalles.total_importe | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">
+              {{ detalles.aporte_porcentaje | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td style="text-align: center; padding: 20px; border: 1px solid #dee2e6; background-color: #ffffec;">
+              {{ detalles.ufv_dia_formal | number:'1.5-5' }}
+            </td>
+            <td style="text-align: center; padding: 20px; border: 1px solid #dee2e6; background-color: #e5ffed;">
+              {{ detalles.ufv_dia_presentacion | number:'1.5-5' }}
+            </td>
+            <td style="text-align: center; padding: 20px; border: 1px solid #dee2e6; background-color: #ffffec;">
+              {{ detalles.fecha_declarada | date:'dd/MM/yyyy' : '-0400' }}
+            </td>
+            <td style="text-align: center; padding: 20px; border: 1px solid #dee2e6; background-color: #e5ffed;">
+              {{ detalles.fecha_pago | date:'dd/MM/yyyy' : '-0400' }}
+            </td>
+            <td style="text-align: center; padding: 20px; border: 1px solid #dee2e6;">
+              {{ detalles.aporte_actualizado | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.monto_actualizado === 0 ? 'red' : 'inherit'}">
+              {{ detalles.monto_actualizado | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.multa_no_presentacion === 0 ? 'red' : 'inherit'}">
+              {{ detalles.multa_no_presentacion | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.dias_retraso === 0 ? 'red' : 'inherit'}">
+              {{ detalles.dias_retraso }}
+            </td>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.intereses === 0 ? 'red' : 'inherit'}">
+              {{ detalles.intereses | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.multa_sobre_intereses === 0 ? 'red' : 'inherit'}">
+              {{ detalles.multa_sobre_intereses | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td [ngStyle]="{'text-align': 'center', 'padding': '20px', 'border': '1px solid #dee2e6', 'color': detalles.total_a_cancelar_parcial === 0 ? 'red' : 'inherit'}">
+              {{ detalles.total_a_cancelar_parcial | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="12" style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              Total Multas:
+            </td>
+            <td style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              {{ calculoDetalles.total_multas | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              Total Tasa de Interés:
+            </td>
+            <td style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              {{ calculoDetalles.total_tasa_interes | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              Form DS-08:
+            </td>
+            <td style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              5,00 BOB
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              Total Aportes ASUSS:
+            </td>
+            <td style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              - {{ calculoDetalles.total_aportes_asuss | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              Total Aportes Ministerio de Salud:
+            </td>
+            <td style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              - {{ calculoDetalles.total_aportes_min_salud | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">
+              Total a Cancelar:
+            </td>
+            <td style="text-align: right; padding: 10px; border: 1px solid #dee2e6; font-weight: bold; background-color: #e5ffed;">
+              {{ calculoDetalles.total_a_cancelar | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Campos adicionales, habilitados solo después de calcular -->
+    <div *ngIf="calculoDetalles">
+      <div class="p-field">
+        <label for="monto_pagado">Monto Pagado</label>
+        <input pInputText type="number" id="monto_pagado" formControlName="monto_pagado" step="0.01" required>
+        <small *ngIf="pagoForm.get('monto_pagado')?.hasError('montoInsuficiente') && pagoForm.get('monto_pagado')?.touched" class="p-error">
+          El monto pagado no puede ser menor que el total a cancelar ({{ calculoDetalles.total_a_cancelar | currency:'BOB':'symbol':'1.2-2' }}).
+        </small>
+        <small *ngIf="pagoForm.get('monto_pagado')?.hasError('required') && pagoForm.get('monto_pagado')?.touched" class="p-error">
+          El monto pagado es obligatorio.
+        </small>
+    </div>
+      <div class="p-field">
+        <label for="metodo_pago">Método de Pago</label>
+        <input pInputText id="metodo_pago" formControlName="metodo_pago">
+      </div>
+      <div class="p-field">
+        <label for="comprobante_pago">Comprobante de Pago</label>
+        <input pInputText id="comprobante_pago" formControlName="comprobante_pago">
+      </div>
+      <div class="p-field">
+        <label for="observaciones">Observaciones</label>
+        <textarea pInputTextarea id="observaciones" formControlName="observaciones"></textarea>
+      </div>
+      <div class="p-field">
+        <label for="foto_comprobante">Subir Comprobante (Imagen/PDF)</label>
+        <input pInputText type="file" id="foto_comprobante" (change)="onFileSelected($event)" accept="image/jpeg,image/png,application/pdf">
+        <small *ngIf="!selectedFile && pagoForm.touched" class="p-error">
+          Debes subir un comprobante.
+        </small>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="p-field" *ngIf="calculoDetalles">
+      <button 
+        pButton 
+        type="submit" 
+        label="Crear" 
+        [disabled]="pagoForm.invalid || !selectedFile" 
+        class="p-button-primary"
+      ></button>
+      <button 
+        pButton 
+        type="button" 
+        label="Cancelar" 
+        class="p-button-secondary" 
+        (click)="displayDialog = false"
+      ></button>
+    </div>
+  </form>
+</p-dialog>
+
+
+
+<!-- Modal para mostrar la imagen o PDF -->
+<p-dialog 
+  #imageDialog 
+  
+  [(visible)]="displayImageDialog" 
+  [modal]="true" 
+  [style]="{ width: '850px' }" 
+  [closable]="true"
+  (onHide)="selectedImageUrl = ''"
+>
+  <div class="image-container">
+    <!-- Verificación alternativa para PDFs -->
+    <iframe 
+      *ngIf="selectedImageUrl && selectedImageUrl.endsWith('.pdf')" 
+      [src]="selectedImageUrl | safeUrl" 
+      style="width: 800px; height: 600px; border: none;" 
+      type="application/pdf" 
+      frameborder="0"
+      (error)="onIframeError($event)"
+    ></iframe>
+    <div *ngIf="selectedImageUrl && selectedImageUrl.endsWith('.pdf') && !isPdfLoaded" class="pdf-error">
+      <p>No se pudo cargar el PDF. <a [href]="selectedImageUrl" target="_blank">Haga clic aquí para descargarlo</a>.</p>
+    </div>
+    <img 
+      *ngIf="selectedImageUrl && !selectedImageUrl.endsWith('.pdf')" 
+      [src]="selectedImageUrl" 
+      style="width: 800px; height: auto; max-height: 600px; object-fit: contain;" 
+      alt="Comprobante"
+    >
+  </div>
+
+</p-dialog>
+
+
+  </div>

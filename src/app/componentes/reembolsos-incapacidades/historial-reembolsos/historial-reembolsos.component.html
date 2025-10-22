@@ -1,0 +1,128 @@
+<div class="grid dashboard historial-reembolsos">
+  <div class="col-12 md:col-12 lg:6">
+      <div class="perfil-empleador">
+        <div class="header">
+          <div class="header-left">
+            <h2 style="font-size: 30px;"> <i class="pi pi-history" style="font-size: 2.5rem"></i> HISTORIAL DE REEMBOLSOS </h2>
+            <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+            <span class="numero-patronal">Control Histórico de Todas las Solicitudes Presentadas</span>
+          </div>
+          <div class="header-right">
+            <div class="button-container">        
+
+            </div>
+          </div>
+        </div>
+
+<p-table 
+[value]="solicitudes" 
+[paginator]="true"
+[rows]="limite" 
+[totalRecords]="totalRegistros" 
+(onPage)="onPageChange($event)"
+[rowsPerPageOptions]="[5,10,20,25,30]"
+[pageLinks]="3" 
+class="tabla-centrada" 
+#tablaHistorialReembolsos
+>
+
+<ng-template pTemplate="caption" >
+  <div class="flex justify-content-between flex-column sm:flex-row align-items-center" >
+    <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="cargarSolicitudes()"></button>
+    <div class="flex flex-column sm:flex-row gap-2 mb-2">
+
+      <p-dropdown
+        [options]="meses"
+        [(ngModel)]="mesSeleccionado"
+        placeholder="Filtrar por mes"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <p-dropdown
+        [options]="anios"
+        [(ngModel)]="anioSeleccionado"
+        placeholder="Filtrar por año"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <span class="p-input-icon-left w-full sm:w-auto">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          #filter
+          (input)="buscar(filter.value)"
+          placeholder="Buscar ....."
+          class="w-full"
+        />
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID Solicitud</th>
+        <th>Empresa</th>
+        <th>Mes</th>
+        <th>Gestión</th>
+        <th>Total Trabajadores</th>
+        <th>Total Reembolso</th>
+        <th style="width: 120px;">Estado</th>
+        <th>Fecha Presentación</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-solicitud>
+    <tr>
+      <td>SOL-{{ solicitud.id_solicitud_reembolso }}</td>
+      <td>{{ solicitud.empresa?.emp_nom || 'N/A' }}</td>
+      <td>{{ historialService.obtenerNombreMes(solicitud.mes) }}</td> 
+      <td>{{ solicitud.gestion }}</td> 
+      <td style="text-align: center;">
+        <button class="btn btn-primary" style="color: #009688; font-size: 18px; font-weight: 600; border: none; background-color: white;">
+          {{ solicitud.total_trabajadores }}
+        </button>
+      </td>
+      <td style="background-color: #f3fff7;">
+        <span>{{ solicitud.total_reembolso | number:'1.2-2' }} Bs</span>
+      </td>
+      <td style="text-align: center;">
+        <button class="estado-btn {{ obtenerClaseEstado(solicitud.estado) }}">
+          {{ historialService.obtenerTextoEstado(solicitud.estado) }}
+        </button>
+      </td>
+      <td>
+        <span>{{ historialService.formatearFecha(solicitud.fecha_modificacion) }}</span>
+      </td>
+      <td>
+        <div class="action-buttons-container">
+          <button 
+            type="button" 
+            class="action-btn btn-view"
+            (click)="verDetalles(solicitud)"
+            title="Ver detalles de la solicitud"
+          >
+            <i class="pi pi-eye"></i>
+            <span>Ver</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+    </ng-template>
+      
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" style="text-align: center; padding: 20px; background-color: #fff;">
+          <div class="no-data-message">
+            <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+            <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay solicitudes presentadas registradas.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+      
+  </p-table>

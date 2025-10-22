@@ -1,0 +1,129 @@
+<p-toast key="perfil" [baseZIndex]="99999"></p-toast>
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h3>Lista de Perfiles</h3>
+      <h5>Visualización, adición, edición y eliminación</h5>
+      <div class="card">
+        <span class="p-float-label">
+          <p-dropdown [options]="listaSistemas" [(ngModel)]="sistemaSeleccionado" optionValue="idSistema" optionLabel="identificadorSistema" (onChange)="mostrarPerfiles()" [style]="{width: '300px'}" [showClear]="true"></p-dropdown>
+          <label for="float-input">Seleccionar Sistema</label>
+        </span>
+      </div>
+        <div class="card" *ngIf="mostrarTabla == true">
+        <p-table #tablaPerfiles [value]="perfiles!"  [tableStyle]="{ 'min-width': '50rem' }" [columns]="columnas" responsiveLayout="scroll" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Buscar..." (input)="listaTablaClasificadores(tablaPerfiles, $event)"  class="w-full sm:w-auto"/>
+            </span>
+                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                  <button pButton pRipple label="Nuevo Perfil"  icon="pi pi-plus"
+                  class="p-button-success mr-2" (click)="abrirNuevoPerfil();"></button>
+                </span>
+            </div>
+        </ng-template>
+          <ng-template pTemplate="header">
+              <tr>
+                  <th pSortableColumn="nombrePerfil">Perfil<p-sortIcon
+                    field="nombrePerfil"></p-sortIcon></th>
+                  <th pSortableColumn="perfil.descripcionPerfil">Descripcion<p-sortIcon
+                    field="descripcionPerfil"></p-sortIcon></th>
+                  <th pSortableColumn="idcNivelRestriccion">Nivel<p-sortIcon
+                    field="idcNivelRestriccion"></p-sortIcon></th>
+                  <th>Acciones</th>
+              </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-perfil>
+              <tr>
+                  <td>{{ perfil.nombrePerfil }}</td>
+                  <td>{{ perfil.descripcionPerfil }}</td>
+                  <td>{{ perfil.idcNivelRestriccion }}</td>
+                  <td>
+                    <button pButton pRipple icon="pi pi-pencil" (click)="abrirEditarPerfil(perfil)" class="p-button-rounded p-button-success mr-2" ></button>
+                    <button pButton pRipple icon="pi pi-trash" (click)="mostrarDialogoEliminarPerfil(perfil)" class="p-button-rounded p-button-danger" ></button>
+                  </td>
+              </tr>
+          </ng-template>
+      </p-table>
+      </div>
+      <p-dialog [(visible)]="guardarPerfilDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+            <span>Desea Guardar Los Cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="guardarPerfilDialogo= false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarGuardadoPerfil()"></button>
+        </ng-template>
+    </p-dialog>
+    <p-dialog [(visible)]="eliminarPerfilDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+          <span *ngIf="perfil">Esta seguro que desea Eliminar  <b>{{perfil.nombrePerfil}}</b>? No podra deshacer los cambios</span>
+      </div>
+      <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="eliminarPerfilDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarEliminarPerfil()"></button>
+      </ng-template>
+  </p-dialog>
+      <form novalidate [formGroup]="perfilForm" (ngSubmit)="mostrarDialogoPerfilGuardar()">
+      <p-dialog [(visible)]="nuevoPerfilDialog" [style]="{width: '800px'}" header="Agregar/editar Perfil" [modal]="true" class="p-fluid" (onHide)="cerrarNuevoPerfil()">
+        <br>
+        <ng-template pTemplate="content">
+          <div class="grid formgrid">
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <input type="text" formControlName="nombrePerfil"  pInputText>
+              <label for="float-input">Nombre</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+              <span class="p-float-label">
+                <textarea formControlName="descripcionPerfil" pInputTextarea required rows="1" cols="20"></textarea>
+              <label for="float-input">Descripcion</label>
+              </span>
+            </div>
+            <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                <span class="p-float-label">
+                  <p-dropdown [options]="niveles" optionValue="identificadorClasificadorDetalle" formControlName="idcNivelRestriccion" optionLabel="nombreClasificadorDetalle" [showClear]="true"></p-dropdown>
+                  <label for="float-input">Seleccionar Sistema</label>
+                </span>
+            </div>
+          </div>
+          <hr>
+          <div class="field">
+            <p-table [value]="nivelesPerfil" [tableStyle]="{ 'min-width': '50rem' }" responsiveLayout="scroll" [rows]="5" [paginator]="true">
+              <ng-template pTemplate="header">
+                  <tr>
+                      <th>Sistema</th>
+                      <th>Recurso</th>
+                      <th>Tipo de Recurso</th>
+                      <th>Recurso Padre</th>
+                      <th>Asignado</th>
+                  </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-nivel>
+                  <tr>
+                      <td>{{ nivel.nombreSistema}}</td>
+                      <td>{{ nivel.nombreRecurso }}</td>
+                      <td>{{ nivel.nombreTipoRecurso }}</td>
+                      <td>{{ nivel.nombreRecursoSuperior}}</td>
+                      <td>
+                        <p-checkbox name="group2" formControlName="colIdRecurso" value="nivel"  [value]="nivel.idRecurso" [inputId]="nivel.idRecurso" [(ngModel)]="colIdRecurso"></p-checkbox>
+                      </td>
+                  </tr>
+              </ng-template>
+          </p-table>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple type="button" (click)="cerrarNuevoPerfil()" label="Cancelar" icon="pi pi-times" class="p-button-text"></button>
+          <button pButton pRipple type="submit" [disabled]="perfilForm.invalid" label="Guardar" icon="pi pi-check"  class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+  </form>
+    </div>
+  </div>
+</div>

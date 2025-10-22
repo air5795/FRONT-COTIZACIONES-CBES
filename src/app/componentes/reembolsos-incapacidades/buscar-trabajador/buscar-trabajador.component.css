@@ -1,0 +1,1413 @@
+/* ========== ESTILOS MEJORADOS PARA MODO MANUAL ========== */
+
+/* Contenedor principal del formulario manual */
+.formulario-manual-container {
+  margin: 0 auto;
+}
+
+/* ========== ESTILOS PARA STEPPER ========== */
+
+.stepper-container {
+  margin-bottom: 2rem;
+/*   padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); */
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.stepper-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  padding: 0 1rem;
+}
+
+.stepper-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #6c757d;
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.stepper-label {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.stepper-item.active .stepper-number {
+  background: #1D7258;
+  border-color: #1D7258;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0 255 200 / 0.3);
+}
+
+.stepper-item.active .stepper-label {
+  color: #1D7258;
+  font-weight: 600;
+}
+
+.stepper-item.completed .stepper-number {
+  background: #28a745;
+  border-color: #28a745;
+  color: #ffffff;
+}
+
+.stepper-item.completed .stepper-label {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.stepper-line {
+  flex: 1;
+  height: 2px;
+  background: #dee2e6;
+  margin: 0 1rem;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.stepper-line.completed {
+  background: #28a745;
+}
+
+/* Botones de navegación del stepper */
+.stepper-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.stepper-actions button {
+  min-width: 120px;
+  height: 40px;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.stepper-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.stepper-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive para stepper */
+@media (max-width: 768px) {
+  .stepper-container {
+    padding: 1rem;
+  }
+  
+  .stepper {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .stepper-line {
+    width: 2px;
+    height: 40px;
+    margin: 0;
+  }
+  
+  .stepper-item {
+    padding: 0;
+  }
+  
+  .stepper-number {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .stepper-label {
+    font-size: 0.8rem;
+  }
+  
+  .stepper-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .stepper-actions button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* ========== ESTILOS PARA TABLA HORIZONTAL DE TRABAJADOR ========== */
+
+.trabajador-encontrado-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.trabajador-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-bottom: 1px solid #dee2e6;
+}
+
+.trabajador-tabla {
+  padding: 1rem;
+}
+
+.trabajador-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.trabajador-fila:last-child {
+  margin-bottom: 0;
+}
+
+.trabajador-celda {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.trabajador-celda strong {
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.trabajador-celda span {
+  color: #212529;
+  font-size: 0.95rem;
+}
+
+/* Estilos específicos para información salarial */
+.salario-info {
+  flex: 1 1 100%;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.salario-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.salario-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.salario-item {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.salario-item strong {
+  color: #495057;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.salario-item span {
+  color: #212529;
+  font-size: 0.9rem;
+}
+
+.salario-formula {
+  flex: 1 1 100%;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #e8f5e8;
+  border-left: 3px solid #4caf50;
+  border-radius: 4px;
+}
+
+.trabajador-acciones {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+/* ========== ESTILOS PARA RESUMEN COMPACTO EN TABLA ========== */
+
+.resumen-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.resumen-compacto {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.resumen-tabla {
+  width: 100%;
+}
+
+.tabla-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tabla-header h6 {
+  margin: 0;
+  color: #495057;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tabla-header i {
+  color: #009688;
+  font-size: 1.1rem;
+}
+
+.tabla-body {
+  padding: 0;
+}
+
+.tabla-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.tabla-fila:last-child {
+  border-bottom: none;
+}
+
+.tabla-celda {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-right: 1px solid #f1f3f4;
+}
+
+.tabla-celda:last-child {
+  border-right: none;
+}
+
+.celda-label {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.celda-valor {
+  color: #212529;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.nombre-trabajador {
+  font-weight: 600;
+  color: #009688;
+}
+
+.salario-valor {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.dias-valor {
+  color: #009688;
+  font-weight: 600;
+}
+
+/* Badge compacto para tipo de incapacidad */
+.tipo-badge-compacto {
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.tipo-badge-compacto.enfermedad {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+.tipo-badge-compacto.maternidad {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid #e1bee7;
+}
+
+.tipo-badge-compacto.profesional {
+  background: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffcc02;
+}
+
+/* Fila de fórmula especial */
+.formula-fila {
+  background: #f8f9fa;
+}
+
+.formula-celda {
+  grid-column: 1 / -1;
+  text-align: center;
+  background: #e8f5e8;
+  border-left: 3px solid #28a745;
+}
+
+.formula-compacta {
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.formula-compacta strong {
+  color: #28a745;
+  font-weight: 700;
+}
+
+/* Estilos para datos profesionales integrados */
+.datos-profesionales-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #ff9800;
+  background: #fff8e1;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.datos-profesionales-section .alert-warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.datos-profesionales-section .alert-warning i {
+  color: #f39c12;
+  font-size: 1rem;
+}
+
+.datos-profesionales-section .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* Responsive para tabla compacta */
+@media (max-width: 768px) {
+  .tabla-fila {
+    grid-template-columns: 1fr;
+  }
+  
+  .datos-profesionales-section .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabla-celda {
+    border-right: none;
+    border-bottom: 1px solid #f1f3f4;
+  }
+  
+  .tabla-celda:last-child {
+    border-bottom: none;
+  }
+  
+  .formula-celda {
+    grid-column: 1;
+  }
+}
+
+/* Responsive para tabla horizontal */
+@media (max-width: 768px) {
+  .trabajador-fila {
+    flex-direction: column;
+  }
+  
+  .trabajador-celda {
+    min-width: 100%;
+  }
+  
+  .salario-datos {
+    flex-direction: column;
+  }
+  
+  .salario-item {
+    min-width: 100%;
+  }
+  
+  .resumen-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Mensaje informativo del modo manual */
+.info-mensaje-manual {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid #2196f3;
+  border-radius: 8px;
+  color: #0d47a1;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.info-mensaje-manual i {
+  color: #2196f3;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Cards del formulario */
+.form-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.form-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Títulos de las cards */
+.form-card-title {
+  margin: -1.5rem -1.5rem 0.5rem -1.5rem;
+  padding: 1rem 1.5rem;
+  
+ 
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #343a40;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-card-title i {
+  color: #009688;
+  font-size: 1.25rem;
+}
+
+.form-card-title.warning {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-bottom-color: #ff9800;
+}
+
+.form-card-title.warning i {
+  color: #ff9800;
+}
+
+/* Card especial para datos adicionales */
+.datos-adicionales-card {
+  border-color: #ff9800;
+  border-width: 2px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Alerta de advertencia dentro de la card */
+.alert-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  color: #856404;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+}
+
+.alert-warning i {
+  color: #ff9800;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Grid de formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Campos del formulario */
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.form-field label i {
+  color: #009688;
+  font-size: 0.95rem;
+}
+
+
+
+::ng-deep .formulario-manual-container .p-dropdown {
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .formulario-manual-container .p-calendar {
+  width: 100%;
+}
+
+::ng-deep .formulario-manual-container .p-calendar input {
+  width: 100%;
+}
+
+/* Estados de los inputs */
+::ng-deep .formulario-manual-container .p-inputtext:hover,
+::ng-deep .formulario-manual-container .p-dropdown:hover,
+::ng-deep .formulario-manual-container .p-calendar:hover {
+  border-color: #80bdff;
+  box-shadow: 0 2px 4px rgba(0,123,255,0.1);
+}
+
+::ng-deep .formulario-manual-container .p-inputtext:focus,
+::ng-deep .formulario-manual-container .p-dropdown:focus,
+::ng-deep .formulario-manual-container .p-calendar:focus-within,
+::ng-deep .formulario-manual-container .p-inputnumber:focus-within {
+  border-color: #009688 !important;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+::ng-deep .formulario-manual-container .p-inputtext.p-invalid,
+::ng-deep .formulario-manual-container .p-dropdown.p-invalid,
+::ng-deep .formulario-manual-container .p-calendar.p-invalid,
+::ng-deep .formulario-manual-container .p-inputnumber.p-invalid .p-inputnumber-input {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+/* Mensajes de error */
+.form-field .p-error {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+}
+
+/* Hints informativos */
+.form-field .p-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  font-style: italic;
+}
+
+.form-field .p-hint i {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+/* Contenedor de acciones (botones) */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.form-actions button {
+  min-width: 250px;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.form-actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+}
+
+.form-actions button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive para tablets */
+@media (max-width: 768px) {
+  .formulario-manual-container {
+    padding: 1rem;
+  }
+  
+  .form-card {
+    padding: 1.25rem;
+  }
+  
+  .form-card-title {
+    margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-actions button {
+    min-width: 100%;
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  .formulario-manual-container {
+    padding: 0.75rem;
+  }
+  
+  .info-mensaje-manual {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .form-card {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .form-card-title {
+    margin: -1rem -1rem 1rem -1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  ::ng-deep .formulario-manual-container .p-inputtext,
+  ::ng-deep .formulario-manual-container .p-dropdown,
+  ::ng-deep .formulario-manual-container .p-calendar,
+  ::ng-deep .formulario-manual-container .p-inputnumber-input {
+    height: 40px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ========== ESTILOS ORIGINALES (PRESERVADOS) ========== */
+
+/* Contenedor para el buscador principal - Más compacto */
+.buscar-trabajador-container {
+  margin: 0.5rem auto;
+  padding: 0 0.5rem;
+}
+
+/* Estilos para inputs nativos de fecha en modo manual */
+input[type="date"] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: #fff;
+  color: #495057;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="date"]:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+input[type="date"]:invalid {
+  border-color: #dc3545;
+}
+
+input[type="date"].p-invalid {
+  border-color: #dc3545;
+}
+
+/* Asegurar que los inputs de fecha tengan el mismo estilo que los inputs de PrimeNG */
+.p-field input[type="date"] {
+  font-family: inherit;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.p-field input[type="date"]:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+:host {
+  font-family: var(--font-family);
+}
+
+/* Z-index alto para diálogos de SweetAlert2 */
+::ng-deep .swal-high-zindex {
+  z-index: 10000 !important;
+}
+
+::ng-deep .swal-high-zindex .swal2-popup {
+  z-index: 20001 !important;
+}
+
+/* Z-index alto para calendarios que sobresalgan del diálogo */
+::ng-deep .p-datepicker {
+  z-index: 9999 !important;
+}
+
+::ng-deep .p-datepicker-overlay {
+  z-index: 9998 !important;
+}
+
+/* Asegurar que los calendarios se muestren por encima de cualquier diálogo */
+::ng-deep .p-calendar .p-datepicker {
+  z-index: 10000 !important;
+}
+
+::ng-deep .p-calendar .p-datepicker-overlay {
+  z-index: 9999 !important;
+}
+
+/* Estilos para datos adicionales compactos */
+.datos-adicionales-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.datos-adicionales-field {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.datos-adicionales-field label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 5px;
+}
+
+/* Uniformizar todos los inputs para que tengan el mismo tamaño y estilo */
+::ng-deep .datos-adicionales-field .p-calendar,
+::ng-deep .datos-adicionales-field .p-dropdown,
+::ng-deep .formulario-manual-container .p-calendar,
+::ng-deep .formulario-manual-container .p-dropdown,
+::ng-deep .formulario-manual-container .p-inputnumber {
+  width: 100%;
+  height: 40px;
+}
+
+
+
+::ng-deep .datos-adicionales-field .p-calendar input:focus,
+::ng-deep .datos-adicionales-field .p-dropdown:focus,
+::ng-deep .formulario-manual-container .p-calendar input:focus,
+::ng-deep .formulario-manual-container .p-dropdown:focus,
+::ng-deep .formulario-manual-container .p-inputnumber:focus-within {
+  outline: none;
+  border-color: #009688;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+::ng-deep .datos-adicionales-field .p-calendar.p-invalid input,
+::ng-deep .datos-adicionales-field .p-dropdown.p-invalid,
+::ng-deep .formulario-manual-container .p-calendar.p-invalid input,
+::ng-deep .formulario-manual-container .p-dropdown.p-invalid,
+::ng-deep .formulario-manual-container .p-inputnumber.p-invalid .p-inputnumber-input {
+  border-color: #dc3545;
+}
+
+.datos-adicionales-field small {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  .datos-adicionales-row {
+    flex-direction: column;
+  }
+  
+  .datos-adicionales-field {
+    min-width: 100%;
+  }
+}
+
+/* Modo Selector */
+.modo-selector {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+::ng-deep .modo-selector .p-selectbutton .p-button {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .modo-selector .p-selectbutton .p-button:not(.p-highlight):hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* Estilos para secciones del formulario manual - Más compacto */
+.form-section {
+  margin-bottom: 1rem;
+}
+
+.form-section-title {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-section-title i {
+  color: var(--primary-color, #009688);
+  font-size: 1.2rem;
+}
+
+/* Grid responsivo para formulario manual */
+::ng-deep .p-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+::ng-deep .p-col-12 {
+  grid-column: span 12;
+}
+
+::ng-deep .p-col-md-6 {
+  grid-column: span 12;
+}
+
+::ng-deep .p-col-md-4 {
+  grid-column: span 12;
+}
+
+@media (min-width: 768px) {
+  ::ng-deep .p-col-md-6 {
+    grid-column: span 6;
+  }
+  
+  ::ng-deep .p-col-md-4 {
+    grid-column: span 4;
+  }
+}
+
+::ng-deep .p-fluid {
+  width: 100%;
+}
+
+::ng-deep .p-fluid .p-field {
+  width: 100%;
+}
+
+/* Mensaje informativo */
+.info-mensaje {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: #e7f3ff;
+  border-left: 3px solid var(--primary-color, #009688);
+  border-radius: 4px;
+  color: #004085;
+  font-size: 0.85rem;
+}
+
+.info-mensaje i {
+  color: var(--primary-color, #009688);
+  font-size: 1.25rem;
+}
+
+/* Width full para botones */
+.w-full {
+  width: 100%;
+}
+
+/* ========== RESTO DE ESTILOS ORIGINALES ========== */
+/* (Aquí irían todos los demás estilos del archivo original que no están relacionados con el modo manual) */
+
+/* Estilos para la tabla de resultados */
+.resultados-container {
+  margin-top: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.calculo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  background: #f8f9fa;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-icon {
+  color: var(--primary-color, #009688);
+  font-size: 1.25rem;
+}
+
+.calculo-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.calculo-subtitle {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-left: 0.5rem;
+}
+
+.header-search {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.header-search .p-inputgroup {
+  width: 250px;
+}
+
+.header-search input {
+  font-size: 0.875rem;
+}
+
+/* Estilos para el mensaje sin búsqueda */
+.no-search-container {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.dotted-message {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 30px;
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.dotted-message .search-icon {
+  font-size: 2rem;
+  color: #adb5bd;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.dotted-message p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Estilos para el mensaje de carga */
+.loading-container {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.loading-message {
+  padding: 30px;
+  color: #6c757d;
+}
+
+.loading-message .loading-icon {
+  font-size: 2rem;
+  color: #009688;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.loading-message p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Estilos para la tabla de bajas */
+.bajas-table-container {
+  padding: 10px;
+}
+
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  font-weight: 600;
+  color: #495057;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+  border-color: #dee2e6;
+  font-size: 0.9rem;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Estilos para badges de tipo */
+.tipo-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.matricula-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.matricula-cell i {
+  color: #6c757d;
+}
+
+.periodo-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.periodo-arrow {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.dias-cell {
+  text-align: center;
+}
+
+.dias-numero {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.dias-cell small {
+  color: #6c757d;
+  font-size: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .periodo-cell {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .periodo-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* Estilos para datos adicionales del modo automático */
+.datos-adicionales-section {
+  margin-top: 15px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.datos-adicionales-header {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.datos-adicionales-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.datos-adicionales-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.datos-adicionales-content {
+  padding: 20px;
+  background: #fafafa;
+}
+
+.datos-adicionales-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Estilos para el cálculo de reembolso */
+.calculo-reembolso-section {
+  margin-top: 15px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tabla-excel-reembolso-integrada {
+  padding: 10px;
+}
+
+.tabla-wrapper {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.calculo-resumen {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.resumen-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.resumen-item:last-child {
+  border-bottom: none;
+}
+
+.resumen-item.total {
+  background: #e8f5e9;
+  margin: 5px -12px -8px -12px;
+  padding: 8px 12px;
+  border-radius: 0 0 3px 3px;
+  border-bottom: none;
+}
+
+.resumen-label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.resumen-valor-final {
+  font-weight: 700;
+  color: #28a745;
+  font-size: 1.4rem;
+}
+
+.acciones-calculo-integradas {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.acciones-calculo-integradas .p-button {
+  min-width: 80px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 3px;
+}
+
+/* Responsive general */
+@media (max-width: 768px) {
+  .calculo-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .header-content {
+    text-align: center;
+  }
+  
+  .header-search {
+    margin: 0;
+    justify-content: center;
+  }
+  
+  .header-search .p-inputgroup {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* Estilos para SweetAlert con z-index alto */
+.swal-high-zindex {
+  z-index: 10000 !important;
+}
+
+/* Asegurar que todos los SweetAlert aparezcan sobre los diálogos */
+.swal2-container {
+  z-index: 10000 !important;
+}
+
+.swal2-popup {
+  z-index: 10001 !important;
+}
+
+

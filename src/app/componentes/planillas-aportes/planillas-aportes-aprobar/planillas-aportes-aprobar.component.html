@@ -1,0 +1,111 @@
+<div class="header">
+    <div class="header-left">
+        <h2>PLANILLAS DE APORTES PENDIENTES DE VALIDACIÓN </h2>
+        <!-- <span class="razon-social">{{ empresa?.EMP_NOM || 'Cargando...' }}</span>
+        <hr style="margin: 2px; border: 1px solid rgb(225 225 225 / 43%)">
+        <span class="numero-patronal">Cod Patronal: {{ empresa?.EMP_NPATRONAL?.slice(3) || '---' }}</span> -->
+    </div>
+    <div class="header-right">
+        <!-- <span class="razon-social">{{ empresa?.EMP_NOM || 'Cargando...' }}</span>
+        <hr style="margin: 2px; border: 1px solid rgb(225 225 225 / 43%)">
+        <span class="numero-patronal">Cod Patronal: {{ empresa?.EMP_NPATRONAL?.slice(3) || '---' }}</span> -->
+    </div>
+    
+</div>
+  
+
+<p-table 
+#tablaPlanillasAportes
+class="tabla-centrada" 
+[value]="planillas" 
+[paginator]="true" 
+[rows]="10" 
+[loading]="loading" 
+responsiveLayout="scroll"
+[rowsPerPageOptions]="[5,10,20,25,30]"
+[paginator]="true" 
+styleClass="p-datatable-gridlines" 
+>
+<ng-template pTemplate="caption">
+    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+      <span class="block mt-2 md:mt-0 p-input-icon-left">
+        <i class="pi pi-search"></i>
+        
+      </span>
+      <span class="block mt-2 md:mt-0 p-input-icon-left">
+
+      </span>
+    </div>
+  </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+     
+        <th>Empresa</th>
+        <th>N° de Comprobante</th>
+        <th>Fecha Declarada</th>
+        <th>Mes</th>
+        <th>Gestión</th>
+        <th>Total trabajadores</th>
+        <th >Total importe</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-planilla>
+  <tr>
+    <td>{{ planilla.empresa }}</td>
+    <td>COM-{{ planilla.com_nro }}</td>
+    <td>{{ planilla.fecha_creacion | date: 'dd/MM/yyyy' }}</td>
+    <td>{{ planilla.mes }}</td>
+    <td>{{ planilla.gestion }}</td>
+    <td style="text-align: center;">
+      <button class="btn btn-primary" style="color: #009688; font-size: 18px; font-weight: 600; border: none; background-color: white;">
+        {{ planilla.total_trabaj }}
+      </button>
+    </td>
+    <td style="background-color: #f3fff7;">
+      <span>{{ planilla.total_importe | currency:'BOB - ':'symbol':'1.2-2' }}</span>
+    </td>
+    <td style="width: 200px; text-align: center;">
+        <!-- Contenedor principal con flexbox -->
+        <div class="semaforo-container">
+          <!-- Semáforo con los 3 círculos visibles, solo uno marcado -->
+          <div class="semaforo">
+            <!-- Círculo amarillo para pendiente, solo se marca si el estado es pendiente -->
+            <span [class.yellow]="planilla.estado === 1" [class.gray]="planilla.estado !== 1" class="circle"></span>
+            <!-- Círculo rojo para observado, solo se marca si el estado es observado -->
+            <span [class.red]="planilla.estado === 3" [class.gray]="planilla.estado !== 3" class="circle"></span>
+            <!-- Círculo verde para aprobado, solo se marca si el estado es aprobado -->
+            <span [class.green]="planilla.estado === 2" [class.gray]="planilla.estado !== 2" class="circle"></span>
+          </div>
+          <!-- Botones de estado -->
+          <div class="label-container">
+            <button *ngIf="planilla.estado === 1" class="estado-btn pendiente" style="width: 100px;">Pendiente</button>
+            <button *ngIf="planilla.estado === 2" class="estado-btn aprobado" style="width: 100px;">Aprobado</button>
+            <button *ngIf="planilla.estado === 3" class="estado-btn observado" style="width: 100px;">Observado</button>
+          </div>
+        </div>
+      </td>
+    <td>
+        <button 
+        pButton 
+        type="button" 
+        label="Validar Planilla"
+        icon="pi pi-check-circle" 
+        (click)="verPlanilla(planilla.id_planilla_aportes)"
+        [style]="{backgroundColor: '#42ab7f', color: 'white' , width: '100%',borderRadius: '0px'}"
+      ></button>
+    </td>
+  </tr>
+</ng-template>
+      
+      
+      
+      
+      
+      
+  </p-table>
+  
+
+

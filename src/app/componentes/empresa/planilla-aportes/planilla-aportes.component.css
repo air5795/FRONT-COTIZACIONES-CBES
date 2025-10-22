@@ -1,0 +1,8 @@
+.bg-green {
+    background-color: green;
+    color: #fff;
+    text-overflow: clip;
+}
+.pi-verified {
+    font-size: 2rem;
+  }

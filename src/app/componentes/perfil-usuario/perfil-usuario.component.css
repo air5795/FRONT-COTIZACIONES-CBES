@@ -1,0 +1,160 @@
+/* Header Personalizado */
+.custom-header {
+    background: linear-gradient(135deg, #009688 0%, #00796B 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    margin-bottom: -1px; /* Para que se fusione con la tarjeta */
+    display: flex;
+    align-items: center;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-icon {
+    font-size: 2rem;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Estilo General del Contenedor */
+:host ::ng-deep .p-card {
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.02);
+}
+
+/* Foto de Usuario Mejorada */
+.user-photo {
+    width: 100%;
+    max-width: 300px; /* Tamaño máximo para que no sea demasiado grande */
+    height: auto; /* Mantener la proporción */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #ffffff; /* Borde blanco para resaltar */
+    background: var(--surface-b);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out;
+}
+
+.user-photo:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+/* Tipografía y Títulos */
+h5 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color); /* Usar color primario del tema */
+}
+
+.text-color-secondary {
+    font-style: italic;
+}
+
+/* Cabecera de Detalles del Usuario (Nombre, Empresa, Estado) */
+.user-details-header {
+/*     display: flex; */
+    justify-content: space-between;
+    align-items: center; /* Alineación vertical centrada */
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--surface-d);
+}
+
+/* Estilo de la Etiqueta de Estado Mejorada */
+:host ::ng-deep .p-tag-success {
+    padding: 0.5rem 1rem;
+    border-radius: 999px; /* Forma de píldora */
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: var(--green-500);
+    color: var(--green-50);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); /* Sombra de color verde sutil */
+    display: inline-flex;
+    align-items: center;
+}
+
+:host ::ng-deep .p-tag-success .pi {
+    font-size: 1rem; /* Ajustar tamaño del icono */
+    margin-right: 0.5rem;
+}
+
+/* Pestañas (Tabs) con Estilo Moderno */
+:host ::ng-deep .p-tabview .p-tabview-nav {
+    border-bottom: 2px solid var(--surface-d);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    transition: all 0.3s ease;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-weight: 600;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-panels {
+    padding: 2rem 0.5rem;
+    background: var(--surface-a);
+}
+
+/* Estilo de los Campos de Información */
+.mb-3 label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mb-3 p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    padding: 0.75rem 1rem; /* Más padding para que se vea mejor */
+    border: 1px solid var(--surface-d); /* Borde sutil */
+    background: var(--surface-a); /* Fondo ligero */
+    border-radius: 6px; /* Bordes redondeados */
+    margin: 0;
+    min-height: 45px; /* Altura mínima para alinear */
+    display: flex;
+    align-items: center;
+}
+
+/* Mensaje de "No Empresa" */
+.no-empresa-message {
+    border: 2px dashed var(--surface-d);
+    border-radius: 8px;
+    padding: 2rem;
+    color: var(--text-color-secondary);
+}
+
+/* Diseño Responsivo */
+@media (max-width: 992px) {
+    .text-center {
+        text-align: center !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-photo {
+        width: 100px;
+        height: 100px;
+    }
+
+    h5 {
+        font-size: 1.3rem;
+    }
+}

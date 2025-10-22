@@ -1,0 +1,150 @@
+<div class="total">
+  <div class="log">
+    <div class="login-panel p-fluid">
+      <form novalidate (ngSubmit)="ingresar()" [formGroup]="restriccionForm">
+        <div class="container">
+          <div class="header" style="text-align: center; color: white;">
+            <img src="../../../assets/demo/images/galleria/logo-text2.png" class="logo">
+            <h4>Selecciona una Opción</h4>
+            <hr>
+          </div>
+          
+          <div class="form-field">
+            <p-dropdown 
+              [options]="restricciones" 
+              formControlName="selectedRestriccion"  
+              optionValue="idUsuarioRestriccion" 
+              optionLabel="nombre" 
+              [showClear]="true" 
+              placeholder="Seleccionar Rol"
+              class="dropdown"
+            ></p-dropdown>
+          </div>
+          
+          <div class="button-container">
+            <button 
+              pButton 
+              type="submit" 
+              [disabled]="restriccionForm.invalid" 
+              label="Seleccionar" 
+              icon="pi pi-check"
+              class="action-button primary"
+            ></button>
+            <p-button 
+              type="button" 
+              label="Cancelar" 
+              (onClick)="cancelarIngreso()" 
+              severity="danger"  
+              icon="pi pi-times"
+              class="action-button secondary"
+            ></p-button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.total {
+  width: 100%;
+  min-height: 100vh;
+  background: url('../../../assets/demo/images/galleria/FONDO15.png') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+}
+
+.log {
+  background-color: rgba(255, 255, 255, 0.16);
+  padding: clamp(20px, 5vw, 50px);
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 450px;
+  margin-right: clamp(20px, 10vw, 150px);
+}
+
+.logo {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+}
+
+.form-field {
+  margin: 1.5rem 0;
+}
+
+.dropdown {
+  width: 100%;
+  max-width: 350px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  align-items: center;
+}
+
+.action-button {
+  width: 100%;
+  max-width: 200px;
+}
+
+.primary {
+  background: #1c5546b8 !important;
+  color: white !important;
+}
+
+.secondary {
+  background: #852c2cc7 !important;
+  color: white !important;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .total {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .log {
+    margin-right: 0;
+    max-width: 100%;
+  }
+
+  .logo {
+    max-width: 250px;
+  }
+
+  .dropdown {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .log {
+    padding: 15px;
+  }
+
+  .header h4 {
+    font-size: 1.2rem;
+  }
+
+  .action-button {
+    padding: 0.5rem;
+    max-width: 150px;
+  }
+}
+</style>

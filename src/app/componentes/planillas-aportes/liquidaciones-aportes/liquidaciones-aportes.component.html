@@ -1,0 +1,655 @@
+<!-- Modal para actualizar fecha pago y tgn  -->
+<p-dialog
+  [header]="esEmpresaPublicaConLiquidacionPreliminar ? 'Actualizar Fecha de Pago Real' : 'Validar Liquidación'"
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [style]="{ width: '600px', maxWidth: '90vw', height: 'auto', maxHeight: '90vh' }"
+  [baseZIndex]="1000"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="custom-modal"
+>
+  <div class="modal-content-wrapper">
+    <!-- Mensaje contextual para empresa pública -->
+    <div *ngIf="esEmpresaPublicaConLiquidacionPreliminar && !showFechaPagoInput && !mostrarInputMontoTGN" 
+         class="info-banner">
+      <i class="pi pi-info-circle"></i>
+      <span>
+        La empresa pública ha realizado el pago. Actualice con la fecha real para recalcular la liquidación.
+      </span>
+    </div>
+    
+    <!-- Paso 1: Preguntar si es necesario actualizar la fecha de pago -->
+    <div *ngIf="!showFechaPagoInput && !mostrarInputMontoTGN" class="step-content">
+      <p class="step-question">{{ esEmpresaPublicaConLiquidacionPreliminar 
+          ? '¿Desea actualizar la fecha de pago con la fecha real?' 
+          : '¿Es necesario actualizar la fecha de pago?' }}</p>
+      <div class="button-group">
+        <button
+          pButton
+          type="button"
+          label="Sí"
+          icon="pi pi-check"
+          class="p-button-primary"
+          (click)="showFechaPagoInput = true"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="No"
+          icon="pi pi-times"
+          class="p-button-secondary"
+          (click)="confirmarLiquidacion(false)"
+          [disabled]="esEmpresaPublicaConLiquidacionPreliminar"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Paso 2: Mostrar campo para seleccionar fecha de pago -->
+    <div *ngIf="showFechaPagoInput && !mostrarInputMontoTGN" class="step-content">
+      <p class="step-question">{{ esEmpresaPublicaConLiquidacionPreliminar 
+          ? 'Seleccione la fecha real de pago:' 
+          : 'Seleccione la nueva fecha de pago:' }}</p>
+      <div class="form-group">
+        <label for="fechaPago" class="field-label">
+          Fecha de Pago {{ esEmpresaPublicaConLiquidacionPreliminar ? 'Real' : '' }}
+        </label>
+        <p-calendar
+          id="fechaPago"
+          [(ngModel)]="fechaPago"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          [maxDate]="today"
+          placeholder="Seleccione la fecha de pago"
+          [style]="{'width': '100%'}"
+          appendTo="body"
+        ></p-calendar>
+        
+        <!-- Mostrar fecha tentativa actual para referencia -->
+        <div *ngIf="esEmpresaPublicaConLiquidacionPreliminar && planilla" 
+             class="reference-info">
+          <i class="pi pi-info-circle"></i>
+          Fecha tentativa actual: {{ planilla.fecha_pago | date:'dd/MM/yyyy' }}
+        </div>
+      </div>
+
+      <!-- Botones para continuar después de seleccionar fecha -->
+      <div class="button-group">
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          class="p-button-secondary"
+          (click)="cancelarSeleccionFecha()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          [label]="esEmpresaPublicaConLiquidacionPreliminar ? 'Continuar' : 'Actualizar'"
+          icon="pi pi-arrow-right"
+          class="p-button-primary"
+          [disabled]="!fechaPago"
+          (click)="esEmpresaPublicaConLiquidacionPreliminar ? mostrarInputMontoTGN = true : confirmarLiquidacion(true)"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Paso 3: Input para nuevo monto TGN (solo para empresas públicas) -->
+    <div *ngIf="mostrarInputMontoTGN" class="step-content tgn-step">
+      <div class="tgn-header">
+        <h4>
+          <i class="pi pi-exclamation-triangle"></i>
+          Nuevo Monto TGN Real
+        </h4>
+        <p>
+          La empresa pública ha realizado el pago con un monto TGN diferente al teórico. 
+          Ingrese el monto real del TGN para recalcular la liquidación.
+        </p>
+      </div>
+      
+      <!-- Mostrar valor actual para referencia -->
+      <div *ngIf="planilla" class="reference-value">
+        <strong>Valor TGN anterior (teórico):</strong> {{ planilla.aporte_porcentaje | currency:'BOB':'symbol':'1.2-2' }}
+      </div>
+      
+      <div class="form-group">
+        <label for="nuevoMontoTGN" class="field-label">
+          Nuevo Monto TGN Real:
+        </label>
+        <p-inputNumber
+          id="nuevoMontoTGN"
+          [(ngModel)]="nuevoMontoTGN"
+          mode="decimal"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="6"
+          placeholder="Ej: 310169.73"
+          [style]="{'width': '100%'}"
+          currency="BOB"
+          locale="es-BO">
+        </p-inputNumber>
+      </div>
+      
+      <div class="button-group">
+        <button
+          pButton
+          type="button"
+          label="Volver"
+          icon="pi pi-arrow-left"
+          class="p-button-secondary"
+          (click)="cancelarNuevoMonto()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Actualizar con Nuevo TGN"
+          icon="pi pi-check"
+          class="p-button-success"
+          (click)="validarNuevoMonto()"
+          [disabled]="!nuevoMontoTGN || nuevoMontoTGN <= 0"
+        ></button>
+      </div>
+    </div>
+
+  </div>
+</p-dialog>
+
+
+  <!-- También asegúrate de que este indicador solo sea visible para administradores -->
+<div *ngIf="esAdministrador && esEmpresaPublicaConLiquidacionPreliminar" 
+     style="background-color: #fff3cd; 
+            border: 1px solid #ffeaa7; 
+            border-radius: 4px; 
+            padding: 12px; 
+            margin: 15px 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;">
+  <i class="pi pi-exclamation-triangle" style="color: #f39c12; font-size: 1.5rem;"></i>
+  <div style="flex: 1;">
+    <strong style="color: #856404;">Realizar Liquidación  - Empresa Pública</strong>
+    <p style="margin: 5px 0 0 0; color: #856404; font-size: 0.9rem;"> 
+      Por favor, actualice con la fecha real cuando la empresa realice el pago. y el monto Real Desembolsado por el TGN
+    </p>
+  </div>
+  <button pButton 
+          type="button" 
+          label="Actualizar Fecha de Pago" 
+          icon="pi pi-calendar" 
+          class="p-button-warning"
+          (click)="showDialog()">
+  </button>
+</div>
+
+
+<div class="liquidaciones-container" *ngIf="planilla?.fecha_liquidacion != null">
+
+
+
+
+  <!-- Dashboard de resumen -->
+  <div *ngIf="planilla" style="display: grid; grid-template-columns: 2fr 6fr; gap: 20px; padding: 15px;">
+    <!-- Left Column: Cards -->
+    <div style="display: grid;  gap: 12px;">
+      <!-- Card 1:  -->
+      <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+        <div style="padding: 12px; border-bottom: 2px solid #80cbc4;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-weight: 600; color: #00796b; font-size: 0.9rem;">Salario Cotizable</span>
+            <i class="pi pi-money-bill" style="color: #00796b; font-size: 1.2rem;"></i>
+          </div>
+        </div>
+        <div style="padding: 15px; text-align: center;">
+          <div style="font-size: 1.8rem;  color: #00695c;">
+            {{ planilla.total_importe | currency:'BOB' }}
+          </div>
+          <div style="color: #616161; font-size: 0.8rem; margin-top: 5px;">Total Salario Cotizable</div>
+        </div>
+      </div>
+  
+      <!-- Card 2:  -->
+      <div style="background-color: #f7ffed; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+        <div style="padding: 12px; border-bottom: 2px solid #80cbc4;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-weight: 600; color: #00796b; font-size: 0.9rem;">Total a Cancelar</span>
+            <i class="pi pi-money-bill" style="color: #00796b; font-size: 1.2rem;"></i>
+          </div>
+        </div>
+        <div style="padding: 15px; text-align: center;">
+          <div style="font-size: 1.8rem;  color: #4caf50; display: flex; align-items: center; justify-content: center; gap: 5px;">
+            {{ planilla.total_a_cancelar | currency:'BOB' }}
+          </div>
+          <div style="color: #616161; font-size: 0.8rem; margin-top: 5px;">Total a Cancelar Liquidado</div>
+        </div>
+      </div>
+
+
+
+      
+  
+      <!-- Card 4:  -->
+
+      <div [ngStyle]="{'background-color': planilla.dias_retraso === 0 ? '#e8f5e9' : '#ffebee', 'border-radius': '8px', 'box-shadow': '0 2px 8px rgba(0,0,0,0.06)', 'overflow': 'hidden'}">
+        <div [ngStyle]="{'padding': '12px', 'border-bottom': '2px solid', 'border-color': planilla.dias_retraso === 0 ? '#81c784' : '#e57373'}">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span [ngStyle]="{'font-weight': '600', 'color': planilla.dias_retraso === 0 ? '#388e3c' : '#d32f2f', 'font-size': '0.9rem'}">
+              Días de mora
+            </span>
+            <i class="pi pi-exclamation-circle" [ngStyle]="{'color': planilla.dias_retraso === 0 ? '#388e3c' : '#d32f2f', 'font-size': '1.2rem'}"></i>
+          </div>
+        </div>
+        <div style="padding: 15px; text-align: center;">
+          <div [ngStyle]="{'font-size': '1.8rem', 'color': planilla.dias_retraso === 0 ? '#2e7d32' : '#c62828'}">
+            {{ planilla.dias_retraso }}
+          </div>
+          <div style="color: #616161; font-size: 0.8rem; margin-top: 5px;">Total días en Mora</div>
+        </div>
+      </div>
+
+  
+      <!-- Card 5: -->
+      <div [ngStyle]="{'background-color': planilla?.total_multas == 0 ? '#e8f5e9' : '#ffebee', 'border-radius': '8px', 'box-shadow': '0 2px 8px rgba(0,0,0,0.06)', 'overflow': 'hidden'}">
+        <div [ngStyle]="{'padding': '12px', 'border-bottom': '2px solid', 'border-color': planilla?.total_multas == 0 ? '#81c784' : '#e57373'}">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span [ngStyle]="{'font-weight': '600', 'color': planilla?.total_multas == 0 ? '#388e3c' : '#d32f2f', 'font-size': '0.9rem'}">
+              Recargos de ley
+            </span>
+            <i class="pi pi-exclamation-circle" [ngStyle]="{'color': planilla?.total_multas == 0 ? '#388e3c' : '#d32f2f', 'font-size': '1.2rem'}"></i>
+          </div>
+        </div>
+        <div style="padding: 15px; text-align: center;">
+          <div [ngStyle]="{'font-size': '1.8rem', 'color': planilla?.total_multas == 0 ? '#2e7d32' : '#c62828'}">
+            {{ planilla?.total_multas | currency:'BOB' }}
+          </div>
+          <div style="color: #616161; font-size: 0.8rem; margin-top: 5px;">Total Recargos de ley</div>
+        </div>
+      </div>
+
+
+
+
+      
+    </div>
+  
+    <!-- Right Column: Tabs -->
+    <div class="data-container">
+      <p-tabView>
+
+
+
+
+<!-- Información para el empleador (NO administrador) -->
+<div *ngIf="!esAdministrador && planilla" 
+     style="background-color: #e3f2fd; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 15px 0;">
+  <i class="pi pi-info-circle" style="color: #1976d2;"></i>
+  <span style="color: #1976d2; margin-left: 8px;">
+    <ng-container *ngIf="esEmpresaPublicaConLiquidacionPreliminar">
+      Liquidación preliminar calculada. Pendiente de actualización por el administrador cuando se realice el pago.
+    </ng-container>
+    <ng-container *ngIf="!esEmpresaPublicaConLiquidacionPreliminar && datosDesdeDB">
+      Liquidación calculada el {{ planilla.fecha_liquidacion | date:'dd/MM/yyyy HH:mm' }}
+    </ng-container>
+    <ng-container *ngIf="!datosDesdeDB">
+      Liquidación pendiente de Validacion.
+    </ng-container>
+  </span>
+</div>
+
+
+
+        
+        <!-- Tab de Resumen -->
+        <p-tabPanel header="Resumen">
+          
+  <div *ngIf="true" class="step-content" role="region" aria-labelledby="summary-title">
+    <div class="summary-section">
+      <!-- Grupo A: Aportes -->
+      <section class="group-section aportes" aria-labelledby="aportes-header">
+        <div class="group-header" id="aportes-header" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 1rem;">
+          <span style="font-size: 1.2rem; font-weight: bold;">Liquidación de Aportes</span>
+
+          <!-- Mostrar información del validador si ya está validada -->
+          <div *ngIf="debeValidarLiquidacion()" class="validation-info">
+            <div class="validation-details">
+              <div class="validation-badge" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 3rem;">
+                
+                <div style="display: flex; align-items: center;">
+                  <i class="pi pi-check-circle" style="color: #28a745; margin-right: 0.5rem;"></i>
+                  <span class="validation-text">Liquidación Validada</span>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: flex-end; text-align: right;">
+                  <small class="validator-name">{{ planilla.valido_cotizacion }}</small> 
+                  <small class="validation-date" *ngIf="planilla.fecha_liquidacion">{{ obtenerFechaLiquidacion() }}</small> 
+                </div>
+                
+              </div>
+            </div>
+          </div>
+
+          <!-- Mostrar botón solo si no está validada -->
+          <button
+            *ngIf="esAdministrador && !esEmpresaPublicaConLiquidacionPreliminar && !debeValidarLiquidacion()"
+            pButton
+            type="button"
+            [label]="obtenerTextoBoton()"
+            [icon]="obtenerIconoBoton()"
+            [class]="obtenerClaseBoton()"
+            [disabled]="estaDeshabilitadoBoton()"
+            (click)="manejarClickBoton()"
+            style="height: 100%;"
+          ></button>
+        </div>
+
+        <table class="summary-table">
+          <tbody>
+            <tr>
+              <td class="amount-label">Tipo de Empresa</td>
+              <td class="amount-value values" colspan="3">
+                <ng-container [ngSwitch]="planilla.tipo_empresa">
+                  <span *ngSwitchCase="'AP'">Pública</span>
+                  <span *ngSwitchCase="'AV'">Privada</span>
+                  <span *ngSwitchCase="'PA'">Pasiva</span>
+                  <span *ngSwitchCase="'VA'">Decreto Supremo</span>
+                  <span *ngSwitchDefault>{{ planilla.tipo_empresa }}</span>
+                </ng-container>
+              </td>
+            </tr>
+            <tr>
+              <td class="amount-label">Tasa</td>
+              <td class="amount-value values" colspan="3">
+                  {{ planilla.tipo_empresa === 'PA' ? '3' : '10' }} %
+              </td>
+            </tr>
+            <tr *ngIf="planilla.total_multas > 0">
+              <td class="amount-label">Fecha Presentación Oficial para calculo</td>
+              <td class="amount-value values">
+                {{ planilla.fechaFormal | date:'dd/MM/yyyy' : '-0400' }}
+              </td>
+              <td class="amount-label" style="text-align: right;">UFV FD</td>
+              <td class="amount-value values ufv-cell">
+                {{ planilla.ufv_dia_formal | number:'1.5-5' }}
+              </td>
+            </tr>
+            <tr *ngIf="planilla.total_multas > 0">
+              <td class="amount-label">Fecha de Depósito o Presentación para calculo</td> 
+               
+              <td class="amount-value values">
+                {{ planilla.fechaPagoUfv | date:'dd/MM/yyyy':'+0000' }}
+              </td>
+              <td class="amount-label" style="text-align: right;">UFV FP</td>
+              <td class="amount-value values ufv-cell">
+                {{ planilla.ufv_dia_presentacion | number:'1.5-5' }}
+              </td>
+            </tr>
+            <tr>
+            <!-- <td  class="amount-label">Cálculo con Vigencia Hasta el Día (Fecha Pago)</td> -->
+             <td  class="amount-label">Fecha Pago</td>
+            <td class="amount-value values">
+              {{ planilla.fecha_pago | date:'dd/MM/yyyy':'+0000' }}
+            </td>
+            <td class="amount-label" style="text-align: right;">Salario Cotizable</td>
+            <td class="amount-value values" [ngStyle]="{'color': planilla.total_importe === 0 ? '#dc2626' : 'inherit'}">
+              {{ planilla.total_importe | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+            
+            <tr class="subtotal">
+              <td class="amount-label">Subtotal Aportes</td>
+              <td class="amount-value values" colspan="3">
+                {{ planilla.aporte_porcentaje | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Grupo B: Recargos -->
+      <section class="group-section recargos" aria-labelledby="recargos-header">
+        <div class="group-header" id="recargos-header">Recargos de Ley</div>
+        <table class="summary-table">
+          <tbody>
+            <tr>
+              <td class="amount-label">Días en Mora</td>
+              <td class="amount-value values-r" colspan="3" style="color: rgb(141, 52, 52);">
+                {{ planilla.dias_retraso }}
+              </td>
+            </tr>
+            <tr>
+            <td class="amount-label">AP - AC (si corresponde)</td>
+            <td class="amount-value values-r" colspan="3">
+              {{ planilla.monto_actualizado | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+            <tr>
+              <td class="amount-label">Interés</td>
+              <td class="amount-value values-r" colspan="3">
+                {{ planilla.intereses | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+            <tr>
+              <td class="amount-label">Multas s/Interés (10%)</td>
+              <td class="amount-value values-r" colspan="3">
+                {{ planilla.multa_sobre_intereses | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+            <tr>
+              <td class="amount-label">Multa No Presentación (1%)</td>
+              <td class="amount-value values-r" colspan="3">
+                {{ planilla.multa_no_presentacion | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+            <tr class="subtotal">
+              <td class="amount-label">Total Recargos de Ley</td>
+              <td class="amount-value values-r" colspan="3">
+                {{ planilla.total_multas | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Grupo C: Deducciones -->
+      <section class="group-section deducciones" aria-labelledby="deducciones-header">
+        <div class="group-header" id="deducciones-header">Deducciones</div>
+        <table class="summary-table">
+          <tbody>
+            <tr *ngIf="planilla.tipo_empresa === 'AP' || planilla.aplica_descuento_min_salud">
+              <td class="amount-label">
+                Menos descuento de 5% para el Ministerio de Salud LEY 2042
+                <span style="font-size: 0.8rem; color: #666;">(Solo empresas públicas)</span>
+              </td>
+              <td class="amount-value values-b">{{ planilla.descuento_min_salud | currency:'BOB' }}</td>
+            </tr>
+            <tr *ngIf="planilla.tipo_empresa !== 'AP' && !planilla.aplica_descuento_min_salud">
+              <td class="amount-label" style="font-style: italic; color: #666;">
+                No aplica descuento del Ministerio de Salud (Solo para empresas públicas)
+              </td>
+              <td class="amount-value values-b">{{ 0 | currency:'BOB' }}</td>
+            </tr>
+            <tr *ngIf="planilla.otros_descuentos > 0">
+                    <td class="amount-label">Otros Descuentos</td>
+                    <td class="amount-value values-b">{{ planilla.otros_descuentos | currency:'BOB' }}</td>
+                  </tr>
+            <tr class="subtotal">
+        <td class="amount-label">Total Deducciones</td>
+        <td class="amount-value values-b">{{ planilla.total_deducciones | currency:'BOB' }}</td>
+      </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Grupo D: Formulario DS-08 -->
+<!--       <section class="group-section ds08" aria-labelledby="ds08-header">
+        <div class="group-header" id="ds08-header">Formulario DS-08</div>
+        <table class="summary-table">
+          <tbody>
+            <tr>
+              <td class="amount-label">Formulario DS-08</td>
+              <td class="amount-value values-b" colspan="3">
+                {{ planilla.formds08 | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section> -->
+
+      <!-- Total Final -->
+      <section class="group-section total" aria-labelledby="total-header">
+        <div class="group-header" id="total-header">Total</div>
+        <table class="summary-table">
+          <tbody>
+            <tr class="total-row">
+              <td class="amount-label">Total a Cancelar</td>
+              <td class="amount-value" colspan="3" [ngStyle]="{'color': planilla.total_a_cancelar === 0 ? '#dc2626' : 'inherit'}">
+                {{ planilla.total_a_cancelar | currency:'BOB':'symbol':'1.2-2' }}
+              </td>
+            </tr>
+            <tr class="total-row">
+              <td class="amount-label">Total a Cancelar (sin multas)</td>
+              <td class="amount-value" colspan="3" [ngStyle]="{'color': planilla.total_a_cancelar === 0 ? '#dc2626' : 'inherit'}">
+                {{ planilla.total_a_cancelar - planilla.total_multas | currency:'BOB':'symbol':'1.2-2' }} 
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+
+    </div>
+
+
+
+
+
+    <!-- <div class="contenedor-centrar">
+      <button pButton type="button" label="Validar Liquidación" icon="pi pi-check" class="p-button-success" (click)="showDialog()" aria-label="Validar la liquidación"></button>
+    </div> -->
+  </div>
+</p-tabPanel>
+  
+        <!-- Tab de Detalles -->
+        <p-tabPanel header="Tabla Detallada">
+          <p-table 
+            [value]="[planilla]" 
+            styleClass="p-datatable-sm p-datatable-striped"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>SALARIO COTIZABLE</th>
+                <th>APORTE AP=10% AV=3%</th>
+                <th>UFV DIA OBLIG. FORMAL</th>
+                <th>UFV DIA PRESENTACION</th>
+                <th>FECHA PRES. OFICIAL</th>
+                <th>FECHA DEPOSITO</th>
+                <th>AP. PATRONAL ACT.</th>
+                <th>MONTO ACT.</th>
+                <th>MULTA NO PRES. 1%</th>
+                <th>DÍAS RETRASO</th>
+                <th>INTERÉS</th>
+                <th>MULTAS S/INT.10%</th>
+                <th>TOTAL PARCIAL</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-planilla>
+              <tr>
+                <td [ngClass]="{'zero-value': planilla.total_importe === 0}">
+                  {{ planilla.total_importe | currency:'BOB' }}
+                </td>
+                <td>{{ planilla.aporte_porcentaje | currency:'BOB' }}</td>
+                <td class="ufv-cell">{{ planilla.ufv_dia_formal }}</td>
+                <td class="ufv-cell">{{ planilla.ufv_dia_presentacion }}</td>
+                <td>{{ planilla.fecha_declarada | date:'dd/MM/yyyy' : '-0400' }}</td>
+                <td>{{ planilla.fecha_pago | date:'dd/MM/yyyy' : '-0400' }}</td>
+                <td>{{ planilla.aporte_actualizado | currency:'BOB' }}</td>
+                <td [ngClass]="{'zero-value': planilla.monto_actualizado === 0}">
+                  {{ planilla.monto_actualizado | currency:'BOB' }}
+                </td>
+                <td [ngClass]="{'zero-value': planilla.multa_no_presentacion === 0}">
+                  {{ planilla.multa_no_presentacion | currency:'BOB' }}
+                </td>
+                <td [ngClass]="{'zero-value': planilla.dias_retraso === 0}">
+                  {{ planilla.dias_retraso }}
+                </td>
+                <td [ngClass]="{'zero-value': planilla.intereses === 0}">
+                  {{ planilla.intereses | currency:'BOB' }}
+                </td>
+                <td [ngClass]="{'zero-value': planilla.multa_sobre_intereses === 0}">
+                  {{ planilla.multa_sobre_intereses | currency:'BOB' }}
+                </td>
+                <td [ngClass]="{'zero-value': planilla.total_a_cancelar_parcial === 0}">
+                  {{ planilla.total_a_cancelar_parcial | currency:'BOB' }}
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr class="total-row">
+                <td colspan="12">Total a Cancelar:</td>
+                <td>{{ planilla.total_a_cancelar | currency:'BOB' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+  </div>
+  
+  <!-- Error Message -->
+   <div *ngIf="errorMessage && !planilla" class="error-message">
+    <i class="pi pi-exclamation-triangle"></i>
+    <p>No se puede realizar el cálculo de su liquidación.</p>
+    <button pButton type="button" label="Volver" icon="pi pi-arrow-left" class="p-button-sm"></button>
+  </div> 
+  
+
+<!-- Modal de Validación de Liquidación -->
+<p-dialog 
+  header="Validar Liquidación" 
+  [(visible)]="mostrarModalValidacion" 
+  [modal]="true" 
+  [closable]="false"
+  [draggable]="false" 
+  [resizable]="false"
+  styleClass="validation-modal"
+  [style]="{width: '450px'}">
+  
+  <div class="validation-content">
+    <div class="user-info">
+      <i class="pi pi-user" style="font-size: 2rem; color: #2196F3; margin-bottom: 1rem;"></i>
+      <h4>Usuario que valida:</h4>
+      <p class="user-name">{{ nombreCompleto }}</p>
+    </div>
+    
+    <div class="warning-message">
+      <i class="pi pi-exclamation-triangle" style="color: #ff9800; margin-right: 0.5rem;"></i>
+      <strong>Advertencia:</strong> Este proceso es irreversible. Una vez validada la liquidación, no podrá ser modificada.
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="modal-buttons">
+      <button 
+        pButton 
+        type="button" 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        class="p-button-secondary"
+        (click)="cerrarModalValidacion()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Validar Liquidación" 
+        icon="pi pi-check" 
+        class="p-button-success"
+        [loading]="loading"
+        (click)="confirmarValidacionLiquidacion()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+  

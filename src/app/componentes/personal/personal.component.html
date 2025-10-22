@@ -1,0 +1,91 @@
+
+<div class="grid">
+  <div class="col-12">
+      <div class="card">
+          <h3>Sistemas</h3>
+          <h5>Visualización, adición, edición y eliminación</h5>
+      </div>
+      <div class="card">
+        <p-toolbar styleClass="mb-4">
+          <ng-template pTemplate="left">
+              <div class="my-2">
+                  <button pButton pRipple label="Nuevo Sistema" icon="pi pi-plus" (click)="abrirNuevoSistema()" class="p-button-success mr-2"></button>
+              </div>
+          </ng-template>
+      </p-toolbar>
+        <p-table #tablasistemas [value]="sistemas!" [columns]="columnas" responsiveLayout="scroll" [globalFilterFields]="['identificadorSistema','nombreSistema','descripcionSistema','fechaRegistro']" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [tableStyle]="{ 'min-width': '50rem' }">
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                <h5 class="m-0">Manejador de Sistemas</h5>
+                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="buscadorSistemas(tablasistemas, $event)"  placeholder="Buscar..."  class="w-full sm:w-auto"/>
+                </span>
+            </div>
+        </ng-template>
+          <ng-template pTemplate="header">
+              <tr>
+                  <th pSortableColumn="identificadorSistema">Identificador<p-sortIcon field="identificadorSistema"></p-sortIcon></th>
+                  <th pSortableColumn="nombreSistema">Nombre<p-sortIcon field="nombreSistema"></p-sortIcon></th>
+                  <th pSortableColumn="descripcionSistema">Descripción<p-sortIcon field="descripcionSistema"></p-sortIcon></th>
+                  <th pSortableColumn="fechaRegistro">Fecha de Registro<p-sortIcon field="fechaRegistro"></p-sortIcon></th>
+                  <th>Acciones</th>
+              </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-sistema>
+              <tr>
+                  <td><span class="p-column-title">Identificador</span>{{sistema.identificadorSistema}}</td>
+                  <td>{{sistema.nombreSistema}}</td>
+                  <td>{{sistema.descripcionSistema}}</td>
+                  <td>{{sistema.fechaRegistro}}</td>
+                  <td>
+                    <button pButton pRipple icon="pi pi-pencil" (click)="abrirEditarSistema(sistema)" class="p-button-rounded p-button-success mr-2"></button>
+                    <button pButton pRipple icon="pi pi-trash" (click)="mostrarDialogoEliminar(sistema)" class="p-button-rounded p-button-danger"></button>
+                  </td>
+              </tr>
+          </ng-template>
+      </p-table>
+      </div>
+      <p-dialog [(visible)]="guardarSistemaDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+            <span>Desea Guardar Los Cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="guardarSistemaDialogo= false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarGuardado()"></button>
+        </ng-template>
+    </p-dialog>
+      <p-dialog [(visible)]="eliminarSistemaDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+            <span *ngIf="sistema">Esta seguro que desea Eliminar  <b>{{sistema.nombreSistema}}</b>? No podra deshacer los cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="eliminarSistemaDialogo= false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarEliminar()"></button>
+        </ng-template>
+    </p-dialog>
+
+      <form novalidate [formGroup]="sistemaForm " (ngSubmit)="mostrarDialogoGuardar()">
+      <p-dialog [(visible)]="nuevoSistemaDialog" [style]="{width: '450px'}" header="Nuevo Sistema" [modal]="true" class="p-fluid">
+        <ng-template pTemplate="content">
+        <div class="field">
+            <input type="text" pInputText formControlName="identificadorSistema" placeholder="Identificador" required autofocus/>
+        </div>
+        <div class="field">
+          <input type="text" pInputText formControlName="nombreSistema" placeholder="Nombre" required autofocus/>
+      </div>
+      <div class="field">
+        <textarea formControlName="descripcionSistema" placeholder="Descripción" pInputTextarea required rows="3" cols="20"></textarea>
+    </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" (click)="cerrarNuevoSistema()" class="p-button-text"></button>
+          <button pButton pRipple type="submit" [disabled]="sistemaForm .invalid" label="Guardar" icon="pi pi-check"  class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+  </form>
+
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="grid dashboard">
+  <div class="col-12 md:col-12 lg:6">
+      <div class="perfil-empleador">
+        <div class="header">
+          <div class="header-left">
+            <h2 style="font-size: 30px;">  DETALLE LIQUIDACIÓN DEVENGADA </h2>
+            <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+            <span class="numero-patronal" *ngIf="detalle">{{ detalle.empresa }} - {{ detalle.cod_patronal }}</span>
+          </div>
+          <div class="header-right">
+            <div class="button-container">
+              <button pButton label="VOLVER" class="boton1" (click)="volver()">
+                <span class="pi pi-arrow-left" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">Lista</span>
+              </button>
+        
+              <button pButton label="PDF" class="boton2" [disabled]="loading || !detalle" [loading]="generandoPDF" (click)="generarPDF()">
+                <span class="pi pi-file-pdf" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">Generar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+  
+
+  
+    <!-- 📄 REPORTE ESTILO EXCEL REAL -->
+    <div *ngIf="!loading && detalle" class="excel-report-container">
+      
+      <!-- 🏷️ TÍTULO PRINCIPAL -->
+      <div class="excel-title-section">
+        <h1 class="excel-main-title">LIQUIDACION DE APORTES DEVENGADOS</h1>
+        <div class="excel-subtitle">(D.S. 25714 de 23 DE Marzo de 2000)</div>
+        <div class="excel-subtitle">EXPRESADO EN BOLIVIANOS</div>
+        <div class="excel-rate-section">
+          <span class="excel-rate-label">TASA DE INTERES ACTIVA BANCARIA COMERCIAL ANUAL</span>
+          <span class="excel-rate-value">{{ detalle.tasa }}</span>
+        </div>
+      </div>
+  
+      <!-- 📋 INFORMACIÓN DE EMPRESA -->
+      <div class="excel-company-section">
+        <div class="excel-company-row">
+          <div class="excel-company-label">EMPRESA:</div>
+          <div class="excel-company-value">{{ detalle.empresa }}</div>
+        </div>
+<!--         <div class="excel-company-row">
+          <div class="excel-company-label">REGIONAL</div>
+          <div class="excel-company-value">{{ detalle.regional }}</div>
+        </div> -->
+      </div>
+  
+      <!-- 📊 TABLA PRINCIPAL ESTILO EXCEL -->
+      <div class="excel-main-table">
+        
+        <!-- HEADER DE TABLA -->
+        <div class="excel-table-header">
+          <div class="excel-header-cell excel-no">No.</div>
+<!--           <div class="excel-header-cell excel-regional">REGIONAL</div> -->
+          <div class="excel-header-cell excel-concepto">CONCEPTO</div>
+          <div class="excel-header-cell excel-salario">SALARIO COTIZABLE</div>
+          <div class="excel-header-cell excel-aporte">APORTE 10%</div>
+          <div class="excel-header-cell excel-ufv-fd">UFV DIA OBLIG FORMAL</div>
+          <div class="excel-header-cell excel-ufv-pres">UFV DIA PRESENTACION</div>
+          <div class="excel-header-cell excel-ap-patronal">AP. PATRONAL ACTUALIZADO</div>
+          <div class="excel-header-cell excel-monto-act">MONTO ACTUALIZADO</div>
+          <div class="excel-header-cell excel-multa-pla">1% MULTA POR LA NO PRESENTACION DE PLANILLA</div>
+          <div class="excel-header-cell excel-fecha-pres">FECHA PRESENTACION OFICIAL</div>
+          <div class="excel-header-cell excel-fecha-dep">FECHA DE DEPOSITO O PRESENTACION</div>
+          <div class="excel-header-cell excel-dias">DIAS DE RETRASO</div>
+          <div class="excel-header-cell excel-interes">INTERES</div>
+          <div class="excel-header-cell excel-multas">MULTAS S/INT.10%</div>
+          <div class="excel-header-cell excel-total">TOTAL A CANCELAR</div>
+        </div>
+  
+        <!-- FILA DE DATOS -->
+        <div class="excel-table-row">
+          <div class="excel-cell excel-no">1</div>
+       <!--    <div class="excel-cell excel-regional">{{ detalle.regional }}</div> -->
+          <div class="excel-cell excel-concepto">{{ formatearMesCorto(detalle.mes) }}-{{ detalle.gestion.substring(2) }}</div>
+          <div class="excel-cell excel-salario excel-money">{{ detalle.salario_cotizable | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-aporte excel-money">{{ detalle.subtotal_aportes | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-ufv-fd">{{ detalle.ufv_dia_formal | number:'1.5-5' }}</div>
+          <div class="excel-cell excel-ufv-pres">{{ detalle.ufv_dia_presentacion | number:'1.5-5' }}</div>
+          <div class="excel-cell excel-ap-patronal excel-money">{{ (detalle.subtotal_aportes * detalle.ufv_dia_presentacion / detalle.ufv_dia_formal) | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-monto-act excel-money">{{ detalle.ap_ac | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-multa-pla excel-money">{{ detalle.multa_no_presentacion | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-fecha-pres">{{ planilla?.fechaFormal | date:'dd/MM/yyyy' : '+0000' }}</div>
+          <div class="excel-cell excel-fecha-dep">{{ planilla?.fechaPagoUfv | date:'dd/MM/yyyy':'+0000' }}</div>
+          <div class="excel-cell excel-dias excel-dias-value" [ngClass]="obtenerClaseMora()">{{ detalle.dias_mora }}</div>
+          <div class="excel-cell excel-interes excel-money">{{ detalle.interes | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-multas excel-money">{{ detalle.multa_sobre_interes | number:'1.2-2' }}</div>
+          <div class="excel-cell excel-total excel-money excel-total-value">{{ formatearMonedaSinSimbolo(detalle.total_a_cancelar) }}</div>
+        </div>
+  
+        <!-- FILA TOTAL A CANCELAR -->
+        <div class="excel-table-total">
+          <div class="excel-total-cell excel-total-label-main">TOTAL A CANCELAR</div>
+    <!--       <div class="excel-total-cell excel-total-space"></div> -->
+          <div class="excel-total-cell excel-total-space"></div>
+          <div class="excel-total-cell excel-total-salario">{{ detalle.salario_cotizable | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-aporte">{{ detalle.subtotal_aportes | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-space"></div>
+          <div class="excel-total-cell excel-total-space"></div>
+          <div class="excel-total-cell excel-total-ap">{{ (detalle.subtotal_aportes * detalle.ufv_dia_presentacion / detalle.ufv_dia_formal) | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-monto">{{ detalle.ap_ac | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-multa">{{ detalle.multa_no_presentacion | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-space"></div>
+          <div class="excel-total-cell excel-total-space"></div>
+          <div class="excel-total-cell excel-total-space"></div>
+          <div class="excel-total-cell excel-total-interes">{{ detalle.interes | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-multas">{{ detalle.multa_sobre_interes | number:'1.2-2' }}</div>
+          <div class="excel-total-cell excel-total-final">{{ formatearMonedaSinSimbolo(detalle.total_a_cancelar) }}</div>
+        </div>
+      </div>
+  
+      <!-- 📊 TABLA RESUMEN INFERIOR -->
+      <div class="excel-summary-section">
+
+  
+        <!-- TABLA DERECHA - RECARGOS DE LEY -->
+        <div class="excel-summary-right">
+          <div class="excel-recargos-header">RECARGOS</div>
+          <div class="excel-recargos-table">
+            <div class="excel-recargos-row">
+              <div class="excel-recargos-label">APORTE 10%</div>
+              <div class="excel-recargos-value">{{ detalle.subtotal_aportes | number:'1.2-2' }}</div>
+            </div>
+            <div class="excel-recargos-row">
+              <div class="excel-recargos-label">INTERES</div>
+              <div class="excel-recargos-value">{{ detalle.interes | number:'1.2-2' }}</div>
+            </div>
+            <div class="excel-recargos-row">
+              <div class="excel-recargos-label">MULTA</div>
+              <div class="excel-recargos-value">{{ (+detalle.multa_sobre_interes + +detalle.multa_no_presentacion) | number:'1.2-2' }}</div>
+            </div>
+            <div class="excel-recargos-row">
+              <div class="excel-recargos-label">ACTUALIZACION</div>
+              <div class="excel-recargos-value">{{ detalle.ap_ac | number:'1.2-2' }}</div>
+            </div>
+            <div class="excel-recargos-row excel-recargos-total">
+              <div class="excel-recargos-label">TOTAL RECARGOS DE LEY</div>
+              <div class="excel-recargos-value">{{ (+detalle.interes + +detalle.multa_sobre_interes + +detalle.multa_no_presentacion + +detalle.ap_ac) | number:'1.2-2' }}</div>
+            </div>
+            <div class="excel-recargos-row excel-recargos-total">
+                <div class="excel-recargos-label">PAGO TOTAL</div>
+                <div class="excel-recargos-value">{{ (detalle.total_a_cancelar) | number:'1.2-2' }}</div>
+              </div>
+          </div>
+        </div>
+      </div>
+  
+  
+    </div>
+  
+  </div>
+</div>

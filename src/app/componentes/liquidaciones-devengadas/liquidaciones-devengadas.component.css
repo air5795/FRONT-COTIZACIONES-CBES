@@ -1,0 +1,370 @@
+/* Estilo principal */
+.perfil-empleador {
+    background: #ffffff;
+    /* border-radius: 12px; */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Estilo de la cabecera compacta */
+.header {
+    background: linear-gradient(135deg, #009688, #00695c);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 3px solid #004d40;
+    /* flex-direction: row-reverse; */
+}
+
+/* Estilo del título "Perfil de Empleador" a la izquierda */
+.header-left h2 {
+    /* margin: 0; */
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Estilo para Razón Social y N° Patronal */
+.header-right {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+/* Razón Social (Empresa) */
+.razon-social {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* N° Patronal */
+.numero-patronal {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+  
+/* ===== ESTADÍSTICAS RÁPIDAS ===== */
+.stats-cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background:#e9e9e9;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  min-width: 150px;
+}
+
+
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stat-label {
+  color: #7f8c8d;
+  font-size: 0.8rem;
+}
+
+/* ===== ESTILOS DE TABLA ===== */
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background-color: #e9e9e9;
+    color: #464646;
+    border: 1px solid #d3cece;
+    padding: 5px;
+  }
+  
+  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0;
+  }
+  
+  :host ::ng-deep .p-datatable-header {
+    background-color: #e9e9e9;
+
+  }
+  
+  /* Estilo para la tabla */
+  .tabla-centrada {
+  
+    border-collapse: collapse;
+    width: 100%;  /* Asegúrate de que la tabla ocupe el 100% del ancho disponible */
+  }
+  
+  /* Estilo para las celdas (centrar horizontal y verticalmente) */
+  .tabla-centrada th, .tabla-centrada td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center; /* Centra el contenido horizontalmente */
+    vertical-align: middle; /* Centra el contenido verticalmente */
+  }
+  
+/* ===== BOTONES DE ESTADO ===== */
+.estado-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: default;
+  min-width: 80px;
+}
+
+.estado-btn.devengado {
+  background-color: #ff9800;
+  color: white;
+}
+
+/* ===== BOTONES PROFESIONALES DE ACCIONES ===== */
+.action-buttons-container {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  padding: 2px;
+  background-color: #e9e9e9;
+}
+
+.action-btn {
+  flex: 1;
+  min-height: 25px;
+  border: none;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-transform: none;
+  letter-spacing: 0.2px;
+  padding: 0.4rem 0.6rem;
+}
+
+.action-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.action-btn span,
+.action-btn i {
+  position: relative;
+  z-index: 2;
+}
+
+/* Botón Ver - Tema principal */
+.btn-view {
+  background: #009688;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #08554D;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.btn-view:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 150, 136, 0.2);
+}
+  
+/* ===== ESTILOS ESPECÍFICOS DE LIQUIDACIONES DEVENGADAS ===== */
+.empresa-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+.tipo-empresa {
+  color: #7f8c8d;
+  font-size: 0.8rem;
+}
+
+.codigo-patronal {
+  font-family: 'Courier New', monospace;
+  background-color: #f8f9fa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.periodo-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mes {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.gestion {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.dias-mora {
+  padding: 2px 6px;
+  border-radius: 3px;
+  /* font-size: 0.8rem;
+  font-weight: 600; */
+  text-align: center;
+}
+
+.nivel-multa {
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.total-pagar {
+  color: #e74c3c;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+  
+/* ===== ESTADOS Y NIVELES ===== */
+.nivel-critico { 
+  background-color: #dc3545 !important; 
+  color: white !important;
+}
+.nivel-alto { 
+  background-color: #fd7e14 !important; 
+  color: white !important;
+}
+.nivel-medio { 
+  background-color: #ffc107 !important; 
+  color: #333 !important;
+}
+.nivel-bajo { 
+  background-color: #28a745 !important; 
+  color: white !important;
+}
+.nivel-sin-multa { 
+  background-color: #6c757d !important; 
+  color: white !important;
+}
+
+.mora-critica { 
+  background-color: #dc3545 !important; 
+  color: white !important;
+}
+.mora-alta { 
+  background-color: #fd7e14 !important; 
+  color: white !important;
+}
+.mora-media { 
+  background-color: #ffc107 !important; 
+  color: #333 !important;
+}
+.mora-baja { 
+  background-color: #28a745 !important; 
+  color: white !important;
+}
+.mora-sin { 
+  background-color: #6c757d !important; 
+  color: white !important;
+}
+  
+/* ===== ESTADÍSTICAS DETALLADAS ===== */
+.statistics-card {
+  margin-top: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.statistics-card h3 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statistics-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.stat-section h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+.stat-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #3498db;
+}
+
+.stat-item .stat-label {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.stat-item .stat-value {
+  color: #495057;
+}
+
+.stat-item .stat-amount {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-right {
+    text-align: center;
+    margin-top: 5px;
+  }
+  
+  .stats-cards {
+    justify-content: center;
+  }
+}

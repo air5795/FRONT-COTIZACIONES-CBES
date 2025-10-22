@@ -1,0 +1,712 @@
+
+/* ===== ESTILOS ESPECÍFICOS DEL COMPONENTE PLANILLAS-APORTES-LIST ===== */
+/* Los estilos generales han sido movidos a styles.css para reutilización */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .circle {
+    width: 20px;
+    height: 20px;
+    margin: 0 2px;
+  }
+
+  .purple {
+    background-color: #9c27b0;
+  }
+  
+  .yellow {
+    background-color: #ebebb8;
+  }
+
+  .blue{
+    background-color: #739eb5;
+  }
+  
+  .green {
+    background-color: rgb(78, 214, 146);
+  }
+  
+  .red {
+    background-color: #f59999;
+  }
+  
+  .gray {
+    background-color: #d3d3d3; /* Gris para los círculos inactivos */
+  }
+  
+  .label-container {
+    text-align: center;
+  }
+  
+  label {
+    font-size: 12px;
+    color: #333;
+  }
+
+  /* Estilos para el menú de plantillas */
+  .menu-plantillas {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-plantillas .menu-item {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #495057;
+    font-size: 13px;
+  }
+
+  .menu-plantillas .menu-item:hover {
+    background-color: #558373;
+    color: white;
+    border-color: #558373;
+  }
+
+  :host ::ng-deep .p-overlaypanel {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e9ecef;
+  }
+
+  :host ::ng-deep .p-overlaypanel .p-overlaypanel-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  :host ::ng-deep p-overlaypanel .p-overlaypanel-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background-color: #e9e9e9;
+    color: #464646;
+    border: 1px solid #d3cece;
+    padding: 5px;
+  }
+  
+  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0;
+  }
+  
+  :host ::ng-deep .p-datatable-header {
+    background-color: #e9e9e9;
+
+  }
+  
+  /* Estilo para la tabla */
+  .tabla-centrada {
+  
+    border-collapse: collapse;
+    width: 100%;  /* Asegúrate de que la tabla ocupe el 100% del ancho disponible */
+  }
+  
+  /* Estilo para las celdas (centrar horizontal y verticalmente) */
+  .tabla-centrada th, .tabla-centrada td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center; /* Centra el contenido horizontalmente */
+    vertical-align: middle; /* Centra el contenido verticalmente */
+  }
+  
+  h3{
+    background-color: #009688;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: medium;
+    margin: 0;
+  }
+  
+  
+  
+  .card h5{
+    background-color: #009688; 
+    color: white; 
+    padding: 10px;
+    margin: 0;   
+    display: inline-block;
+   
+    width: 100%; 
+  }
+  
+  .text-green {
+    color: green;
+  }
+  
+  .text-red {
+    color: red;
+  }
+  
+  :host ::ng-deep .p-button-success {
+    background-color: #71B452;
+    color: #ffffff; 
+  }
+  
+  /* Hacer la tabla más compacta */
+  .compact-table .p-datatable-tbody > tr > td, 
+  .compact-table .p-datatable-thead > tr > th {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Espaciado reducido entre los botones */
+  .flex.gap-1 > * {
+    margin-right: 0.25rem;
+  }
+  
+  .centered-table th, .centered-table td {
+    text-align: center;
+  }
+  
+  .row-pending {
+    background-color: #fff4f4 !important; /* Rojo claro */
+  }
+  
+  .row-assigned {
+    background-color: #f0fff0 !important; /* Verde claro */
+  }
+  
+  
+  
+  
+      /* Estilos del contenedor principal */
+      .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+  
+    /* Estilos del botón principal del dropdown */
+    .dropdown-button {
+        background-color: #4caf50;
+        color: white;
+        border: 1px solid #4caf50;
+        padding: 0.4rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        height: 2rem;
+        border-radius: 4px;
+    }
+  
+    /* Contenedor de los elementos del menú */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        flex-direction: column;
+        border: 1px solid #e9e9e9;
+        padding: 0.2rem;
+    }
+  
+    .dropdown-content button {
+        background-color: #757575;
+        border: none;
+        color: white;
+        font-size: 0.7rem;
+        padding: 0.3rem;
+        text-align: left;
+        width: 100%;
+        height: 2rem;
+        cursor: pointer;
+        margin: 0.1rem 0;
+        border-radius: 4px;
+    }
+  
+    .dropdown-content button:hover {
+        background-color: #616161;
+    }
+  
+    /* Mostrar el menú al hacer clic */
+    .dropdown.show .dropdown-content {
+        display: flex;
+    }
+  
+  
+  /* Ocultar el texto en pantallas menores a 1080px */
+  @media (max-width: 1079px) {
+    .button-text {
+        display: none;
+    }
+    .button-label {
+        flex: initial; /* Permite que los botones tengan ancho variable sin texto */
+    }
+  }
+  
+  /* Mostrar el texto y hacer que los botones tengan el mismo ancho en pantallas de al menos 1080px */
+  @media (min-width: 1080px) {
+    .button-text {
+        display: inline;
+        margin-left: 0.5rem;
+        max-width: max-content;
+    }
+    .p-buttonset {
+        display: flex;
+    }
+    .button-label {
+        flex: 1; /* Hace que todos los botones tengan el mismo ancho cuando el texto está visible */
+        text-align: center; /* Alinea el contenido al centro */
+    }
+  }
+  
+  
+  
+  
+  
+  /* Contenedor de la tabla */
+  .custom-table-container {
+    padding: 1rem;
+    background-color: #f9f9f9; /* Fondo claro */
+    border: 1px solid #ddd; /* Borde suave */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  }
+  
+  /* Tabla */
+  .custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+  }
+  
+  /* Cabecera de las filas */
+  .custom-th {
+    background-color: #f4f4f4; /* Fondo azul */
+    color: rgb(55, 55, 55); /* Texto blanco */
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd; /* Línea de separación */
+    border: 10px solid #ffffff; /* Línea de separación */
+    font-size: 15px;
+  
+  }
+  
+  /* Celdas de datos */
+  .custom-td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd; /* Línea de separación */
+    vertical-align: top;
+  }
+  
+  /* Lista de diagnósticos */
+  .diagnosticos-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .diagnosticos-list li {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #e9ecef; /* Fondo gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 0.85rem;
+  }
+  
+  /* Estilo para categorías */
+  .diagnostico-category {
+    display: block;
+    color: #343a40; /* Gris oscuro */
+    font-weight: bold;
+  }
+  
+  /* Estilo para nombres */
+  .diagnostico-name {
+    display: block;
+    color: #6c757d; /* Gris claro */
+    margin-top: 0.25rem;
+  }
+  
+  .alert-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .alert-active {
+    background-color: #4caf50; /* Verde */
+    border: 1px solid #388e3c;
+  }
+  
+  .alert-inactive {
+    background-color: #f44336; /* Rojo */
+    border: 1px solid #d32f2f;
+  }
+  
+  .alert-card i {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+  }
+  
+  
+  
+  
+  .botones-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 2 columnas de tamaño igual */
+    gap:0.1rem; /* Espaciado uniforme entre botones */
+    justify-content: center; /* Centra la cuadrícula horizontalmente */
+    align-items: center; /* Centra los botones verticalmente */
+  }
+  .botones-grid button {
+    width: 100%; /* Ancho fijo */
+    height: 4rem; /* Alto fijo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+
+
+
+  .button-container {
+    display: flex;
+    gap: 10px; /* Ajusta este valor para controlar la separación entre los botones */
+}
+
+
+
+  .custom-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1rem;
+    /* padding: 1rem 2rem; */
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+}
+
+.custom-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.custom-icon {
+    font-size: 2rem;
+    padding-bottom: 10px;
+}
+
+/* Colores específicos para cada botón */
+.p-button-danger.custom-button {
+    background-color: #ff6565;
+    color: white;
+}
+
+.p-button-danger.custom-button:hover {
+    background-color: #eb3f3f;
+}
+
+.p-button-success.custom-button {
+    background-color: #3a915d;
+    color: white;
+}
+
+.p-button-success.custom-button:hover {
+    background-color: #007E33;
+}
+
+.p-button-info.custom-button {
+    background-color: #44bbae;
+    color: white;
+}
+
+.p-button-info.custom-button:hover {
+    background-color: #3aa195;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Contenedor del archivo */
+.file-upload-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: 8px;
+    padding: 20px;
+  }
+  
+  /* Estilo del input file */
+  .file-upload-input {
+    display: none; /* Ocultar el input file original */
+  }
+  
+  /* Estilo del botón personalizado */
+  .file-upload-button {
+    background-color: #009688;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .file-upload-button:hover {
+    background-color: #02bdaa;
+  }
+  
+  .file-upload-button i {
+    margin-right: 8px;
+  }
+  
+  /* Texto informativo */
+  small.text-muted {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+  }
+
+/* Estilos para colorear filas según el estado */
+:host ::ng-deep .p-datatable .p-datatable-tbody .fila-borrador {
+  background-color: #ebe6ff !important;
+  color: #333 !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody .fila-presentado {
+  background-color: #d7f1ff !important;
+  color: #547485 !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody .fila-aprobado {
+  background-color: rgb(78, 214, 146) !important;
+  color: white !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody .fila-observado {
+  background-color: #f59999 !important;
+  color: white !important;
+}
+
+/* ===== BOTONES PROFESIONALES DE ACCIONES ===== */
+.action-buttons-container {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  padding: 2px;
+  background-color: #e9e9e9;
+}
+
+.action-btn {
+  flex: 1;
+  min-height: 25px;
+  border: none;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-transform: none;
+  letter-spacing: 0.2px;
+  padding: 0.4rem 0.6rem;
+}
+
+
+
+.action-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.action-btn span,
+.action-btn i {
+  position: relative;
+  z-index: 2;
+}
+
+/* Botón Ver - Tema principal */
+.btn-view {
+  background: #009688;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #08554D;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.btn-view:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 150, 136, 0.2);
+}
+
+/* Botón Eliminar - Habilitado */
+.btn-delete.enabled {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+}
+
+.btn-delete.enabled:hover {
+  background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.btn-delete.enabled:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(229, 62, 62, 0.2);
+}
+
+/* Botón Eliminar - Deshabilitado */
+.btn-delete.disabled {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+  color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.btn-delete.disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-delete.disabled::before {
+  display: none;
+}
+
+
+
+/* ===== TEXTO DE TIPO DE PLANILLA ===== */
+.tipo-planilla-text {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease;
+  width: 90%;
+}
+
+/* Mensual - Verde principal */
+.tipo-mensual {
+  color: #008496;
+  background-color: rgba(0, 150, 136, 0.1);
+}
+
+/* Planilla Adicional - Azul */
+.tipo-adicional {
+  color: #2262af;
+  background-color: rgba(34, 98, 175, 0.1);
+}
+
+/* Beneficio Social - Púrpura */
+.tipo-beneficio {
+  color: #7c3aed;
+  background-color: rgba(124, 58, 237, 0.1);
+}
+
+/* Reintegro - Naranja */
+.tipo-reintegro {
+  color: #f97316;
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+/* Retroactivo - Teal */
+.tipo-retroactivo {
+  color: #14b8a6;
+  background-color: rgba(20, 184, 166, 0.1);
+}
+
+/* Default - Gris */
+.tipo-default {
+  color: #64748b;
+  background-color: rgba(100, 116, 139, 0.1);
+}
+
+
+
+

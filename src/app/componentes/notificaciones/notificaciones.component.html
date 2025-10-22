@@ -1,0 +1,46 @@
+<div class="notification-container" (clickOutside)="closeDropdown()">
+  <button
+    type="button"
+    class="notification-btn"
+    (click)="toggleDropdown($event)"
+    aria-label="Notificaciones"
+    title="{{ notificacionesNoLeidas }} notificaciones">
+
+      <span class="icon-wrapper">
+        <i class="pi pi-bell"></i>
+        <span *ngIf="notificacionesNoLeidas > 0" class="custom-badge">
+          {{ badgeText }}
+        </span>
+      </span>
+  </button>
+
+  <div class="notification-dropdown modern-scroll" *ngIf="isDropdownVisible"  (mouseleave)="closeDropdown()">
+    <div class="notification-header">Notificaciones</div>
+
+    <div class="notification-list">
+      <div *ngIf="notificaciones.length === 0" class="no-notifications">
+        <i class="pi pi-inbox"></i>
+        <span>No tienes notificaciones</span>
+      </div>
+
+      <div
+        *ngFor="let notificacion of notificaciones"
+        class="notification-item"
+        [ngClass]="{'unread': !notificacion.leido}"
+        (click)="onNotificacionClick(notificacion)">
+        
+        <div class="unread-indicator" *ngIf="!notificacion.leido"></div>
+        <div class="notification-icon">
+          <i class="pi pi-file"></i>
+        </div>
+        <div class="notification-content">
+          <span class="titulo">{{ notificacion.empresa }}</span>
+          <span class="notification-message">{{ notificacion.mensaje }}</span>
+          <div class="notification-time">
+            {{ notificacion.fecha_creacion | date:'mediumDate' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

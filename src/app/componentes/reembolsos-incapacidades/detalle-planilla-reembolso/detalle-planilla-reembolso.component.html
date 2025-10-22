@@ -1,0 +1,909 @@
+
+<!-- ENCAMBEZADO DE PLANILLA ---------------------------------------------------------------------------------->
+<div class="grid dashboard" >
+  <div class="col-12 md:col-12 lg:6">
+    <div class="perfil-empleador">
+      <div class="cabezera-planilla">
+        <div class="header-left">
+          <h2 style="font-size: 15px; display: flex; align-items: center; font-family: 'Roboto', sans-serif; margin: 5px 0 5px;">
+            <span style="background-color: #009688; color: white; padding: 6px 10px; border-radius: 4px 0 0 4px; display: flex; align-items: center;">
+              N° {{ solicitudReembolso?.id_solicitud_reembolso }}
+            </span>
+            <span style="background-color: #018b7b; color: white; padding: 6px 10px; ">
+              INCAPACIDADES 
+            </span>
+            <span style="background-color: #00796b; color: white; padding: 6px 10px; ">
+              {{ solicitudReembolso?.mes }}
+            </span>
+            <span style="background-color: #00685a; color: white; padding: 6px 10px; ">
+              {{ solicitudReembolso?.gestion }}
+            </span>
+            <span  style="background-color: #00483a; color: white; padding: 6px 10px;  ">
+              {{ solicitudReembolso?.empresa?.emp_nom || 'N/A' }}
+            </span>
+            <span
+              style="background-color: #00382a; color: white; padding: 6px 10px; border-radius: 0 4px 4px 0;">
+              {{ solicitudReembolso?.tipo_empresa === 'PA' ? 'PASIVO' : 
+                solicitudReembolso?.tipo_empresa === 'AP' ? 'PÚBLICA' : 
+                solicitudReembolso?.tipo_empresa === 'AV' ? 'PRIVADA' : 
+                solicitudReembolso?.tipo_empresa === 'VA' ? 'DECRETO SUPREMO' : 
+                solicitudReembolso?.tipo_empresa || 'N/A'}}
+            </span>
+          </h2>
+
+          <hr style="border: 1px solid #cacaca; margin: 4px 0;">
+
+          <div class="list-container">
+            <!-- Estado de Planilla -->
+            <div [ngSwitch]="solicitudReembolso?.estado" class="list-item"
+              [ngStyle]="{'background-color': getFondoEstado(solicitudReembolso?.estado || 0)}">
+              <div class="estado-container" *ngSwitchCase="0">
+                <span class="label">ESTADO</span>
+                <span class="value" [ngStyle]="{'color': getColorEstado(solicitudReembolso?.estado || 0)}">
+                  BORRADOR <i class="pi pi-question-circle"></i>
+                </span>
+              </div>
+              <div class="estado-container" *ngSwitchCase="1">
+              <span class="label">ESTADO</span>
+              <span class="value" [ngStyle]="{'color': getColorEstado(solicitudReembolso?.estado || 0)}">
+                PRESENTADO <i class="pi pi-send"></i>
+              </span>
+            </div>
+            <div class="estado-container" *ngSwitchCase="2">
+              <span class="label">ESTADO</span>
+              <span class="value" [ngStyle]="{'color': getColorEstado(solicitudReembolso?.estado || 0)}">
+                APROBADO <i class="pi pi-check"></i>
+              </span>
+            </div>
+            <div class="estado-container" *ngSwitchCase="3">
+              <span class="label">ESTADO</span>
+              <span class="value" [ngStyle]="{'color': getColorEstado(solicitudReembolso?.estado || 0)}">
+                <i class="pi pi-exclamation-triangle"></i> OBSERVADO - {{ solicitudReembolso?.observaciones }} 
+              </span>
+            </div>
+          </div>
+
+
+          <!-- Información de Presentación (solo para estados diferentes a borrador) -->
+          <div *ngIf="solicitudReembolso?.estado !== 0" class="list-item" >
+            <span class="label">PRESENTADO POR</span>
+            <span class="value" >
+              {{ solicitudReembolso?.nombre_usuario || 'No especificado' }}
+            </span>
+          </div>
+
+          <div *ngIf="solicitudReembolso?.estado !== 0 && solicitudReembolso?.fecha_presentacion" class="list-item" >
+            <span class="label">FECHA DE PRESENTACIÓN</span>
+            <span class="value" >
+               {{ solicitudReembolso?.fecha_presentacion | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+
+          <!-- N° de Trabajadores -->
+          <div class="list-item">
+            <span class="label">N° de Trabajadores</span>
+            <ng-container>
+              <span class="value">
+                 {{ totalTrabajadores }}
+              </span>
+            </ng-container>
+          </div>
+
+          <!-- Total Reembolso -->
+          <div class="list-item">
+            <span class="label">Total Reembolso</span>
+            <ng-container>
+              <span class="value">
+                <i class="pi pi-money-bill"></i> {{ totalReembolso | number:'1.2-2' }} Bs
+              </span>
+            </ng-container>
+          </div>
+        </div>
+        </div>
+
+        <div class="header-right">
+          <div class="button-container">
+            <button
+              *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3"
+              pButton
+              label="Trabajador"
+              class="boton2"
+              style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 120px; "
+              (click)="abrirBuscarTrabajador()">
+                <span class="pi pi-search" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;" >Agregar</span>
+            </button>
+
+
+            <button
+              *ngIf="solicitudReembolso?.estado === 0"
+              pButton
+              label="Solicitud"
+              class="boton5"
+              style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 120px; "
+              [disabled]="detallesReembolso.length === 0 || solicitudReembolso?.estado !== 0 || !puedePresentarSolicitud"
+              (click)="presentarSolicitud()">
+                <span class="pi pi-send" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;" >Presentar</span>
+            </button>
+
+            <button
+              *ngIf="solicitudReembolso?.estado === 3"
+              pButton
+              label="Correcciones"
+              class="boton-aprobar"
+              style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 120px; "
+              (click)="enviarCorrecciones()">
+                <span class="pi pi-check" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;" >Enviar</span>
+            </button>
+
+            <!-- Botón de Reporte PDF -->
+            <button
+              *ngIf="solicitudReembolso?.estado !== 0 && solicitudReembolso?.estado !== 3"
+              pButton
+              label="PDF"
+              class="boton4"
+              style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 80px; "
+              (click)="generarReportePDF()">
+                <span class="pi pi-file-pdf" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;" >Reporte</span>
+            </button>
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  
+  <!-- Tabla de detalles con pestañas -->
+  <div class="p-card planilla-card" style="box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+    <div class="p-card-body" style="padding: 0;">
+      
+      <!-- Pestañas -->
+      <p-tabView [(activeIndex)]="activeTabIndex" [style]="{ padding: '5px' , 'border': '1px solid #ccc', borderRadius: '5px' }" >
+        
+        <!-- PESTAÑA RESUMEN ORIGINAL -->
+        <p-tabPanel>
+          <ng-template pTemplate="header">
+            <i class="pi pi-chart-bar" style="margin-right: 0.5rem; color: inherit;"></i>
+            <span>Resumen General</span>
+          </ng-template>
+          <div class="dashboard-container">
+            <!-- Contenedor principal de dos secciones -->
+            <div class="content-grid" style="display: grid; grid-template-columns: 4fr 4fr; background-color: #f5f5f5;">
+              <!-- Panel izquierdo: Tarjetas de información -->
+              <div class="summary-panel">
+                <!-- Diseño de tarjetas -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; padding: 15px; background-color: #f5f5f5;">
+                  <!-- Tarjeta: Total Trabajadores -->
+                  <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                    <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
+                      <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Trabajadores</span>
+                        <i class="pi pi-users" style="color: #00796b; font-size: 1.5rem;"></i>
+                      </div>
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                      <div style="font-size: 2.2rem; font-weight: 700; color: #00695c;">
+                        {{ totalTrabajadores }}
+                      </div>
+                      <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Trabajadores en planilla</div>
+                    </div>
+                  </div>
+  
+                  <!-- Tarjeta: Total Reembolso -->
+                  <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                    <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
+                      <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Reembolso</span>
+                        <i class="pi pi-money-bill" style="color: #00796b; font-size: 1.5rem;"></i>
+                      </div>
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                      <div style="font-size: 2.2rem; font-weight: 700; color: #4caf50; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        {{ totalReembolso | currency:'BOB':'symbol':'1.2-2' }}
+                      </div>
+                      <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Monto total a reembolsar</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- Panel derecho: Tabla de resumen por tipo de incapacidad -->
+              <div class="summary-panel">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <i class="pi pi-tag"></i>
+                        Tipo de Incapacidad
+                      </th>
+                      <th class="text-right">
+                        <i class="pi pi-users"></i>
+                        Cantidad
+                      </th>
+                      <th class="text-right">
+                        <i class="pi pi-money-bill"></i>
+                        Total Reembolso
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Filas de resumen por tipo de incapacidad -->
+                    <tr>
+                      <td>Enfermedad Común</td>
+                      <td class="text-right">{{ totalesPorTipo.ENFERMEDAD.trabajadores }}</td>
+                      <td class="text-right">{{ totalesPorTipo.ENFERMEDAD.monto | currency:'BOB':'symbol':'1.2-2' }}</td>
+                    </tr>
+                    <tr>
+                      <td>Maternidad</td>
+                      <td class="text-right">{{ totalesPorTipo.MATERNIDAD.trabajadores }}</td>
+                      <td class="text-right">{{ totalesPorTipo.MATERNIDAD.monto | currency:'BOB':'symbol':'1.2-2' }}</td>
+                    </tr>
+                    <tr>
+                      <td>Riesgo Profesional</td>
+                      <td class="text-right">{{ totalesPorTipo.PROFESIONAL.trabajadores }}</td>
+                      <td class="text-right">{{ totalesPorTipo.PROFESIONAL.monto | currency:'BOB':'symbol':'1.2-2' }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td>
+                        <i class="pi pi-chart-bar"></i>
+                        Totales
+                      </td>
+                      <td style="text-align: right;">{{ totalTrabajadores }}</td>
+                      <td style="text-align: right;">{{ totalReembolso | currency:'BOB':'symbol':'1.2-2' }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+                <div *ngIf="totalTrabajadores === 0" class="empty-message">
+                  <i class="pi pi-info-circle"></i>
+                  No hay trabajadores agregados aún.
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+        
+        <!-- PESTAÑA ENFERMEDAD COMÚN -->
+        <p-tabPanel [disabled]="detallesPorTipo.ENFERMEDAD.length === 0">
+          <ng-template pTemplate="header">
+            
+            <span style="margin-right: 0.5rem;">Enfermedad Común</span>
+            <span class="badge-circular">{{ totalesPorTipo.ENFERMEDAD.trabajadores }}</span>
+          </ng-template>
+          
+          <p-table 
+            [value]="getDetallesFiltradosPorTipo('ENFERMEDAD')"
+            styleClass="p-datatable-sm tabla-contador"
+            [paginator]="true"
+            [rows]="paginacionPorTipo.ENFERMEDAD.limite"
+            [totalRecords]="paginacionPorTipo.ENFERMEDAD.total"
+            (onPage)="onPageChangePorTipo($event, 'ENFERMEDAD')"
+            [rowsPerPageOptions]="[10,20,30,50]"
+            [pageLinks]="3"
+            [loading]="paginacionPorTipo.ENFERMEDAD.cargando">
+            
+            <ng-template pTemplate="caption">
+              <div class="flex justify-content-between flex-column sm:flex-row align-items-center">
+                <div class="flex flex-column sm:flex-row gap-2 mb-2">
+                  <span class="p-input-icon-left w-full sm:w-auto">
+                    <i class="pi pi-search"></i>
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="busquedaPorTipo.ENFERMEDAD"
+                      (input)="buscarPorTipoAutomatico('ENFERMEDAD')"
+                      placeholder="Buscar..."
+                      class="w-full"
+                    />
+                  </span>
+                  <!-- <button 
+                    pButton 
+                    type="button" 
+                    label="Limpiar" 
+                    icon="pi pi-times" 
+                    class="p-button-secondary"
+                    (click)="limpiarBusquedaPorTipo('ENFERMEDAD')">
+                  </button> -->
+                </div>
+                <button pButton label="Recargar" class="p-button-outlined " icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+              </div>
+            </ng-template>
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th rowspan="2" class="col-numero" style="text-align: center">N°</th>
+                <th rowspan="2" class="col-nombre" style="text-align: center">NOMBRE</th>
+                <th colspan="3" style="text-align: center">BAJA MÉDICA</th>
+                <th colspan="3" style="text-align: center">CORRESPONDIENTE AL MES</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">día -3</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL<br>GANADO</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL<br>DÍA</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">DÍAS<br>CBES</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL</th>
+                <th rowspan="2" class="col-total-porcentaje-header" style="text-align: center">TOTAL<br>(75%)</th>
+                <th rowspan="2" style="text-align: center">OBSERVACIÓN</th>
+
+                <th rowspan="2" *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3" style="text-align: center">ACCIONES</th>
+              </tr>
+              <tr>
+                <th class="col-fecha" style="text-align: center">Empiezo</th>
+                <th class="col-fecha" style="text-align: center">Termino</th>
+                <th class="col-numero" style="text-align: center">día</th>
+                <th class="col-fecha" style="text-align: center">DE</th>
+                <th class="col-fecha" style="text-align: center">A</th>
+                <th class="col-numero" style="text-align: center">DIA</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-detalle let-i="rowIndex">
+              <tr [ngStyle]="{
+                'background-color': detalle.estado_revision === 'observado' ? '#ffe6e6' : 
+                                   detalle.estado_revision === 'aprobado' ? '#e6ffe6' : 'transparent'
+              }">
+                <td class="col-numero" style="text-align: center;">{{ detalle.nro }}</td>
+                <td class="col-nombre" style="text-align: center;">{{ detalle.apellido_paterno }} {{ detalle.apellido_materno }}, {{ detalle.nombres }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(detalle.fecha_inicio_baja) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(detalle.fecha_fin_baja) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasTotalesBaja(detalle) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(getFechaInicioEnMes(detalle)) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(getFechaFinEnMes(detalle)) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasEnMes(detalle) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasMenos3(detalle) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.salario | number:'1.2-2' }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.monto_dia | number:'1.2-2' }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.dias_reembolso }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.monto_subtotal | number:'1.2-2' }}</td>
+                <td class="col-total-porcentaje" style="text-align: center;">{{ detalle.monto_reembolso | number:'1.2-2' }}</td>
+                <td style="text-align: center;">{{ detalle.observaciones || '' }}</td>
+                <td style="text-align: center;" *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3">
+                  <div class="action-buttons-container">
+                    <button 
+                      type="button" 
+                      class="action-btn btn-delete enabled"
+                      (click)="eliminarDetalle(getIndexInFullArray(detalle))"
+                      title="Eliminar trabajador de la planilla"
+                    >
+                      <i class="pi pi-trash"></i>
+                      <span>Eliminar</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td [attr.colspan]="solicitudReembolso?.estado === 0 ? 15 : 14" style="text-align: center; padding: 2rem;">
+                  <div style="color: #6c757d;">
+                    <i class="pi pi-info-circle" style="font-size: 2rem; margin-bottom: 1rem; color: #dee2e6;"></i>
+                    <p>No hay registros de enfermedad común</p>
+                    <p style="font-size: 0.9rem;">Utilice el botón "Buscar Trabajador" para agregar trabajadores.</p>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="footer">
+              <tr class="footer-total-row">
+                <td [attr.colspan]="13" class="footer-total-label">TOTAL ENFERMEDAD COMÚN:</td>
+                <td class="footer-total-monto" style="background: #009688 !important; color: white !important;">{{ totalesPorTipo.ENFERMEDAD.monto | number:'1.2-2' }} </td>
+                <td></td>
+                <td *ngIf="solicitudReembolso?.estado === 0"></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabPanel>
+        
+        <!-- PESTAÑA MATERNIDAD -->
+        <p-tabPanel [disabled]="detallesPorTipo.MATERNIDAD.length === 0">
+          <ng-template pTemplate="header">
+            
+            <span style="margin-right: 0.5rem;">Maternidad</span>
+            <span class="badge-circular">{{ totalesPorTipo.MATERNIDAD.trabajadores }}</span>
+          </ng-template>
+          
+          <p-table 
+            [value]="getDetallesFiltradosPorTipo('MATERNIDAD')"
+            styleClass="p-datatable-sm tabla-contador"
+            [paginator]="true"
+            [rows]="paginacionPorTipo.MATERNIDAD.limite"
+            [totalRecords]="paginacionPorTipo.MATERNIDAD.total"
+            (onPage)="onPageChangePorTipo($event, 'MATERNIDAD')"
+            [rowsPerPageOptions]="[10,20,30,50]"
+            [pageLinks]="3"
+            [loading]="paginacionPorTipo.MATERNIDAD.cargando">
+            
+            <ng-template pTemplate="caption">
+              <div class="flex justify-content-between flex-column sm:flex-row align-items-center">
+                <div class="flex flex-column sm:flex-row gap-2 mb-2">
+                  <span class="p-input-icon-left w-full sm:w-auto">
+                    <i class="pi pi-search"></i>
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="busquedaPorTipo.MATERNIDAD"
+                      (input)="buscarPorTipoAutomatico('MATERNIDAD')"
+                      placeholder="Buscar..."
+                      class="w-full"
+                    />
+                  </span>
+                  <!-- <button 
+                    pButton 
+                    type="button" 
+                    label="Limpiar" 
+                    icon="pi pi-times" 
+                    class="p-button-secondary"
+                    (click)="limpiarBusquedaPorTipo('MATERNIDAD')">
+                  </button> -->
+                </div>
+                <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+              </div>
+            </ng-template>
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th rowspan="2" class="col-numero" style="text-align: center">N°</th>
+                <th rowspan="2" class="col-nombre" style="text-align: center">NOMBRE</th>
+                <th colspan="3" style="text-align: center">BAJA MÉDICA</th>
+                <th colspan="3" style="text-align: center">CORRESPONDIENTE AL MES</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">día -3</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL<br>GANADO</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL<br>DÍA</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">DÍAS<br>CBES</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL</th>
+                <th rowspan="2" class="col-total-porcentaje-header" style="text-align: center">TOTAL<br>(90%)</th>
+                <th rowspan="2" style="text-align: center">OBSERVACIÓN</th>
+                <th rowspan="2" *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3" style="text-align: center">ACCIONES</th>
+              </tr>
+              <tr>
+                <th class="col-fecha" style="text-align: center">Empiezo</th>
+                <th class="col-fecha" style="text-align: center">Termino</th>
+                <th class="col-numero" style="text-align: center">día</th>
+                <th class="col-fecha" style="text-align: center">DE</th>
+                <th class="col-fecha" style="text-align: center">A</th>
+                <th class="col-numero" style="text-align: center">DIA</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-detalle let-i="rowIndex">
+              <tr [ngStyle]="{
+                'background-color': detalle.estado_revision === 'observado' ? '#ffe6e6' : 
+                                   detalle.estado_revision === 'aprobado' ? '#e6ffe6' : 'transparent'
+              }">
+                <td class="col-numero" style="text-align: center;">{{ detalle.nro }}</td>
+                <td class="col-nombre" style="text-align: center;">{{ detalle.apellido_paterno }} {{ detalle.apellido_materno }}, {{ detalle.nombres }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(detalle.fecha_inicio_baja) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(detalle.fecha_fin_baja) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasTotalesBaja(detalle) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(getFechaInicioEnMes(detalle)) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(getFechaFinEnMes(detalle)) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasEnMes(detalle) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasMenos3(detalle) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.salario | number:'1.2-2' }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.monto_dia | number:'1.2-2' }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.dias_reembolso }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.monto_subtotal | number:'1.2-2' }}</td>
+                <td class="col-total-porcentaje" style="text-align: center;">{{ detalle.monto_reembolso | number:'1.2-2' }}</td>
+                <td style="text-align: center;">{{ detalle.observaciones || '' }}</td>
+
+                <td style="text-align: center;" *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3">
+                  <div class="action-buttons-container">
+                    <button 
+                      type="button" 
+                      class="action-btn btn-delete enabled"
+                      (click)="eliminarDetalle(getIndexInFullArray(detalle))"
+                      title="Eliminar trabajador de la planilla"
+                    >
+                      <i class="pi pi-trash"></i>
+                      <span>Eliminar</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td [attr.colspan]="solicitudReembolso?.estado === 0 ? 16 : 15" style="text-align: center; padding: 2rem;">
+                  <div style="color: #6c757d;">
+                    <i class="pi pi-info-circle" style="font-size: 2rem; margin-bottom: 1rem; color: #dee2e6;"></i>
+                    <p>No hay registros de maternidad</p>
+                    <p style="font-size: 0.9rem;">Utilice el botón "Buscar Trabajador" para agregar trabajadores.</p>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="footer">
+              <tr class="footer-total-row">
+                <td [attr.colspan]="13" class="footer-total-label">TOTAL MATERNIDAD:</td>
+                <td class="footer-total-monto" style="background: #009688 !important; color: white !important;">{{ totalesPorTipo.MATERNIDAD.monto | number:'1.2-2' }} </td>
+                <td></td>
+                <td *ngIf="solicitudReembolso?.estado === 0"></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabPanel>
+        
+        <!-- PESTAÑA RIESGO PROFESIONAL -->
+        <p-tabPanel [disabled]="detallesPorTipo.PROFESIONAL.length === 0">
+          <ng-template pTemplate="header">
+            
+            <span style="margin-right: 0.5rem;">Riesgo Profesional</span>
+            <span class="badge-circular">{{ totalesPorTipo.PROFESIONAL.trabajadores }}</span>
+          </ng-template>
+          
+          
+          <p-table 
+            [value]="getDetallesFiltradosPorTipo('PROFESIONAL')"
+            styleClass="p-datatable-sm tabla-contador"
+            [paginator]="true"
+            [rows]="paginacionPorTipo.PROFESIONAL.limite"
+            [totalRecords]="paginacionPorTipo.PROFESIONAL.total"
+            (onPage)="onPageChangePorTipo($event, 'PROFESIONAL')"
+            [rowsPerPageOptions]="[10,20,30,50]"
+            [pageLinks]="3"
+            [loading]="paginacionPorTipo.PROFESIONAL.cargando">
+            
+            <ng-template pTemplate="caption">
+              <div class="flex justify-content-between flex-column sm:flex-row align-items-center">
+                <div class="flex flex-column sm:flex-row gap-2 ">
+                  <span class="p-input-icon-left w-full sm:w-auto">
+                    <i class="pi pi-search"></i>
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="busquedaPorTipo.PROFESIONAL"
+                      (input)="buscarPorTipoAutomatico('PROFESIONAL')"
+                      placeholder="Buscar..."
+                      class="w-full"
+                    />
+                  </span>
+                  <!-- <button 
+                    pButton 
+                    type="button" 
+                    label="Limpiar" 
+                    icon="pi pi-times" 
+                    class="p-button-secondary"
+                    (click)="limpiarBusquedaPorTipo('PROFESIONAL')">
+                  </button> -->
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                  <!-- Alerta de denuncias en pestaña -->
+                  <div *ngIf="totalDenunciasRequeridas > 0" class="denuncias-alerta-tab" 
+                       [class.denuncias-pendientes]="denunciasFaltantes > 0"
+                       [class.denuncias-completas]="denunciasFaltantes === 0">
+                    <div class="alerta-content">
+                      <div class="alerta-icon">
+                        <i *ngIf="denunciasFaltantes > 0" class="pi pi-exclamation-triangle"></i>
+                        <i *ngIf="denunciasFaltantes === 0" class="pi pi-check-circle"></i>
+                      </div>
+                      <div class="alerta-text">
+                        <div class="alerta-title">
+                          <span *ngIf="denunciasFaltantes > 0">Denuncias Pendientes</span>
+                          <span *ngIf="denunciasFaltantes === 0">Denuncias Completas</span>
+                        </div>
+                        <div class="alerta-subtitle">
+                          <span *ngIf="denunciasFaltantes > 0">{{ denunciasFaltantes }} de {{ totalDenunciasRequeridas }} faltantes</span>
+                          <span *ngIf="denunciasFaltantes === 0">{{ totalDenunciasRequeridas }} subidas</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                </div>
+              </div>
+            </ng-template>
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th rowspan="2" class="col-numero" style="text-align: center">N°</th>
+                <th rowspan="2" class="col-nombre" style="text-align: center">NOMBRE</th>
+                <th colspan="3" style="text-align: center">BAJA MÉDICA</th>
+                <th colspan="3" style="text-align: center">CORRESPONDIENTE AL MES</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">día -3</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL<br>GANADO</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL<br>DÍA</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">DÍAS<br>CBES</th>
+                <th rowspan="2" class="col-numero" style="text-align: center">TOTAL</th>
+                <th rowspan="2" class="col-total-porcentaje-header" style="text-align: center">TOTAL<br>(90%)</th>
+                <th rowspan="2" style="text-align: center">OBSERVACIÓN</th>
+                <th rowspan="2" style="text-align: center">DENUNCIA</th>
+                <th rowspan="2" *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3" style="text-align: center">ACCIONES</th>
+              </tr>
+              <tr>
+                <th class="col-fecha" style="text-align: center">Empiezo</th>
+                <th class="col-fecha" style="text-align: center">Termino</th>
+                <th class="col-numero" style="text-align: center">día</th>
+                <th class="col-fecha" style="text-align: center">DE</th>
+                <th class="col-fecha" style="text-align: center">A</th>
+                <th class="col-numero" style="text-align: center">DIA</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-detalle let-i="rowIndex">
+              <tr [ngStyle]="{
+                'background-color': detalle.estado_revision === 'observado' ? '#ffe6e6' : 
+                                   detalle.estado_revision === 'aprobado' ? '#e6ffe6' : 'transparent'
+              }">
+                <td class="col-numero" style="text-align: center;">{{ detalle.nro }}</td>
+                <td class="col-nombre" style="text-align: center;">{{ detalle.apellido_paterno }} {{ detalle.apellido_materno }}, {{ detalle.nombres }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(detalle.fecha_inicio_baja) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(detalle.fecha_fin_baja) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasTotalesBaja(detalle) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(getFechaInicioEnMes(detalle)) }}</td>
+                <td class="col-fecha" style="text-align: center;">{{ formatDateShort(getFechaFinEnMes(detalle)) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasEnMes(detalle) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ getDiasMenos3(detalle) }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.salario | number:'1.2-2' }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.monto_dia | number:'1.2-2' }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.dias_reembolso }}</td>
+                <td class="col-numero" style="text-align: center;">{{ detalle.monto_subtotal | number:'1.2-2' }}</td>
+                <td class="col-total-porcentaje" style="text-align: center;">{{ detalle.monto_reembolso | number:'1.2-2' }}</td>
+                <td style="text-align: center;">{{ detalle.observaciones || '' }}</td>
+                <td style="text-align: center;">
+                  <div class="denuncia-buttons-container">
+                    <button 
+                      *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3"
+                      type="button"
+                      class="denuncia-btn btn-upload"
+                      (click)="abrirSubirArchivo(detalle)"
+                      title="Subir archivo de denuncia"
+                    >
+                      <i class="pi pi-upload"></i>
+                      <span>Subir</span>
+                    </button>
+                    <button 
+                      type="button"
+                      class="denuncia-btn btn-view-file"
+                      [disabled]="!tieneArchivoDenuncia(detalle)"
+                      (click)="verArchivoDenuncia(detalle)"
+                      title="Ver archivo de denuncia"
+                    >
+                      <i class="pi pi-eye"></i>
+                      <span>Ver</span>
+                    </button>
+<!--                     <button 
+                      type="button"
+                      class="denuncia-btn btn-download"
+                      [disabled]="!tieneArchivoDenuncia(detalle)"
+                      (click)="descargarArchivoDenuncia(detalle)"
+                      title="Descargar archivo de denuncia"
+                    >
+                      <i class="pi pi-download"></i>
+                      <span>Descargar</span>
+                    </button> -->
+                  </div>
+                </td>
+                <td style="text-align: center;" *ngIf="solicitudReembolso?.estado === 0 || solicitudReembolso?.estado === 3">
+                  <div class="action-buttons-container">
+                    <button 
+                      type="button" 
+                      class="action-btn btn-delete enabled"
+                      (click)="eliminarDetalle(getIndexInFullArray(detalle))"
+                      title="Eliminar trabajador de la planilla"
+                    >
+                      <i class="pi pi-trash"></i>
+                      <span>Eliminar</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td [attr.colspan]="solicitudReembolso?.estado === 0 ? 17 : 16" style="text-align: center; padding: 2rem;">
+                  <div style="color: #6c757d;">
+                    <i class="pi pi-info-circle" style="font-size: 2rem; margin-bottom: 1rem; color: #dee2e6;"></i>
+                    <p>No hay registros de riesgo profesional</p>
+                    <p style="font-size: 0.9rem;">Utilice el botón "Buscar Trabajador" para agregar trabajadores.</p>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="footer">
+              <tr class="footer-total-row">
+                <td [attr.colspan]="13" class="footer-total-label">TOTAL RIESGO PROFESIONAL:</td>
+                <td class="footer-total-monto" style="background: #009688 !important; color: white !important;">{{ totalesPorTipo.PROFESIONAL.monto | number:'1.2-2' }}</td>
+                <td></td>
+                <td></td>
+                <td *ngIf="solicitudReembolso?.estado === 0"></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabPanel>
+        
+      </p-tabView>
+    </div>
+  </div>
+  
+  <!-- Dialog para buscar trabajador -->
+  <p-dialog 
+    [(visible)]="mostrarBuscarTrabajador" 
+    [modal]="true" 
+    [style]="{width: '90vw', maxWidth: '1400px'}"
+    [closable]="true"
+    [maximizable]="true">
+    
+    <ng-template pTemplate="header">
+      <div class="dialog-header-custom">
+        <span class="dialog-title"></span>
+        <div class="header-mode-selector">
+          <p-selectButton 
+            [options]="[
+              {label: 'Búsqueda Automática', value: 'automatico', icon: 'pi pi-search'},
+              {label: 'Ingreso Manual', value: 'manual', icon: 'pi pi-pencil'}
+            ]" 
+            [(ngModel)]="modoIngresoBusqueda" 
+            optionLabel="label" 
+            optionValue="value"
+            (onChange)="cambiarModoBusqueda($event.value)">
+            <ng-template let-item>
+              <i [class]="item.icon"></i>
+              <span class="ml-1">{{ item.label }}</span>
+            </ng-template>
+          </p-selectButton>
+        </div>
+      </div>
+    </ng-template>
+    
+    <app-buscar-trabajador 
+      #buscarTrabajadorRef
+      [codPatronal]="solicitudReembolso?.cod_patronal || ''"
+      [mes]="solicitudReembolso?.mes || ''"
+      [gestion]="solicitudReembolso?.gestion || ''"
+      [modoIngreso]="modoIngresoBusqueda"
+      (detalleSeleccionado)="onDetalleSeleccionado($event)">
+    </app-buscar-trabajador>
+  </p-dialog>
+
+  <!-- Dialog para subir archivo de denuncia -->
+  <app-subir-archivo-denuncia
+    [idDetalle]="detalleSeleccionadoParaArchivo?.id_detalle_reembolso || 0"
+    [(visible)]="mostrarSubirArchivo"
+    (archivoSubido)="onArchivoSubido($event)">
+  </app-subir-archivo-denuncia>
+
+  <!-- Dialog para visualizar archivo de denuncia -->
+  <p-dialog 
+    [(visible)]="mostrarVisualizarArchivo" 
+    [modal]="true" 
+    [style]="{width: '90vw', maxWidth: '1200px', height: '80vh'}"
+    [closable]="true"
+    [maximizable]="true"
+    [header]="'Visualizar Archivo de Denuncia - ' + (detalleSeleccionadoParaVisualizacion?.matricula || '')">
+    
+    <!-- Controles de zoom y pan (solo para imágenes) -->
+    <div *ngIf="tipoArchivoVisualizacion === 'imagen'" class="zoom-controls" style="display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; background-color: #f5f5f5; border-bottom: 1px solid #ddd;">
+      <button 
+        pButton 
+        type="button" 
+        icon="pi pi-minus" 
+        class="p-button-sm p-button-outlined"
+        (click)="zoomOut()"
+        [disabled]="zoomLevel <= minZoom"
+        pTooltip="Alejar">
+      </button>
+      
+      <span style="font-weight: bold; min-width: 80px; text-align: center;">
+        {{ zoomLevel }}%
+      </span>
+      
+      <button 
+        pButton 
+        type="button" 
+        icon="pi pi-plus" 
+        class="p-button-sm p-button-outlined"
+        (click)="zoomIn()"
+        [disabled]="zoomLevel >= maxZoom"
+        pTooltip="Acercar">
+      </button>
+      
+      <button 
+        pButton 
+        type="button" 
+        icon="pi pi-refresh" 
+        class="p-button-sm p-button-outlined"
+        (click)="resetZoom(); resetPan()"
+        pTooltip="Tamaño y posición original">
+      </button>
+      
+      <div style="width: 1px; height: 20px; background-color: #ddd; margin: 0 10px;"></div>
+      
+      <span style="font-size: 0.9rem; color: #666;">
+        <i class="pi pi-info-circle"></i> Arrastra para mover • Scroll para zoom
+      </span>
+    </div>
+
+    <div class="archivo-visualizacion-container" style="height: 70vh; display: flex; justify-content: center; align-items: center; overflow: auto;">
+      <!-- Mostrar PDF como en recursos -->
+      <div *ngIf="tipoArchivoVisualizacion === 'pdf'" style="width: 100%; height: 100%; position: relative;">
+        <iframe 
+          *ngIf="urlArchivoVisualizacion"
+          [src]="urlArchivoVisualizacion" 
+          style="width: 100%; height: 100%; border: none;"
+          frameborder="0">
+        </iframe>
+        
+        <!-- Mensaje si no hay URL -->
+        <div *ngIf="!urlArchivoVisualizacion" 
+             style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
+          <div style="text-align: center;">
+            <i class="pi pi-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <p>No se pudo cargar la vista previa del archivo.</p>
+            <p>Intente nuevamente o contacte al administrador.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mostrar Imagen con zoom y pan -->
+      <div *ngIf="tipoArchivoVisualizacion === 'imagen'" 
+           style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: grab;"
+           [style.cursor]="isDragging ? 'grabbing' : 'grab'"
+           (mousedown)="onMouseDown($event)"
+           (mousemove)="onMouseMove($event)"
+           (mouseup)="onMouseUp($event)"
+           (mouseleave)="onMouseLeave()"
+           (wheel)="onMouseWheel($event)">
+        <img 
+          [src]="urlArchivoVisualizacion" 
+          [style]="getPanStyle()"
+          style="max-width: none; max-height: none; object-fit: contain; transition: transform 0.1s ease; user-select: none;"
+          alt="Archivo de denuncia"
+          (error)="onErrorCargaArchivo()"
+          (load)="onCargaArchivo()"
+          draggable="false">
+      </div>
+      
+      <!-- Mensaje de carga -->
+      <div *ngIf="!tipoArchivoVisualizacion" class="loading-message">
+        <p-progressSpinner></p-progressSpinner>
+        <p>Cargando archivo...</p>
+      </div>
+      
+      <!-- Mensaje de error general -->
+      <div *ngIf="errorCargaArchivo && tipoArchivoVisualizacion !== 'pdf'" class="error-message" style="text-align: center; color: #e74c3c;">
+        <i class="pi pi-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <h3>Error al cargar el archivo</h3>
+        <p>No se pudo cargar el archivo de denuncia.</p>
+        <p style="font-size: 0.9rem; color: #666;">URL: {{ urlArchivoVisualizacion }}</p>
+        <button 
+          pButton 
+          type="button" 
+          label="Reintentar" 
+          icon="pi pi-refresh" 
+          class="p-button-outlined"
+          (click)="reintentarCargaArchivo()">
+        </button>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button 
+        pButton 
+        type="button" 
+        label="Descargar" 
+        icon="pi pi-download" 
+        class="p-button-success"
+        (click)="descargarArchivoDesdeModal()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Cerrar" 
+        icon="pi pi-times" 
+        class="p-button-secondary"
+        (click)="cerrarModalVisualizacion()">
+      </button>
+    </ng-template>
+  </p-dialog>

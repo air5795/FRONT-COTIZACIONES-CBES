@@ -1,0 +1,81 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="custom-header">
+            <div class="header-content">
+                <i class="pi pi-user header-icon"></i>
+                <h1 class="header-title">PERFIL DE USUARIO</h1>
+            </div>
+        </div>
+        <div class="card">
+            <div class="grid">
+                <div class="col-12 md:col-4 lg:col-3 flex align-items-center justify-content-center">
+                    <img src="assets/layout/images/user.png" alt="Foto de Usuario" class="user-photo mb-3">
+                </div>
+                <div class="col-12 md:col-8 lg:col-9">
+                    <div class="user-details-header">
+                        <div>
+                            <h5 class="mb-1">{{ nombreCompleto || 'Usuario' }}</h5>
+                            
+                            <div class="text-sm text-color-secondary mb-3">{{ getTipoUsuario() === 'Empresa' ? (empresa?.nombre || 'NO DISPONIBLE') : (rolActual || 'NO DISPONIBLE') }}</div>
+                        </div>
+                        <span class="p-tag p-component p-tag-success"><i class="pi pi-check-circle mr-2"></i>ACTIVO</span>
+                    </div>
+                    <p-tabView>
+                        <p-tabPanel header="Información Personal">
+                            <div class="grid pt-3">
+                                <div class="col-12 md:col-6">
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">USUARIO DEL SISTEMA</label>
+                                        <p>{{ usuario || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">DOCUMENTO DE IDENTIDAD</label>
+                                        <p>{{ persona?.documentoIdentidad || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-6">
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">EMAIL</label>
+                                        <p>{{ email || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">TELÉFONO</label>
+                                        <p>{{ persona?.telefono || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+                        <p-tabPanel header="Información de Empresa" *ngIf="empresa">
+                            <div class="grid pt-3">
+                                <div class="col-12 md:col-6">
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">NOMBRE DE LA EMPRESA</label>
+                                        <p>{{ empresa?.nombre || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">TIPO DE EMPRESA</label>
+                                        <p>{{ empresa?.tipo || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-6">
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-bold mb-2">CÓDIGO PATRONAL</label>
+                                        <p>{{ empresa?.codPatronal || 'NO DISPONIBLE' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+                        <p-tabPanel header="Información de Empresa" *ngIf="!empresa">
+                            <div class="flex align-items-center justify-content-center" style="min-height: 150px;">
+                                <div class="text-center text-color-secondary">
+                                    <i class="pi pi-building text-4xl mb-3"></i>
+                                    <p>No se encontró información de empresa asociada.</p>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+                    </p-tabView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

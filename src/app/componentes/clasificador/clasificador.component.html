@@ -1,0 +1,192 @@
+<p-toast key="clasificador" [baseZIndex]="99999"></p-toast>
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h3>Lista de Clasificadores</h3>
+      <h5>Visualización, adición, edición y eliminación</h5>
+      <div class="card">
+        <p-table #tablaClasificadores [value]="listaClasificadores!" [columns]="columnas" dataKey="identificadorClasificador" [expandedRowKeys]="expandedRows"   responsiveLayout="scroll" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Buscar..." (input)="listaTablaClasificadores(tablaClasificadores, $event)" class="w-full sm:w-auto"/>
+            </span>
+                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                  <button pButton pRipple label="Nuevo Clasificador" icon="pi pi-plus"
+                  class="p-button-success mr-2" (click)="abrirNuevoClasificador();"></button>
+                </span>
+            </div>
+        </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3rem"></th>
+              <th pSortableColumn="identificadorClasificador">Identificador<p-sortIcon
+                  field="identificadorClasificador"></p-sortIcon></th>
+              <th pSortableColumn="descripcionClasificador">Descripción<p-sortIcon
+                  field="descripcionClasificador"></p-sortIcon></th>
+              <th pSortableColumn="fechaRegistro">Fecha de Registro<p-sortIcon field="fechaRegistro"></p-sortIcon></th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-clasificador let-expanded="expanded">
+            <tr>
+              <td>
+                <button type="button" pButton pRipple [pRowToggler]="clasificador"
+                  class="p-button-text p-button-rounded p-button-plain"
+                  [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+              </td>
+              <td style="min-width: 12rem;">{{clasificador.identificadorClasificador}}</td>
+              <td style="min-width: 8rem;">{{clasificador.descripcionClasificador}}</td>
+              <td style="min-width: 10rem;">{{clasificador.fechaRegistro}}</td>
+              <td>
+                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="abrirEditarClasificador(clasificador)"></button>
+                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="mostrarDialogoEliminar(clasificador)"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="rowexpansion" let-clasificador>
+            <tr>
+              <td colspan="7">
+                <div class="p-3">
+                  <p-table [value]="clasificador.detalles"  dataKey="identificadorClasificadorDetalle" responsiveLayout="scroll" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+                    <ng-template pTemplate="caption">
+                      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5>DETALLES: {{clasificador.identificadorClasificador}}</h5>
+                          <span class="block mt-2 md:mt-0 p-input-icon-left">
+                              <button pButton pRipple label="Nuevo Detalle Clasificador" icon="pi pi-plus"
+                          class="p-button-success mr-2" (click)="abrirNuevoDetalleClasificador(clasificador.identificadorClasificador)"></button>
+                          </span>
+                      </div>
+                  </ng-template>
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th pSortableColumn="identificadorClasificadorDetalle">Identificador <p-sortIcon field="identificadorClasificadorDetalle"></p-sortIcon></th>
+                        <th pSortableColumn="nombreClasificadorDetalle">Nombre <p-sortIcon field="nombreClasificadorDetalle"></p-sortIcon></th>
+                        <th pSortableColumn="orden">Orden <p-sortIcon field="orden"></p-sortIcon></th>
+                        <th pSortableColumn="fechaRegistro">Fecha Registro <p-sortIcon field="fechaRegistro"></p-sortIcon></th>
+                        <th>Acciones</th>
+                      </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-detalle>
+                      <tr>
+                        <td>{{detalle.identificadorClasificadorDetalle}}</td>
+                        <td>{{detalle.nombreClasificadorDetalle}}</td>
+                        <td>{{detalle.orden}}</td>
+                        <td>{{detalle.fechaRegistro}}</td>
+                        <td>
+                          <button pButton pRipple icon="pi pi-pencil" (click)="abrirEditarDetalleClasificador(detalle)" class="p-button-rounded p-button-success mr-2" ></button>
+                          <button pButton pRipple icon="pi pi-trash" (click)="mostrarDetalleDialogoEliminar(detalle)" class="p-button-rounded p-button-danger"></button>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      <p-dialog [(visible)]="confirmClasificadorDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+            <span>Desea Guardar Los Cambios</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="confirmClasificadorDialogo= false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarGuardado()"></button>
+        </ng-template>
+    </p-dialog>
+    <p-dialog [(visible)]="confirmDetalleClasificadorDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+          <span>Desea Guardar Los Cambios</span>
+      </div>
+      <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="confirmDetalleClasificadorDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarDetalleGuardado()"></button>
+      </ng-template>
+  </p-dialog>
+    <p-dialog [(visible)]="eliminarClasificadorDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+          <span *ngIf="clasificador">Esta seguro que desea Eliminar  <b>{{clasificador.identificadorClasificador}}</b>? No podra deshacer los cambios</span>
+      </div>
+      <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="eliminarClasificadorDialogo= false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarEliminar()"></button>
+      </ng-template>
+  </p-dialog>
+  <p-dialog [(visible)]="eliminarDetalleClasificadorDialogo" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+        <span *ngIf="detalleClasificador">Esta seguro que desea Eliminar  <b>{{detalleClasificador.identificadorClasificadorDetalle}}</b>? No podra deshacer los cambios</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No" (click)="eliminarDetalleClasificadorDialogo= false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si" (click)="confirmarDetalleEliminar()"></button>
+    </ng-template>
+</p-dialog>
+      <form novalidate [formGroup]="clasificadorForm" (ngSubmit)="mostrarDialogoConfirmarGuardar()">
+      <p-dialog [(visible)]="nuevoClasificadorDialog" [style]="{width: '450px'}" header="Agregar/editar Clasificador" [modal]="true" class="p-fluid" (onHide)="cerrarNuevoClasificador()">
+        <br>
+        <ng-template pTemplate="content">
+        <div class="field">
+          <span class="p-float-label">
+            <input type="text" pInputText formControlName="identificadorClasificador" required autofocus/>
+            <label for="float-input">Identificador</label>
+          </span>
+        </div>
+        <div class="field">
+          <span class="p-float-label">
+            <input type="text" pInputText formControlName="descripcionClasificador" required autofocus/>
+            <label for="float-input">Descripción</label>
+          </span>
+      </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple type="button" (click)="cerrarNuevoClasificador()" label="Cancelar" icon="pi pi-times" class="p-button-text"></button>
+          <button pButton pRipple type="submit" [disabled]="clasificadorForm.invalid" label="Guardar" icon="pi pi-check"  class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+  </form>
+  <form novalidate [formGroup]="clasificadorDetalleForm" (ngSubmit)="mostrarDetalleDialogoConfirmarGuardar()">
+    <p-dialog [(visible)]="nuevoClasificadorDetalleDialog" [style]="{width: '450px'}" header="Agregar/editar para" [modal]="true" class="p-fluid" (onHide)="cerrarNuevoDetalleClasificador()">
+      <br>
+      <ng-template pTemplate="content">
+      <div class="field">
+        <span class="p-float-label">
+          <input type="text" pInputText formControlName="identificadorClasificadorDetalle" required autofocus/>
+          <label for="float-input">Identificador Clasificador</label>
+        </span>
+      </div>
+      <div class="field">
+        <span class="p-float-label">
+          <input type="text" pInputText formControlName="nombreClasificadorDetalle" required autofocus/>
+          <label for="float-input">Nombre</label>
+        </span>
+    </div>
+    <div class="field">
+      <span class="p-float-label">
+        <input type="number" pInputText formControlName="orden" required autofocus/>
+        <label for="float-input">Orden</label>
+      </span>
+  </div>
+  <div class="field">
+    <span class="p-float-label">
+      <textarea formControlName="descripcionClasificadorDetalle" pInputTextarea required rows="3" cols="20"></textarea>
+      <label for="float-input">Descripción</label>
+    </span>
+
+</div>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple type="button" (click)="cerrarNuevoDetalleClasificador()" label="Cancelar" icon="pi pi-times" class="p-button-text"></button>
+        <button pButton pRipple type="submit" [disabled]="clasificadorDetalleForm.invalid" label="Guardar" icon="pi pi-check"  class="p-button-text"></button>
+      </ng-template>
+  </p-dialog>
+</form>
+    </div>
+  </div>
+</div>

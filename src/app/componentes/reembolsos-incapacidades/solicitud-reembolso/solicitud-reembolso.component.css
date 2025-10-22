@@ -1,0 +1,35 @@
+/* ===== ESTILOS ESPECÍFICOS DEL COMPONENTE SOLICITUD-REEMBOLSO ===== */
+/* Los estilos generales han sido movidos a styles.css para reutilización */
+
+/* Estilos específicos para datatable de solicitud-reembolso - deben estar en el componente */
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background-color: #e9e9e9;
+    color: #464646;
+    border: 1px solid #d3cece;
+    padding: 0.5rem;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0px;
+    border: 1px solid #ccc;
+    text-align: center;
+    vertical-align: middle;
+}
+
+:host ::ng-deep .p-datatable-header {
+    background-color: #e9e9e9;
+}
+
+/* Estilos específicos para botones de PrimeNG */
+:host ::ng-deep .p-button-success {
+    background-color: #71B452;
+    color: #ffffff; 
+}
+
+/* Estilos específicos para responsive del componente */
+@media (max-width: 768px) {
+    .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}

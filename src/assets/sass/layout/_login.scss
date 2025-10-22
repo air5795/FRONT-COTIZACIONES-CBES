@@ -1,0 +1,66 @@
+.login-body {
+    background-color: #f5f5f5;
+    padding-top: 200px;
+    height: auto;
+    background: url("../../layout/images/login/login-image.png");
+    background-repeat: no-repeat;
+    background-position: 0 -180px;
+    background-size: cover;
+
+    .login-panel {
+        background-color: #ffffff;
+        width: 400px;
+        margin: 0 auto;
+        padding-bottom: 20px;
+        -webkit-box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        -moz-box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+    	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+
+        .login-header {
+            margin-bottom: 30px;
+            background-color: $primaryColor;
+            color: $primaryTextColor;
+            position: relative;
+
+            h1 {
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            h2 {
+                font-size: 14px;
+                font-weight: normal;
+                margin-top: 0;
+            }
+
+            img {
+                width: 64px;
+                position: absolute;
+                top: 24px;
+                right: 30px;
+            }
+
+            &.col-12 {
+                padding: 20px 30px;
+            }
+        }
+
+        .col-12 {
+            padding: 20px 70px;
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .login-body {
+        padding-top: 150px;
+
+        .login-panel {
+            width: 300px;
+
+            .col-12 {
+                padding: 20px 35px;
+            }
+        }
+    }
+}

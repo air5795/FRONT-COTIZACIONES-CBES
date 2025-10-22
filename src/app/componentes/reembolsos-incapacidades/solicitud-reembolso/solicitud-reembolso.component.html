@@ -1,0 +1,212 @@
+<div class="grid dashboard solicitud-reembolso">
+  <div class="col-12 md:col-12 lg:6">
+      <div class="perfil-empleador">
+        <div class="header">
+          <div class="header-left">
+            <h2 style="font-size: 30px;"> <i class="pi pi-money-bill" style="font-size: 2.5rem"></i> SOLICITUDES DE REEMBOLSO </h2>
+            <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+            <span class="numero-patronal">Control Histórico Reembolsos por Incapacidades</span>
+          </div>
+          <div class="header-right">
+            <div class="button-container">        
+              <button pButton label="SOLICITUD" class="boton2" (click)="mostrarModal = true">
+                <span class="pi pi-plus" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">Nueva</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+<p-table 
+[value]="solicitudes" 
+[paginator]="true"
+[rows]="limite" 
+[totalRecords]="totalRegistros" 
+(onPage)="onPageChange($event)"
+[rowsPerPageOptions]="[5,10,20,25,30]"
+[pageLinks]="3" 
+class="tabla-centrada" 
+#tablaSolicitudesReembolso
+>
+
+<ng-template pTemplate="caption" >
+  <div class="flex justify-content-between flex-column sm:flex-row align-items-center" >
+    <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+    <div class="flex flex-column sm:flex-row gap-2 mb-2">
+
+      <p-dropdown
+        [options]="meses"
+        [(ngModel)]="mesFiltro"
+        placeholder="Filtrar por mes"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <p-dropdown
+        [options]="anios"
+        [(ngModel)]="anioFiltro"
+        placeholder="Filtrar por año"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <span class="p-input-icon-left w-full sm:w-auto">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          #filter
+          (input)="buscar(filter.value)"
+          placeholder="Buscar ....."
+          class="w-full"
+        />
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID Solicitud</th>
+        <th>Mes</th>
+        <th>Gestión</th>
+        <th>Total Trabajadores</th>
+        <th>Total Reembolso</th>
+        <th style="width: 120px;">Estado</th>
+        <th>Fecha Solicitud</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-solicitud>
+    <tr>
+      <td>SOL-{{ solicitud.id_solicitud_reembolso }}</td>
+      <td>{{ obtenerMesNombre(solicitud.mes) }}</td> 
+      <td>{{ solicitud.gestion }}</td> 
+      <td style="text-align: center;">
+        <button class="btn btn-primary" style="color: #009688; font-size: 18px; font-weight: 600; border: none; background-color: white;">
+          {{ solicitud.total_trabajadores }}
+        </button>
+      </td>
+      <td style="background-color: #f3fff7;">
+        <span>{{ solicitud.total_reembolso | number:'1.2-2' }} Bs</span>
+      </td>
+      <td style="text-align: center;">
+        <button class="estado-btn {{ obtenerClaseEstado(solicitud.estado) }}">
+          {{ obtenerEstadoTexto(solicitud.estado) }}
+        </button>
+      </td>
+      <td>
+        <span>{{ solicitud.fecha_solicitud | date: 'dd/MM/yyyy' }}</span>
+      </td>
+      <td>
+        <div class="action-buttons-container">
+          <button 
+            class="action-btn btn-view"
+            pTooltip="Ver detalle"
+            (click)="verDetalle(solicitud.id_solicitud_reembolso)">
+            <i class="pi pi-eye"></i>
+            <span>Ver</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+    </ng-template>
+      
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 20px; background-color: #fff;">
+          <div class="no-data-message">
+            <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+            <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay Solicitudes de Reembolso registradas.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+      
+  </p-table>
+
+<!-- Modal con Stepper para Crear Solicitud -->
+<p-dialog [(visible)]="mostrarModal" [modal]="true" header="Nueva Solicitud de Reembolso" [closable]="true" [style]="{width: '800px'}">
+    <p-steps [model]="steps" [(activeIndex)]="activeIndex" [style]="{padding: '20px'}"></p-steps>
+
+    <!-- Paso 1: Elegir Mes y Gestión -->
+    <div *ngIf="activeIndex === 0">
+      <div class="flex flex-column" style="height: calc(100% - 50px);">
+        <div class="grid">
+          <div class="col">
+            <div class="text-center p-3 border-round-sm font-bold" style="background-color: #e2f5e7;">
+              <h5>Mes</h5>
+              <p-dropdown
+                id="mes"
+                [options]="meses"
+                [(ngModel)]="mesSeleccionado"
+                placeholder="Seleccione el mes"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+          </div>
+          <div class="col">
+            <div class="text-center p-3 border-round-sm font-bold" style="background-color: #e2f5e7;">
+              <h5>Gestión</h5>
+              <p-dropdown
+                id="gestion"
+                [options]="gestiones"
+                [(ngModel)]="gestionSeleccionada"
+                placeholder="Seleccione la gestión"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="p-d-flex p-jc-end" style="margin-top: auto; padding-top: 50px;">
+        <button pButton label="Siguiente" icon="pi pi-arrow-right" (click)="nextStep()"></button>
+      </div>
+    </div>
+
+    <!-- Paso 2: Confirmar Datos y Crear Solicitud -->
+    <div *ngIf="activeIndex === 1">
+        <div class="p-card p-mb-3" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; margin: 0 auto;">
+            <div class="p-card-body" style="padding: 20px; text-align: center;">
+                <div class="p-d-flex p-flex-column">
+                    <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 20px;">Resumen de Solicitud</h3>
+                    <p>Verifique la información antes de crear la solicitud</p>
+
+                    <div class="p-d-flex p-ai-center" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                      <i class="pi pi-user p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                      <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Usuario: <strong style="color: #2c3e50;">{{ persona.nombres }} {{ persona.primerApellido }} {{ persona.segundoApellido }}</strong></label>
+                  </div>
+                    
+                    <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                        <i class="pi pi-calendar p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                        <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Mes: <strong style="color: #2c3e50;">{{ obtenerMesNombre(mesSeleccionado) }}</strong></label>
+                    </div>
+                    
+                    <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                        <i class="pi pi-calendar-plus p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                        <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Gestión: <strong style="color: #2c3e50;">{{ gestionSeleccionada }}</strong></label>
+                    </div>
+                    
+                    <div class="p-d-flex p-ai-center" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                        <i class="pi pi-building p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                        <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Código Patronal: <strong style="color: #2c3e50;">{{ numPatronal }}</strong></label>
+                    </div>
+                </div>
+
+                <hr>
+
+                <button pButton label="Crear Solicitud" icon="pi pi-check" (click)="crearSolicitudReembolso()"></button>
+            </div>
+        </div>
+      
+        <div class="p-d-flex p-jc-between">
+          <button pButton label="Atrás" icon="pi pi-arrow-left" (click)="prevStep()" style="margin-right: 15px;background-color: #6a8582;"></button>
+        </div>
+    </div>
+
+  </p-dialog>
+
+  <app-loading-componente *ngIf="isLoading" [progress]="loadingProgress" [message]="loadingMessage"></app-loading-componente>
+</div>

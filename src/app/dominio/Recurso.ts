@@ -1,0 +1,15 @@
+export interface Recurso {
+  idRecurso: number,
+  idRecursoSuperior?: number,
+  idTipoRecurso: number,
+  nombreTipoRecurso: string,
+  uri:string,
+  nombreRecurso: string,
+  esVisible: boolean,
+  orden: number,
+  icono: string,
+  nombreRecursoSuperior?: string,
+  bajaLogicaRegistro: boolean,
+  esSuperior: boolean,
+  listaDeRecurso:Recurso[],
+}

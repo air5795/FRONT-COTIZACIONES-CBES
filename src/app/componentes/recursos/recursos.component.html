@@ -1,0 +1,399 @@
+<div class="grid dashboard">
+  <div class="col-12 md:col-12 lg:6">
+    <div class="perfil-empleador">
+      <div class="header">
+        <div class="header-left">
+          <h2 style="font-size: 30px;"> <i class="pi pi-book" style="font-size: 2.5rem"></i> RECURSOS Y MANUALES </h2>
+          <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+          <span class="numero-patronal">Centro de Documentación y Recursos</span>
+        </div>
+        <div class="header-right">
+          <div class="button-container">
+            <!-- Botón de subir archivo - Solo para administradores -->
+            <button 
+              *ngIf="esAdmin"
+              pButton 
+              label="RECURSO" 
+              class="boton1" 
+              (click)="mostrarModalSubir = true">
+              <span class="pi pi-upload" style="font-size: 2rem; padding-bottom: 10px;"></span>
+              <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">Subir</span>
+            </button>
+          </div>
+        </div>
+      </div>
+  
+<p-table 
+[value]="recursos" 
+[paginator]="true"
+[rows]="filtros.limit" 
+[totalRecords]="totalRecursos" 
+(onPage)="onPageChange($event)"
+[rowsPerPageOptions]="[5,10,20,25,30]"
+[pageLinks]="3" 
+[lazy]="true"
+class="tabla-centrada" 
+[loading]="loading"
+#tablaRecursos
+>
+
+<ng-template pTemplate="caption" >
+  <div class="flex justify-content-between flex-column sm:flex-row align-items-center" >
+    <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+    <div class="flex flex-column sm:flex-row gap-2 mb-2">
+
+      <p-dropdown
+        [options]="categorias"
+        [(ngModel)]="filtros.categoria"
+        placeholder="Filtrar por categoría"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="buscarRecursos()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <p-dropdown
+        [options]="estadosOptions"
+        [(ngModel)]="filtros.estado"
+        placeholder="Filtrar por estado"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="buscarRecursos()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <span class="p-input-icon-left w-full sm:w-auto">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          #filter
+          (input)="buscar(filter.value)"
+          placeholder="Buscar ..."
+          class="w-full"
+        />
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Categoría</th>
+        <th style="width: 80px;">Tipo</th>
+        <th>Tipo de Usuario</th>
+        <th>Tamaño</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+  
+    <ng-template pTemplate="body" let-recurso>
+     <tr>
+
+
+    <!-- Título -->
+    <td>
+      <strong style="color: #009688;">{{ recurso.titulo }}</strong>
+      <div style="font-size: 0.8rem; color: #666;">
+        {{ recurso.nombre_archivo }}
+      </div>
+    </td>
+
+    <!-- Descripción -->
+    <td>
+      <span [title]="recurso.descripcion">
+        {{ recurso.descripcion | slice:0:80 }}
+        <span *ngIf="recurso.descripcion && recurso.descripcion.length > 80">...</span>
+      </span>
+    </td>
+
+    <!-- Categoría -->
+    <td>
+      <ng-container [ngSwitch]="recurso.categoria">
+        <!-- Manual - Verde -->
+        <span *ngSwitchCase="'Manual'" class="tipo-planilla-text tipo-mensual">
+          {{recurso.categoria}}
+        </span>
+    
+        <!-- Guía - Azul -->
+        <span *ngSwitchCase="'Guía'" class="tipo-planilla-text tipo-adicional">
+          {{recurso.categoria}}
+        </span>
+    
+        <!-- Tutorial - Púrpura -->
+        <span *ngSwitchCase="'Tutorial'" class="tipo-planilla-text tipo-beneficio">
+          {{recurso.categoria}}
+        </span>
+    
+        <!-- Formato - Naranja -->
+        <span *ngSwitchCase="'Formato'" class="tipo-planilla-text tipo-reintegro">
+          {{recurso.categoria}}
+        </span>
+
+        <!-- Documento - Teal -->
+        <span *ngSwitchCase="'Documento'" class="tipo-planilla-text tipo-retroactivo">
+          {{recurso.categoria}}
+        </span>
+    
+        <!-- Default - Gris -->
+        <span *ngSwitchDefault class="tipo-planilla-text tipo-default">
+          {{recurso.categoria}}
+        </span>
+      </ng-container>
+    </td>
+
+        <!-- Tipo de archivo con icono -->
+        <td style="text-align: center;">
+          <i [class]="obtenerIconoArchivo(recurso.tipo_mime)" 
+             style="font-size: 2rem;" 
+             [style.color]="obtenerColorArchivo(recurso.tipo_mime)">
+          </i>
+        </td>
+    <!-- Tipo de Usuario -->
+    <td>
+      <p-tag 
+        [value]="formatearTipoUsuario(recurso.tipo_usuario)" 
+        [style]="obtenerEstiloTipoUsuario(recurso.tipo_usuario)">
+      </p-tag>
+    </td>
+
+    <!-- Tamaño -->
+    <td style="text-align: center;">
+      <button class="btn btn-primary" style="color: #009688; font-size: 14px; font-weight: 600; border: none; background-color: white;">
+        {{ formatearTamano(recurso.tamano_archivo) }}
+      </button>
+    </td>
+
+
+
+    <!-- Fecha -->
+    <td>{{ recurso.fecha_creacion | date:'dd/MM/yyyy' }}</td>
+
+    <!-- Acciones -->
+    <td>
+      <div class="action-buttons-container">
+<!--         <button 
+          type="button" 
+          class="action-btn btn-view"
+          (click)="descargarRecurso(recurso.id_recurso)"
+          title="Descargar archivo"
+        >
+          <i class="pi pi-download"></i>
+          <span>Descargar</span>
+        </button> -->
+        
+        <button 
+          *ngIf="recurso.tipo_mime === 'application/pdf'"
+          type="button" 
+          class="action-btn btn-view"
+          style="background: #4caf50;"
+          (click)="abrirVistaLibro(recurso)"
+          title="Vista en libro"
+        >
+          <i class="pi pi-book"></i>
+          <span>Ver</span>
+        </button>
+
+        
+        <button 
+          *ngIf="esAdmin"
+          type="button" 
+          class="action-btn btn-delete enabled"
+          (click)="confirmarEliminar(recurso)"
+          title="Eliminar recurso"
+        >
+          <i class="pi pi-trash"></i>
+          <span></span>
+        </button>
+      </div>
+    </td>
+  </tr>
+    </ng-template>
+  
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 20px; background-color: #fff;">
+          <div class="no-data-message">
+            <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+            <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay Recursos Cargados.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  
+    </div>
+  </div>
+</div>
+
+  <!-- Modal para subir archivo -->
+  <p-dialog 
+    [(visible)]="mostrarModalSubir" 
+    [modal]="true" 
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    header="Subir Nuevo Recurso"
+    [style]="{ width: '600px' }">
+    
+    <form #formularioSubir="ngForm" (ngSubmit)="subirArchivo()">
+      <div class="p-grid p-fluid">
+        <!-- Título -->
+        <div class="p-col-12">
+          <label for="titulo">Título *</label>
+          <input 
+            pInputText 
+            id="titulo" 
+            [(ngModel)]="nuevoRecurso.titulo"
+            name="titulo"
+            required
+            placeholder="Nombre descriptivo del recurso">
+        </div>
+  
+        <!-- Descripción -->
+        <div class="p-col-12">
+          <label for="descripcion">Descripción</label>
+          <textarea 
+            pInputTextarea 
+            id="descripcion" 
+            [(ngModel)]="nuevoRecurso.descripcion"
+            name="descripcion"
+            rows="3"
+            placeholder="Descripción opcional del recurso">
+          </textarea>
+        </div>
+  
+        <!-- Categoría -->
+        <div class="p-col-12 p-md-6">
+          <label for="categoria">Categoría</label>
+          <p-dropdown 
+            [options]="categorias" 
+            [(ngModel)]="nuevoRecurso.categoria"
+            name="categoria"
+            placeholder="Seleccionar categoría"
+            [showClear]="true"
+            optionLabel="label"
+            optionValue="value">
+          </p-dropdown>
+        </div>
+
+        <!-- Tipo de Usuario -->
+        <div class="p-col-12">
+          <label for="tipoUsuario">Tipo de Usuario</label>
+          <p-dropdown 
+            [options]="tiposUsuario" 
+            [(ngModel)]="nuevoRecurso.tipo_usuario"
+            name="tipoUsuario"
+            placeholder="Seleccionar tipo de usuario"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full">
+          </p-dropdown>
+        </div>
+  
+        <!-- Es público -->
+        <div class="p-col-12 p-md-6">
+          <label>Visibilidad</label>
+          <div class="p-field-checkbox">
+            <p-checkbox 
+              [(ngModel)]="nuevoRecurso.esPublico"
+              name="esPublico"
+              binary="true"
+              label="Visible para todos los usuarios">
+            </p-checkbox>
+          </div>
+        </div>
+  
+        <!-- Subir archivo -->
+        <div class="p-col-12">
+          <label>Archivo *</label>
+          <p-fileUpload 
+            #fileUpload
+            mode="advanced"
+            [multiple]="false"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.zip,.txt"
+            maxFileSize="52428800"
+            [showUploadButton]="false"
+            [showCancelButton]="false"
+            (onSelect)="onFileSelect($event)"
+            customUpload="true">
+            
+            <ng-template pTemplate="content" let-files let-uploadedFiles="uploadedFiles">
+              <div *ngIf="files?.length">
+                <div *ngFor="let file of files" class="archivo-seleccionado">
+                  <div class="flex align-items-center">
+                    <i class="pi pi-file" style="margin-right: 10px;"></i>
+                    <div>
+                      <strong>{{ file.name }}</strong>
+                      <div style="font-size: 0.8rem; color: #666;">
+                        {{ formatearTamano(file.size) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-fileUpload>
+        </div>
+      </div>
+  
+      <!-- Botones del modal -->
+      <div class="p-dialog-footer">
+        <button 
+          pButton 
+          type="button" 
+          label="Cancelar" 
+          icon="pi pi-times" 
+          class="p-button-text"
+          (click)="cerrarModalSubir()">
+        </button>
+        <button 
+          pButton 
+          type="submit" 
+          label="Subir Recurso" 
+          icon="pi pi-upload" 
+          class="p-button-success"
+          [disabled]="!formularioSubir.valid || !archivoSeleccionado || subiendoArchivo"
+          [loading]="subiendoArchivo">
+        </button>
+      </div>
+    </form>
+  </p-dialog>
+  
+  <!-- Modal para vista de libro (PDFs) -->
+  <p-dialog 
+    [(visible)]="mostrarVistaLibro" 
+    [modal]="true" 
+    [closable]="true"
+    [maximizable]="true"
+    [draggable]="false"
+    [resizable]="true"
+    [header]="'Vista de Libro - ' + recursoActual?.titulo"
+    [style]="{ width: '90vw', height: '90vh' }">
+    
+    <div *ngIf="recursoActual" style="height: 80vh;">
+      <!-- ✅ Mostrar iframe solo si hay URL válida -->
+      <iframe 
+        *ngIf="urlVistaPrevia"
+        [src]="urlVistaPrevia" 
+        style="width: 100%; height: 100%; border: none;"
+        frameborder="0">
+      </iframe>
+      
+      <!-- ✅ Mostrar mensaje si no hay URL -->
+      <div *ngIf="!urlVistaPrevia" 
+           style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
+        <div style="text-align: center;">
+          <i class="pi pi-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+          <p>No se pudo cargar la vista previa del archivo.</p>
+          <p>Intente nuevamente o contacte al administrador.</p>
+        </div>
+      </div>
+    </div>
+  </p-dialog>

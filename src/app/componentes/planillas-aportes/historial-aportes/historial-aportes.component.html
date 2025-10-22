@@ -1,0 +1,248 @@
+<div class="grid dashboard historial-aportes">
+  <div class="col-12 md:col-12 lg:6">
+      <div class="perfil-empleador">
+    <div class="header">
+      <div class="header-left">
+        <h2 style="font-size: 30px;"> PLANILLAS DE APORTES  </h2>
+        <hr style="margin: 2px; ">
+        <span class="numero-patronal">Control Historico Aportes (Administrador)  </span>
+      </div>
+      <div class="header-right">
+        <div class="button-container">
+<!--           <button 
+          pButton 
+          label="Reportes" 
+          class="boton1"
+          style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 80px; " 
+          
+          >
+            <span class="pi pi-book" style="font-size: 2rem; padding-bottom: 10px;"></span>
+            <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;" >Descargar </span>
+          </button> -->
+    
+        </div>
+      </div>
+    </div>
+  
+  <p-table 
+   [value]="planillas" 
+   [paginator]="true" 
+   [rows]="limite" 
+   [totalRecords]="totalRegistros" 
+   (onPage)="onPageChange($event)"
+   [rowsPerPageOptions]="[5, 10, 20]"
+   [pageLinks]="3" 
+   [lazy]="true"
+   class="tabla-centrada"
+   #dt1
+   >
+
+   <ng-template pTemplate="caption" >
+    <div class="flex justify-content-between flex-column sm:flex-row align-items-center" >
+      <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+      <div class="flex flex-column sm:flex-row gap-2 mb-2">
+
+
+        <p-dropdown
+      [options]="estados"
+      [(ngModel)]="estadoFiltro"
+      placeholder="Filtrar por estado"
+      (onChange)="aplicarFiltros()"
+      styleClass="w-full sm:w-auto"
+      [appendTo]="'body'"
+      [autoDisplayFirst]="false"
+      panelStyleClass="min-w-fit"
+    ></p-dropdown>
+
+    <p-dropdown
+      [options]="meses"
+      [(ngModel)]="mesFiltro"
+      placeholder="Filtrar por mes"
+      (onChange)="aplicarFiltros()"
+      styleClass="w-full sm:w-auto"
+      [appendTo]="'body'"
+      [autoDisplayFirst]="false"
+      panelStyleClass="min-w-fit"
+    ></p-dropdown>
+
+    <p-dropdown
+      [options]="anios"
+      [(ngModel)]="anioFiltro"
+      placeholder="Filtrar por año"
+      (onChange)="aplicarFiltros()"
+      styleClass="w-full sm:w-auto"
+      [appendTo]="'body'"
+      [autoDisplayFirst]="false"
+      panelStyleClass="min-w-fit"
+    ></p-dropdown>
+
+    <span class="p-input-icon-left w-full sm:w-auto">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        #filter
+        (input)="buscar(filter.value)"
+        placeholder="Buscar ..."
+        class="w-full"
+      />
+    </span>
+</div>
+    </div>
+  </ng-template>
+
+   
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 50px;">N° Comprobante</th>
+      <th style="width: 280px;">Empleador</th>
+      
+      <th style="width: 50px;">Mes</th>
+      <th style="width: 50px;">Gestión</th>
+      <th style="width: 50px;">Regitros </th>
+      <th style="width: 150px;">Total importe</th>
+<!--       <th>Fecha Declarada</th>
+       -->
+      <th style="width: 50px;">Declarado</th>
+      <!-- <th style="width: 50px;">Pagado</th> -->
+      <th style="width: 50px;">Liquidado</th>
+      <th style="width: 150px;">Tipo Planilla</th>
+      <th style="width: 120px;">Estado</th>
+      <th style="width: 100px;">Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-planilla>
+   
+  <tr>
+    <td>{{ planilla.com_nro }}</td>
+    <td style="text-align: left; padding: 2px 10px;" >
+      <span style="color: #009688; font-weight: 600;">{{planilla.empresa}}</span> <br>
+      <span style="color: #767d88; font-size: 12px;">N° patronal: </span><span style="color: #64748b; font-size: 12px;">{{ planilla.cod_patronal.slice(3) }}
+</span>
+    </td>
+ 
+  
+  <td>{{ planilla.mes }}</td> 
+  <td>{{ planilla.gestion }}</td> 
+  <td style="text-align: center;">
+    {{ planilla.total_trabaj }}
+  </td>
+  <td style="background-color: #f3fff7;">
+    <span>{{ planilla.total_importe | number:'1.2-2' }} Bs</span>
+  </td>
+<!--   <td>
+    <span *ngIf="planilla.fecha_declarada; else sinFechad"> 
+      <span style="color: green;">
+        {{ planilla.fecha_declarada | date: 'd \'de\' MMMM \'de\' yyyy' : 'UTC' }}
+      </span>
+    </span>
+    <ng-template #sinFechad>
+      <span style="color: red;">
+        <i class="pi pi-ban check-icon red-x"></i> 
+      </span>
+    </ng-template>
+
+  
+  </td> -->
+
+  <td>
+    <span *ngIf="planilla.fecha_declarada; else sinFecha"> 
+      <span style="color: green;">
+        <i class="pi pi-check check-icon green-check"></i> 
+      </span>
+    </span>
+    <ng-template #sinFecha>
+      <span style="color: red;">
+        <i class="pi pi-times check-icon red-x"></i> 
+      </span>
+    </ng-template>
+  </td>
+  
+<!--   <td>
+    <span *ngIf="planilla.fecha_liquidacion; else sinPago">
+      <span style="color: green;">
+        <i class="pi pi-check check-icon green-check"></i> 
+      </span>
+    </span>
+    <ng-template #sinPago>
+      <span style="color: red;">
+        <i class="pi pi-times check-icon red-x"></i> 
+      </span>
+    </ng-template>
+  </td> -->
+
+  <td>
+    <span *ngIf="planilla.valido_cotizacion; else validacion">
+      <span style="color: green;">
+        <i class="pi pi-check check-icon green-check"></i> 
+      </span>
+    </span>
+    <ng-template #validacion>
+      <span style="color: red;">
+        <i class="pi pi-times check-icon red-x"></i> 
+      </span>
+    </ng-template>
+  </td>
+
+  <td>
+    <ng-container [ngSwitch]="planilla.tipo_planilla">
+      <!-- Mensual - Verde -->
+      <span *ngSwitchCase="'Mensual'" class="tipo-planilla-text tipo-mensual">
+        {{planilla.tipo_planilla}}
+      </span>
+  
+      <!-- Planilla Adicional - Azul -->
+      <span *ngSwitchCase="'Planilla Adicional'" class="tipo-planilla-text tipo-adicional">
+        {{planilla.tipo_planilla}}
+      </span>
+  
+      <!-- Beneficio Social - Púrpura -->
+      <span *ngSwitchCase="'Beneficio Social'" class="tipo-planilla-text tipo-beneficio">
+        {{planilla.tipo_planilla}}
+      </span>
+  
+      <!-- Reintegro - Naranja -->
+      <span *ngSwitchCase="'Reintegro'" class="tipo-planilla-text tipo-reintegro">
+        {{planilla.tipo_planilla}}
+      </span>
+
+      <!-- Retroactivo - Teal -->
+      <span *ngSwitchCase="'Retroactivo'" class="tipo-planilla-text tipo-retroactivo">
+        {{planilla.tipo_planilla}}
+      </span>
+  
+      <!-- Default - Gris -->
+      <span *ngSwitchDefault class="tipo-planilla-text tipo-default">
+        {{planilla.tipo_planilla}}
+      </span>
+    </ng-container>
+  </td>
+  
+  <td style=" text-align: center;">
+
+       
+          <button *ngIf="planilla.estado === 0" class="estado-btn borrador" >BORRADOR</button>
+          <button *ngIf="planilla.estado === 1" class="estado-btn pendiente" >PRESENTADO</button>
+          <button *ngIf="planilla.estado === 2" class="estado-btn aprobado" >APROBADO</button>
+          <button *ngIf="planilla.estado === 3" class="estado-btn observado" >OBSERVADO</button>
+     
+      
+    </td>
+  <td>
+    <div class="action-buttons-container">
+      <button 
+        type="button" 
+        class="action-btn btn-view"
+        (click)="verPlanilla(planilla.id_planilla_aportes)"
+        title="Ver detalles de la planilla"
+      >
+        <i class="pi pi-eye"></i>
+        <span>Ver Planilla</span>
+      </button>
+    </div>
+  </td>
+</tr>
+  </ng-template>
+  </p-table>
+  

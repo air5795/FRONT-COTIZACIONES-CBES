@@ -1,0 +1,1447 @@
+/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
+@import "../node_modules/primeng/resources/primeng.css";
+@import "../node_modules/primeflex/primeflex.scss";
+@import "../node_modules/primeicons/primeicons.css";
+@import "../node_modules/prismjs/themes/prism-coy.css";
+@import "assets/demo/flags/flags.css";
+@import "./assets/demo/documentation.scss";
+
+
+
+/* header ---------------------------------------------------------------------------------- */
+
+.cabezera-planilla {
+  background: linear-gradient(135deg, #e9e9e9, #e9e9e9);
+  color: white;
+  padding: 1px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  font-weight: bold;
+  border: 1px solid #c1c1c1;
+  border-radius: 5px;
+
+}
+
+.detalle-cabezera-planilla {
+    display: flex;
+    flex-direction: column;
+    background-color: #e9e9e9;
+    padding: 6px;
+    border-radius: 10px;
+    padding-left: 15px;
+    border-left: 10px solid #00796b;
+}
+
+
+
+.list-container {
+    display: flex;
+    /* flex-direction: column; */
+    gap: 8px; 
+    padding: 3px;
+    background-color: #f5f7fa;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: max-content;
+  }
+  
+  .list-item {
+    /* display: flex; */
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 10px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .label {
+    font-size: 11px;
+    font-weight: normal;
+    color: #6b7280;
+    /* text-transform: uppercase; */
+  }
+  
+  .value {
+    font-size: 14px;
+    color: #02685f;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre el icono y el texto */
+  }
+  
+  .pi {
+    font-size: 14px; /* Tamaño de los iconos */
+  }
+
+  /* BOTONES ------------------------------------------------------------------------------*/
+  /* botones verdes ------------------------------------------------------------------------------*/
+
+  .boton1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color: #558373; 
+
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+  
+
+  .boton1:hover {
+    background-color: #61927d !important; 
+    transform: translateY(2px); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+
+  }
+
+  .boton2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color: #5aa674; 
+
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+  
+
+  .boton2:hover {
+    background-color: #58967b !important;
+    transform: translateY(2px); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+
+  }
+
+  .boton3 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color: #47a36d; 
+
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+
+  .boton3:hover {
+    background-color: #51ca84 !important; 
+    transform: translateY(2px); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+
+  }
+
+  .botonObs{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color: #d55c25; 
+
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+
+  .botonObs:hover {
+    background-color: #f87d43 !important;
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .botonValidar{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color:  #2d549d; 
+
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+
+  .botonValidar:hover {
+    background-color: #4382f8 !important;
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+ 
+
+    /* botones OTROS ------------------------------------------------------------------------------*/
+
+    .boton4 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      background-color: #125e73; 
+  
+      padding: 10px 20px; 
+      border-radius: 4px; 
+      transition: all 0.2s ease;
+    }
+  
+    .boton4:hover {
+      background-color: #187994 !important; 
+      transform: translateY(2px); 
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  
+    }
+
+  .boton-aprobar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color: #41b392; 
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+  .boton-aprobar:hover {
+    background-color: #37977C !important;
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .boton-observar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background-color: #A32D38; 
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+  }
+
+  .boton-observar:hover {
+    background-color: #80262F !important;
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+
+  /* PESTAÑAS TAB VIEW  ----------------------------------------------------------------------- */
+
+
+  .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    background-color: #f5f7fa;
+    color: #495057;
+    border-radius: 10px 10px 0 0;
+    padding: 0.7rem 1rem;
+    border: 1px solid #cfcfcf;
+  }
+
+
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    background-color: #be4242;
+    color: #03533f;
+    border-radius: 10px 10px 0 0;
+    
+  }
+
+  .p-tabview .p-tabview-nav .p-tabview-ink-bar {
+    background-color: #c1c1c1;
+  }
+
+  .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    border-radius: 10px 10px 0 0; 
+  }
+  
+  .p-tabview .p-tabview-nav li:nth-child(1).p-highlight .p-tabview-nav-link {
+    background-color: #e9e9e9; 
+    color: #03533f;
+    border: 1px solid #cfcfcf;
+   
+  }
+
+  .p-tabview .p-tabview-nav li:nth-child(2).p-highlight .p-tabview-nav-link {
+    background-color: #d5effc; 
+    color: #032f53;
+    border: 1px solid #cfcfcf;
+  }
+  
+  .p-tabview .p-tabview-nav li:nth-child(3).p-highlight .p-tabview-nav-link {
+    background-color: #ffe6e6; 
+    color: #dc3545;
+    border: 1px solid #cfcfcf;
+  }
+
+  
+  .p-tabview .p-tabview-nav li:nth-child(4).p-highlight .p-tabview-nav-link {
+    background-color: #e6ffe6; 
+    color: #28a781;
+    border: 1px solid #cfcfcf;
+  }
+
+  .p-tabview .p-tabview-nav li:nth-child(5).p-highlight .p-tabview-nav-link {
+    background-color: #28a796; 
+    color: #e9fff5;
+    border: 1px solid #cfcfcf;
+  }
+
+  .p-tabview .p-tabview-nav li:nth-child(6).p-highlight .p-tabview-nav-link {
+    background-color: #28a796; 
+    color: #e9fff5;
+    border: 1px solid #cfcfcf;
+  }
+
+  .p-tabview .p-tabview-nav li:nth-child(7).p-highlight .p-tabview-nav-link {
+    background-color: #f0feff; 
+    color: #488488;
+    border: 1px solid #cfcfcf;
+  }
+
+
+
+
+
+
+  
+
+
+
+  /* ESTADOS  ************************************************************************************/ 
+
+  .estado-btn {
+    padding: 0.25rem 0.5rem; 
+    border: none;
+    border-radius: 4px; 
+    font-size: 12px; 
+    font-weight: 600; 
+    color: white; 
+    cursor: default; 
+  }
+
+  .borrador {
+    background-color: #ebe6ff; 
+    color: #333; 
+    width: 90%;
+  }
+  
+  .pendiente {
+    background-color: #d7f1ff; 
+    color: #547485; 
+    width: 90%;
+  }
+  
+  .aprobado {
+    background-color: rgb(78, 214, 146); 
+    width: 90%;
+  }
+  
+
+  .observado {
+    background-color: #f59999; 
+    width: 90%;
+  }
+
+  /***********************************************************************************************/
+  /* icono check******************************************************************************** */
+
+  .check-icon {
+    font-size: 1rem;
+    position: relative;
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    border: 1px solid rgb(187, 187, 187); /* Creates the black box around the checkmark */
+    border-radius: 3px; /* Optional: slight rounding for the box */
+  }
+  
+  .red-check {
+    color: red; /* Red checkmark */
+  }
+  
+  .green-check {
+    color: green; /* Green checkmark */
+  }
+
+
+  /*********************************************************************************************************/
+
+/* ===== ESTILOS REFACTORIZADOS DE PLANILLAS-APORTES-LIST ===== */
+
+/* ===== PERFIL DE EMPLEADOR ===== */
+.perfil-empleador {
+    background: #ffffff;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #009688, #00695c);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 3px solid #004d40;
+}
+
+.header-left h2 {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.razon-social {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.numero-patronal {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+.perfil-contenido {
+    display: grid;
+    gap: 8px;
+    padding: 15px;
+}
+
+.perfil-item {
+    background: #f8f8f8;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.titulo {
+    font-weight: bold;
+    color: #357c61;
+}
+
+.info {
+    text-align: right;
+    color: #333;
+}
+
+/* ===== TABLAS Y DATATABLE ===== */
+.tabla-centrada {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tabla-centrada th, .tabla-centrada td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.compact-table .p-datatable-tbody > tr > td, 
+.compact-table .p-datatable-thead > tr > th {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.centered-table th, .centered-table td {
+    text-align: center;
+}
+
+/* ===== ESTADOS DE FILAS ===== */
+.row-pending {
+    background-color: #fff4f4 !important;
+}
+
+.row-assigned {
+    background-color: #f0fff0 !important;
+}
+
+.fila-borrador {
+    background-color: #ebe6ff !important;
+    color: #333 !important;
+}
+
+.fila-presentado {
+    background-color: #d7f1ff !important;
+    color: #547485 !important;
+}
+
+.fila-aprobado {
+    background-color: rgb(78, 214, 146) !important;
+    color: white !important;
+}
+
+.fila-observado {
+    background-color: #f59999 !important;
+    color: white !important;
+}
+
+/* ===== BOTONES DE ACCIÓN ===== */
+.action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.btn-view {
+    background: #009688;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* ===== TIPOS DE PLANILLA ===== */
+.tipo-planilla-text {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.3s ease;
+    width: 90%;
+}
+
+.tipo-mensual {
+    color: #008496;
+    background-color: rgba(0, 150, 136, 0.1);
+}
+
+.tipo-adicional {
+    color: #2262af;
+    background-color: rgba(34, 98, 175, 0.1);
+}
+
+.tipo-beneficio {
+    color: #7c3aed;
+    background-color: rgba(124, 58, 237, 0.1);
+}
+
+.tipo-reintegro {
+    color: #f97316;
+    background-color: rgba(249, 115, 22, 0.1);
+}
+
+.tipo-retroactivo {
+    color: #14b8a6;
+    background-color: rgba(20, 184, 166, 0.1);
+}
+
+.tipo-default {
+    color: #64748b;
+    background-color: rgba(100, 116, 139, 0.1);
+}
+
+/* ===== CÍRCULOS DE ESTADO ===== */
+.circle {
+    width: 20px;
+    height: 20px;
+    margin: 0 2px;
+}
+
+.purple {
+    background-color: #9c27b0;
+}
+
+.yellow {
+    background-color: #ebebb8;
+}
+
+.blue {
+    background-color: #739eb5;
+}
+
+.green {
+    background-color: rgb(78, 214, 146);
+}
+
+.red {
+    background-color: #f59999;
+}
+
+.gray {
+    background-color: #d3d3d3;
+}
+
+/* ===== MENÚ DE PLANTILLAS ===== */
+.menu-plantillas {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-plantillas .menu-item {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #495057;
+    font-size: 13px;
+}
+
+.menu-plantillas .menu-item:hover {
+    background-color: #558373;
+    color: white;
+    border-color: #558373;
+}
+
+/* ===== DROPDOWN ===== */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-button {
+    background-color: #4caf50;
+    color: white;
+    border: 1px solid #4caf50;
+    padding: 0.4rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    height: 2rem;
+    border-radius: 4px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    flex-direction: column;
+    border: 1px solid #e9e9e9;
+    padding: 0.2rem;
+}
+
+.dropdown-content button {
+    background-color: #757575;
+    border: none;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.3rem;
+    text-align: left;
+    width: 100%;
+    height: 2rem;
+    cursor: pointer;
+    margin: 0.1rem 0;
+    border-radius: 4px;
+}
+
+.dropdown-content button:hover {
+    background-color: #616161;
+}
+
+.dropdown.show .dropdown-content {
+    display: flex;
+}
+
+/* ===== UPLOAD DE ARCHIVOS ===== */
+.file-upload-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: 8px;
+    padding: 20px;
+}
+
+.file-upload-input {
+    display: none;
+}
+
+.file-upload-button {
+    background-color: #009688;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.file-upload-button:hover {
+    background-color: #02bdaa;
+}
+
+.file-upload-button i {
+    margin-right: 8px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .perfil-contenido {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .header-right {
+        text-align: center;
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 1079px) {
+    .button-text {
+        display: none;
+    }
+    .button-label {
+        flex: initial;
+    }
+}
+
+@media (min-width: 1080px) {
+    .button-text {
+        display: inline;
+        margin-left: 0.5rem;
+        max-width: max-content;
+    }
+    .p-buttonset {
+        display: flex;
+    }
+    .button-label {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE NOTIFICACIONES ===== */
+
+/* ===== TIPOS DE NOTIFICACIÓN ===== */
+.tipo-notification {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.tipo-text {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== MENSAJES DE NOTIFICACIÓN ===== */
+.mensaje-notificacion {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+/* ===== BADGES DE EMPRESA ===== */
+.empresa-badge {
+    color: #186e46;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+/* ===== CONTENEDOR DE NO DATA ===== */
+.no-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    padding: 20px;
+}
+
+.no-data-container h3 {
+    margin: 15px 0 5px 0;
+    color: #495057;
+}
+
+.no-data-container p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* ===== TOOLTIPS ===== */
+::ng-deep .p-tooltip .p-tooltip-text {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+/* ===== ANIMACIONES DE NOTIFICACIONES ===== */
+.notificacion-no-leida {
+    animation: highlight-notification 0.3s ease-in-out;
+}
+
+@keyframes highlight-notification {
+    from {
+        background-color: #fffbee;
+    }
+    to {
+        background-color: #fff3cd;
+    }
+}
+
+/* ===== RESPONSIVE PARA NOTIFICACIONES ===== */
+@media (max-width: 768px) {
+    .mensaje-notificacion {
+        max-width: 150px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE HISTORIAL-NOTIFICACIONES ===== */
+
+/* Estilos para botones de acciones en historial-notificaciones */
+.historial-notificaciones .action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.historial-notificaciones .action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.historial-notificaciones .btn-view {
+    background: #009688;
+    color: white;
+}
+
+.historial-notificaciones .btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.historial-notificaciones .btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.historial-notificaciones .btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.historial-notificaciones .btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Estilos específicos para responsive del componente historial-notificaciones */
+@media (max-width: 768px) {
+    .historial-notificaciones .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE SOLICITUD-REEMBOLSO ===== */
+
+/* Estilos para botones de acciones en solicitud-reembolso */
+.solicitud-reembolso .action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.solicitud-reembolso .action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.solicitud-reembolso .btn-view {
+    background: #009688;
+    color: white;
+}
+
+.solicitud-reembolso .btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.solicitud-reembolso .btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.solicitud-reembolso .btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.solicitud-reembolso .btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Estilos específicos para responsive del componente solicitud-reembolso */
+@media (max-width: 768px) {
+    .solicitud-reembolso .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE PAGOS-APORTES ===== */
+
+/* Estilos para botones de acciones en pagos-aportes */
+.pagos-aportes .action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.pagos-aportes .action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.pagos-aportes .btn-view {
+    background: #009688;
+    color: white;
+}
+
+.pagos-aportes .btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.pagos-aportes .btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.pagos-aportes .btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.pagos-aportes .btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Estilos para contenedor centrado */
+.pagos-aportes .contenedor-centrar {
+    text-align: center;
+    width: 100%;
+}
+
+/* Estilos para mensaje de no datos */
+.pagos-aportes .no-data-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para contenedor de imagen */
+.pagos-aportes .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    text-align: center;
+}
+
+.pagos-aportes .image-container iframe,
+.pagos-aportes .image-container img {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Estilos para error de PDF */
+.pagos-aportes .pdf-error {
+    text-align: center;
+    color: #d32f2f;
+    padding: 20px;
+}
+
+/* Estilos para imagen de vista previa */
+.pagos-aportes .preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+}
+
+.pagos-aportes .preview-pdf {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+}
+
+/* Estilos para grid de confirmación */
+.pagos-aportes .confirmation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 10px;
+}
+
+.pagos-aportes .confirmation-item {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.pagos-aportes .preview-container {
+    text-align: center;
+    padding: 10px;
+}
+
+/* Estilos para caja de contenido */
+.pagos-aportes .caja-contenido {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* Estilos específicos para responsive del componente pagos-aportes */
+@media (max-width: 768px) {
+    .pagos-aportes .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE PAGOS-APORTES-ADMIN ===== */
+
+/* Estilos para botones de acciones en pagos-aportes-admin */
+.pagos-aportes-admin .action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.pagos-aportes-admin .action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.pagos-aportes-admin .btn-view {
+    background: #009688;
+    color: white;
+}
+
+.pagos-aportes-admin .btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.pagos-aportes-admin .btn-download {
+    background: #42ab7f;
+    color: white;
+}
+
+.pagos-aportes-admin .btn-download:hover {
+    background: #3a9a6f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 171, 127, 0.3);
+}
+
+.pagos-aportes-admin .btn-edit {
+    background: #f59e0b;
+    color: white;
+}
+
+.pagos-aportes-admin .btn-edit:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.pagos-aportes-admin .btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.pagos-aportes-admin .btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.pagos-aportes-admin .btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Estilos para contenedor de imagen */
+.pagos-aportes-admin .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    text-align: center;
+}
+
+.pagos-aportes-admin .image-container iframe,
+.pagos-aportes-admin .image-container img {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Estilos para error de PDF */
+.pagos-aportes-admin .pdf-error {
+    text-align: center;
+    color: #d32f2f;
+    padding: 20px;
+}
+
+/* Estilos específicos para responsive del componente pagos-aportes-admin */
+@media (max-width: 768px) {
+    .pagos-aportes-admin .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE HISTORIAL-APORTES ===== */
+
+/* Estilos para botones de acciones en historial-aportes */
+.historial-aportes .action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.historial-aportes .action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none !important;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.historial-aportes .action-btn i {
+    font-size: 12px;
+    line-height: 1;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.historial-aportes .action-btn span {
+    text-transform: none !important;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.historial-aportes .btn-view {
+    background: #009688;
+    color: white;
+    text-transform: none !important;
+    font-weight: 500;
+}
+
+.historial-aportes .btn-view span {
+    text-transform: none !important;
+    font-weight: 500;
+}
+
+.historial-aportes .btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.historial-aportes .btn-view:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 150, 136, 0.2);
+}
+
+.historial-aportes .btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.historial-aportes .btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.historial-aportes .btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Estilos específicos para responsive del componente historial-aportes */
+@media (max-width: 768px) {
+    .historial-aportes .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* ===== ESTILOS ESPECÍFICOS DE HISTORIAL-REEMBOLSOS ===== */
+
+/* Estilos para botones de acciones en historial-reembolsos */
+.historial-reembolsos .action-buttons-container {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 2px;
+    background-color: #e9e9e9;
+}
+
+.historial-reembolsos .action-btn {
+    flex: 1;
+    min-height: 25px;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: none !important;
+    letter-spacing: 0.2px;
+    padding: 0.4rem 0.6rem;
+}
+
+.historial-reembolsos .action-btn i {
+    font-size: 12px;
+    line-height: 1;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.historial-reembolsos .action-btn span {
+    text-transform: none !important;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.historial-reembolsos .btn-view {
+    background: #009688;
+    color: white;
+    text-transform: none !important;
+    font-weight: 500;
+}
+
+.historial-reembolsos .btn-view:hover {
+    background: #08554D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.historial-reembolsos .btn-view:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 150, 136, 0.2);
+}
+
+.historial-reembolsos .btn-delete.enabled {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.historial-reembolsos .btn-delete.enabled:hover {
+    background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.historial-reembolsos .btn-delete.disabled {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Estilos específicos para responsive del componente historial-reembolsos */
+@media (max-width: 768px) {
+    .historial-reembolsos .button-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}

@@ -1,0 +1,382 @@
+/* Estilo principal */
+.perfil-empleador {
+    background: #ffffff;
+    /* border-radius: 12px; */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Estilo de la cabecera compacta */
+.header {
+    background: linear-gradient(135deg, #009688, #00695c);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 3px solid #004d40;
+    /* flex-direction: row-reverse; */
+}
+
+/* Estilo del título "Perfil de Empleador" a la izquierda */
+.header-left h2 {
+    /* margin: 0; */
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Estilo para Razón Social y N° Patronal */
+.header-right {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+/* Razón Social (Empresa) */
+.razon-social {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* N° Patronal */
+.numero-patronal {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+/* Contenedor del contenido */
+.perfil-contenido {
+    display: grid;
+    /* grid-template-columns: repeat(2, 1fr); */
+    gap: 8px;
+    padding: 15px;
+}
+
+/* Elementos individuales */
+.perfil-item {
+    background: #f8f8f8;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Estilos de títulos e información */
+.titulo {
+    font-weight: bold;
+    color: #357c61;
+}
+
+.info {
+    text-align: right;
+    color: #333;
+}
+
+/* Diseño adaptable */
+@media (max-width: 768px) {
+    .perfil-contenido {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .header-right {
+        text-align: center;
+        margin-top: 5px;
+    }
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Ajusta este valor para controlar la separación entre los botones */
+}
+
+.custom-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1rem;
+    /* padding: 1rem 2rem; */
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+}
+
+.custom-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.custom-icon {
+    font-size: 2rem;
+    padding-bottom: 10px;
+}
+
+/* Colores específicos para cada botón */
+.p-button-danger.custom-button {
+    background-color: #ff6565;
+    color: white;
+}
+
+.p-button-danger.custom-button:hover {
+    background-color: #eb3f3f;
+}
+
+.p-button-success.custom-button {
+    background-color: #3a915d;
+    color: white;
+}
+
+.p-button-success.custom-button:hover {
+    background-color: #007E33;
+}
+
+.p-button-info.custom-button {
+    background-color: #44bbae;
+    color: white;
+}
+
+.p-button-info.custom-button:hover {
+    background-color: #3aa195;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background-color: #e9e9e9;
+    color: #464646;
+    border: 1px solid #d3cece;
+    padding: 5px;
+  }
+  
+
+  
+  :host ::ng-deep .p-datatable-header {
+    background-color: #e9e9e9;
+
+  }
+  
+  /* Estilo para la tabla */
+  .tabla-centrada {
+  
+    border-collapse: collapse;
+    width: 100%;  /* Asegúrate de que la tabla ocupe el 100% del ancho disponible */
+  }
+  
+  /* Estilo para las celdas (centrar horizontal y verticalmente) */
+  .tabla-centrada th, .tabla-centrada td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center; /* Centra el contenido horizontalmente */
+    vertical-align: middle; /* Centra el contenido verticalmente */
+  }
+
+/* ===== BOTONES PROFESIONALES DE ACCIONES ===== */
+.action-buttons-container {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  padding: 2px;
+  background-color: #e9e9e9;
+}
+
+.action-btn {
+  flex: 1;
+  min-height: 25px;
+  border: none;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-transform: none;
+  letter-spacing: 0.2px;
+  padding: 0.4rem 0.6rem;
+}
+
+.action-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.action-btn span,
+.action-btn i {
+  position: relative;
+  z-index: 2;
+}
+
+/* Botón Ver - Tema principal */
+.btn-view {
+  background: #009688;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #08554D;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.btn-view:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 150, 136, 0.2);
+}
+
+/* Botón Eliminar - Habilitado */
+.btn-delete.enabled {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+}
+
+.btn-delete.enabled:hover {
+  background: linear-gradient(135deg, #c53030 0%, #9c2727 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.btn-delete.enabled:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(229, 62, 62, 0.2);
+}
+
+/* Botón Eliminar - Deshabilitado */
+.btn-delete.disabled {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+  color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.btn-delete.disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-delete.disabled::before {
+  display: none;
+}
+
+/* ===== TEXTO DE TIPO DE PLANILLA ===== */
+.tipo-planilla-text {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease;
+  width: 90%;
+}
+
+/* Mensual - Verde principal */
+.tipo-mensual {
+  color: #008496;
+  background-color: rgba(0, 150, 136, 0.1);
+}
+
+/* Planilla Adicional - Azul */
+.tipo-adicional {
+  color: #2262af;
+  background-color: rgba(34, 98, 175, 0.1);
+}
+
+/* Beneficio Social - Púrpura */
+.tipo-beneficio {
+  color: #7c3aed;
+  background-color: rgba(124, 58, 237, 0.1);
+}
+
+/* Reintegro - Naranja */
+.tipo-reintegro {
+  color: #f97316;
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+/* Retroactivo - Teal */
+.tipo-retroactivo {
+  color: #14b8a6;
+  background-color: rgba(20, 184, 166, 0.1);
+}
+
+/* Default - Gris */
+.tipo-default {
+  color: #64748b;
+  background-color: rgba(100, 116, 139, 0.1);
+}
+
+/* Iconos de check */
+.check-icon {
+  font-size: 1.2rem;
+}
+
+.green-check {
+  color: #4caf50;
+}
+
+.red-x {
+  color: #f44336;
+}
+
+/* Mensaje sin datos */
+.no-data-message {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Modal */
+:host ::ng-deep .p-dialog {
+  border-radius: 8px;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: #009688;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 20px;
+}
+
+/* Archivo seleccionado en el upload */
+.archivo-seleccionado {
+  background: #e8f5e8;
+  border: 1px solid #009688;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .header-left h2 {
+    font-size: 20px;
+  }
+}

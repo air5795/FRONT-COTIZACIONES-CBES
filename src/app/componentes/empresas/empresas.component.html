@@ -1,0 +1,137 @@
+<div class="grid dashboard">
+  <div class="col-12 md:col-12 lg:6">
+    <div class="perfil-empleador">
+      <div class="header">
+        <div class="header-left">
+          <h2 style="font-size: 30px;">
+            <i class="pi pi-building" style="font-size: 2.5rem"></i> GESTIÓN DE EMPRESAS
+          </h2>
+          <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+          <span class="numero-patronal">Control de Empresas Registradas</span>
+        </div>
+        <div class="header-right">
+          <div class="button-container">
+            <button 
+              pButton 
+              label="SINCRONIZAR EMPRESAS" 
+              class="boton2"
+              (click)="sincronizarEmpresas()"
+              [disabled]="sincronizando"
+            >
+              <span 
+                class="pi" 
+                [ngClass]="sincronizando ? 'pi-spin pi-spinner' : 'pi-sync'" 
+                style="font-size: 2rem; padding-bottom: 10px;"
+              ></span>
+              <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">
+                {{ sincronizando ? 'Sincronizando...' : 'Sincronizar' }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p-table 
+        [value]="empresas" 
+        [paginator]="true"
+        [rows]="limite" 
+        [totalRecords]="totalRegistros" 
+        (onPage)="onPageChange($event)"
+        [rowsPerPageOptions]="[5,10,20,25,30]"
+        [pageLinks]="3" 
+        [lazy]="true"
+        [loading]="loading"
+        class="tabla-centrada compact-table" 
+        #tablaEmpresas
+      >
+
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row align-items-center">
+            <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+            <div class="flex flex-column sm:flex-row gap-2 mb-2">
+              <span class="p-input-icon-left w-full sm:w-auto">
+                <i class="pi pi-search"></i>
+                <input
+                  pInputText
+                  type="text"
+                  #filter
+                  (input)="buscar(filter.value)"
+                  placeholder="Buscar empresa..."
+                  class="w-full"
+                />
+              </span>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Código</th>
+            <th>Código Patronal</th>
+            <th>Nombre Empresa</th>
+            <th>Razón Social</th>
+            <th>NIT</th>
+            <th>N° Trabajadores</th>
+            <th>Tipo</th>
+
+            <th>Observaciones</th>
+            
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-empresa>
+          <tr>
+            <td>{{ empresa.emp_cod }}</td>
+            <td>
+              <span class="font-bold text-primary">{{ empresa.cod_patronal }}</span>
+            </td>
+            <td>
+              <div class="font-medium">{{ empresa.emp_nom }}</div>
+              <div class="text-sm text-gray-500">{{ empresa.emp_nom_corto }}</div>
+            </td>
+            <td>{{ empresa.emp_legal }}</td>
+            <td>{{ empresa.emp_nit }}</td>
+            <td style="text-align: center;">
+              <span class="badge badge-info">{{ empresa.emp_ntrab || 0 }}</span>
+            </td>
+            <td>
+              <div [ngSwitch]="empresa.tipo">
+                <span *ngSwitchCase="'AP'" class="badge badge-warning" style="width: 100%;">PÚBLICA - {{ empresa.tipo }}</span>
+                <span *ngSwitchCase="'AV'" class="badge badge-success" style="width: 100%;">PRIVADA - {{ empresa.tipo }}</span>
+                <span *ngSwitchCase="'PA'" class="badge badge-info" style="width: 100%;">PASIVA - {{ empresa.tipo }}</span>
+                <span *ngSwitchCase="'VA'" class="badge badge-primary" style="width: 100%;">DECRETO SUPREMO - {{ empresa.tipo }}</span>
+                <span *ngSwitchDefault class="badge" style="width: 100%;">{{ empresa.tipo }}</span>
+              </div>
+            </td>
+
+            <td>{{ empresa.emp_obs }}</td>
+
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" style="text-align: center;">
+              <div class="p-4">
+                <i class="pi pi-info-circle text-4xl text-gray-400 mb-3"></i>
+                <p class="text-gray-500">No se encontraron empresas</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="9" style="text-align: center;">
+              <div class="p-4">
+                <i class="pi pi-spin pi-spinner text-2xl text-primary"></i>
+                <p class="mt-2">Cargando empresas...</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+  </div>
+</div>

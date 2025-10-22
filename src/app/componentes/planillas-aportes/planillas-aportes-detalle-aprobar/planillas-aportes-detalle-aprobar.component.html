@@ -1,0 +1,1184 @@
+<!-- ENCAMBEZADO DE PLANILLA ---------------------------------------------------------------------------------- -->
+<div class="grid dashboard">
+  <div class="col-12 md:col-12 lg:6">
+    <div class="perfil-empleador">
+      <div class="cabezera-planilla">
+        <div class="header-left">
+          <h2 style="font-size: 15px; display: flex; align-items: center; font-family: 'Roboto', sans-serif; margin: 5px 0 5px;">
+            <span style="background-color: #009688; color: white; padding: 6px 10px; border-radius: 4px 0 0 4px; display: flex; align-items: center;">
+              
+               N° {{ planillaInfo?.planilla?.com_nro }}
+            </span>
+            <span style="background-color: #00796b; color: white; padding: 6px 10px; ">
+              {{ planillaInfo.planilla.mes }}
+            </span>
+            <span style="background-color: #00685a; color: white; padding: 6px 10px; ">
+              {{ planillaInfo.planilla.gestion }}
+            </span>
+            <span  style="background-color: #00483a; color: white; padding: 6px 10px;  ">
+              {{ planillaInfo.planilla.empresa.nombre }}
+            </span>
+
+            <span 
+              style="background-color: #00382a; color: white; padding: 6px 10px; border-radius: 0 4px 4px 0;">
+              {{
+                planillaInfo.planilla.empresa.tipo === 'PA' ? 'PASIVO' :
+                planillaInfo.planilla.empresa.tipo === 'AP' ? 'PÚBLICA' :
+                planillaInfo.planilla.empresa.tipo === 'AV' ? 'PRIVADA' :
+                planillaInfo.planilla.empresa.tipo === 'VA' ? 'DECRETO SUPREMO' :
+                planillaInfo.planilla.empresa.tipo // Por si acaso, muestra el valor original
+              }}
+            </span>
+          </h2>
+          
+          
+          <hr style="border: 1px solid #949494; margin: 2px 0;">
+        
+          <div class="list-container">
+            <!-- Estado de Planilla -->
+            <div [ngSwitch]="planillaInfo.planilla.estado" class="list-item" 
+              [ngStyle]="{'background-color': getFondoEstado(planillaInfo.planilla.estado)}">
+              <div class="estado-container" *ngSwitchCase="0">
+                <span class="label">ESTADO</span>
+                <span class="value" [ngStyle]="{'color': getColorEstado(planillaInfo.planilla.estado)}">
+                  BORRADOR <i class="pi pi-question-circle"></i>
+                </span>
+              </div>
+              <div class="estado-container" *ngSwitchCase="1">
+              <span class="label">ESTADO</span>
+              <span class="value" [ngStyle]="{'color': getColorEstado(planillaInfo.planilla.estado)}">
+                PRESENTADO <i class="pi pi-send"></i>
+              </span>
+            </div>
+            <div class="estado-container" *ngSwitchCase="2">
+              <span class="label">ESTADO</span>
+              <span class="value" [ngStyle]="{'color': getColorEstado(planillaInfo.planilla.estado)}">
+                 APROBADO <i class="pi pi-check"></i>
+              </span>
+            </div>
+            <div class="estado-container" *ngSwitchCase="3">
+              <span class="label">ESTADO</span>
+              <span class="value" [ngStyle]="{'color': getColorEstado(planillaInfo.planilla.estado)}">
+                OBSERVADO <i class="pi pi-exclamation-triangle"></i>
+              </span>
+            </div>
+          </div>
+          
+
+            <!-- Declarado por -->
+
+            <div class="list-item">
+              <span class="label">Declarado Por </span>
+              <ng-container *ngIf="resumenData?.planilla; else sinDatosImporte">
+                <span class="value">
+                   {{ planillaInfo?.planilla?.nombre_creacion || '---' }}
+                </span>
+              </ng-container>
+              <ng-template #sinDatosImporte>
+                <span class="value">
+                  <i class="pi user"></i> -
+                </span>
+              </ng-template>
+            </div>
+
+            <!-- fecha y hora declaracion -->
+
+            <div class="list-item">
+              <span class="label">Fecha Declaración</span>
+              <ng-container *ngIf="resumenData?.planilla; else sinDatos">
+                <span class="value">
+                  {{ planillaInfo?.planilla?.fecha_declarada | date: "dd/MM/yyyy " : 'UTC' }}
+                </span>
+              </ng-container>
+              <ng-template #sinDatos>
+                <span class="value">---</span>
+              </ng-template>
+            </div>
+          
+            <!-- N° de Trabajadores -->
+            <div class="list-item">
+              <span class="label">N° de Registros</span>
+              <ng-container *ngIf="resumenData?.planilla; else sinDatosTrabajadores">
+                <span class="value">
+                  <i class="pi pi-users"></i> {{ planillaInfo.planilla.total_trabaj }}
+                </span>
+              </ng-container>
+              <ng-template #sinDatosTrabajadores>
+                <span class="value">
+                  <i class="pi pi-users"></i> 0
+                </span>
+              </ng-template>
+            </div>
+
+            <!-- Total Importe -->
+            <div class="list-item">
+              <span class="label">Total Ingresos</span>
+              <ng-container *ngIf="resumenData?.planilla; else sinDatosImporte">
+                <span class="value">
+                  <i class="pi pi-money-bill"></i> {{ planillaInfo.planilla.total_importe | number:'1.2-2'  }} Bs
+                </span>
+              </ng-container>
+              <ng-template #sinDatosImporte>
+                <span class="value">
+                  <i class="pi pi-money-bill"></i> 0.00 Bs
+                </span>
+              </ng-template>
+            </div>
+
+               <!-- Total Importe Tasa -->
+            <div class="list-item">
+              <span class="label">
+                Cotización tasa: 
+                {{ planillaInfo.planilla.empresa.tipo === 'PA' ? '3' : '10' }} %
+              </span>
+              <ng-container *ngIf="resumenData?.planilla; else sinDatosImporte">
+                <span class="value">
+                  <i class="pi pi-money-bill"></i> 
+                  {{ planillaInfo.planilla.cotizacion_tasa | number:'1.2-2' }} Bs
+                </span>
+              </ng-container>
+              <ng-template #sinDatosImporte>
+                <span class="value">
+                  <i class="pi pi-money-bill"></i> 0.00 Bs
+                </span>
+              </ng-template>
+            </div>
+
+
+
+            
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="button-container">
+
+            <button 
+              *ngIf="planillaInfo.planilla.estado === 1"
+              pButton 
+              label="Planilla" 
+              class="botonValidar"
+              style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 80px;" 
+              (click)="guardarEstado()">
+                <span class="pi pi-flag" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;">Validar</span>
+            </button>
+
+            <button 
+            pButton 
+            *ngIf="planillaInfo?.planilla?.estado === 2" 
+            label="DS-08" 
+            class="boton4"
+            style="display: flex; flex-direction: column; align-items: center; font-size: 1rem; width: 80px; " 
+            (click)="ReporteDS08() ">
+              <span class="pi pi-book" style="font-size: 2rem; padding-bottom: 10px;"></span>
+              <span style="font-size: 10px;color: #ffffff;border-bottom: 1px solid white;margin-bottom: 2px;" >Formulario</span>
+            
+            </button>
+
+ 
+          </div>
+        </div>
+      </div>
+      <div [ngSwitch]="planillaInfo.planilla.estado" [ngStyle]="{'background-color': getFondoEstado(planillaInfo.planilla.estado)}" >
+        <div *ngSwitchCase="3" style="padding: 20px;">
+
+       
+          <span style="color: aliceblue;background-color: #f7f7f7;color: red;padding: 9px;border-radius: 8px;"> 
+            <strong style="color: #b00020;"> OBSERVACIÓN: </strong> <span style="color: rgb(73, 73, 73); margin-left: 15px;"> {{ planillaInfo.planilla.observaciones || 'Ninguna' }}</span>
+          </span>
+        </div>
+    
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<!-- OPCIONES DE PLANILLA ---------------------------------------------------------------------------------- -->
+<p-tabView [style]="{ padding: '5px' , 'border': '1px solid #ccc', borderRadius: '5px' }" >
+  <p-tabPanel header="Planilla Declarada" leftIcon="pi pi-file" >
+    <p-table
+    [value]="trabajadores"
+    [paginator]="true"
+    [rows]="limite"
+    [totalRecords]="total"
+    [loading]="loading"
+    [rowsPerPageOptions]="[5, 10, 15, 20 , -1]"
+    [pageLinks]="5"
+    [lazy]="true"
+    responsiveLayout="scroll"
+    styleClass="p-datatable-sm p-datatable-striped"
+    [style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+    (onPage)="onPageChange($event)"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando registros del {first} al {last} de un total de {totalRecords} registros"
+  >
+  <ng-template pTemplate="caption">
+    <div class="flex justify-content-between align-items-center flex-column sm:flex-row">
+        <!-- Contenedor del buscador (izquierda) -->
+        <div class="flex align-items-center mb-2 sm:mb-0">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" #filter (input)="buscar(filter.value)" placeholder="Buscar ..." class="w-full">
+            </span>
+        </div>
+
+        <!-- Contenedor de los botones (derecha) -->
+        <div class="flex align-items-center">
+<!--             <button 
+            
+            pButton style="border: 1px;" 
+            label="Exportar PDF " 
+            class="p-button-outlined p-button-plain mr-2" 
+            icon="pi pi-file-pdf" 
+            (click)="recargar()">
+          </button> -->
+<!--             <button 
+            
+            pButton style="border: 1px;" 
+            label="Exportar Excel " 
+            class="p-button-outlined p-button-plain mr-2" 
+            icon="pi pi-file-excel" 
+            (click)="recargar()">
+          </button> -->
+
+
+          <button 
+          pButton 
+          style="border: 1px; margin-right: 8px;" 
+          label="Recargar" 
+          class="p-button-outlined p-button-plain" 
+          icon="pi pi-sync" 
+          (click)="recargar()">
+        </button>
+
+        <button 
+        pButton 
+        *ngIf="planillaInfo?.planilla?.estado === 1"
+        style="border: 1px; margin-right: 8px;" 
+        [label]="planillaInfo?.planilla?.fecha_verificacion_afiliacion ? 'Re-verificar Afiliaciones' : 'Verificar Afiliaciones'"
+        class="p-button-outlined p-button-plain" 
+        (click)="verificarAfiliaciones()">
+      </button>
+      
+      <button 
+        pButton 
+        *ngIf="resumenCompleto || planillaInfo?.planilla?.fecha_verificacion_afiliacion"
+        style="border: 2px; margin-right: 8px;" 
+        [label]="resumenCompleto ? 
+          'Ver Detalles (' + (resumenCompleto.vigentes + resumenCompleto.no_vigentes + resumenCompleto.no_encontrados + resumenCompleto.faltantes) + ')' : 
+          'Ver Detalles Guardados'"
+        class="p-button-outlined p-button-plain" 
+        (click)="verTrabajadoresFaltantes()">
+      </button>
+
+
+
+
+  <div style="background-color: #e9e9e9; padding: 2px; border-radius: 5px;" *ngIf="planillaInfo.planilla.fecha_verificacion_afiliacion !== null" >
+
+    <!-- Chips de totales por estado de afiliación -->
+    <ng-container *ngIf="obtenerTotalesEstadosAfiliacion() as totales">
+
+   <!-- Botón de Vigentes -->
+<button 
+pButton 
+*ngIf="totales.vigentes > 0"
+style="opacity: 1; background-color: #d4edda; color: #345c47;"
+class="p-button p-button-success mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="Vigentes" 
+tooltipPosition="top">
+
+<span>{{totales.vigentes}}</span>
+</button>
+
+<!-- Botón de Bajas -->
+<button 
+pButton 
+*ngIf="totales.bajas > 0"
+style="opacity: 1; background-color: #f8d7da; color: #853139;"
+class="p-button p-button-danger mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="Bajas" 
+tooltipPosition="top">
+
+<span>{{totales.bajas}}</span>
+</button>
+
+<!-- Botón de Fallecidos -->
+<button 
+pButton 
+*ngIf="totales.fallecidos > 0"
+style="opacity: 1;"
+class="p-button p-button-secondary mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="Fallecidos" 
+tooltipPosition="top">
+
+<span>{{totales.fallecidos}}</span>
+</button>
+
+<!-- Botón de Cesantías -->
+<button 
+pButton 
+*ngIf="totales.cesantias > 0"
+style="opacity: 1; background-color: #fff3cd; color: #72430b;"
+class="p-button p-button-warning mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="Cesantías" 
+tooltipPosition="top">
+<span>{{totales.cesantias}}</span>
+</button>
+
+<!-- Botón de Derechohabientes -->
+<button 
+pButton 
+*ngIf="totales.derHabientes > 0"
+style="opacity: 1; background-color: #cce5ff; color: #004085;"
+class="p-button p-button-info mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="Derechohabientes" 
+tooltipPosition="top">
+<span>{{totales.derHabientes}}</span>
+</button>
+
+<!-- Botón de No Encontrados -->
+<button 
+pButton 
+*ngIf="resumenCompleto.no_encontrados > 0"
+style="opacity: 1; background-color: #c7c7c7; color: #636363;"
+class="p-button p-button-danger mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="No Encontrados" 
+tooltipPosition="top">
+<span>{{resumenCompleto.no_encontrados}}</span>
+</button>
+
+<!-- Botón de Sin Estado -->
+<button 
+pButton 
+*ngIf="totales.sinEstado > 0"
+style="opacity: 1;"
+class="p-button p-button-help mr-2 d-flex align-items-center justify-content-center"
+type="button"
+pTooltip="Sin Estado" 
+tooltipPosition="top">
+<span>{{totales.sinEstado}}</span>
+</button>
+
+<button 
+pButton 
+*ngIf="planillaInfo.planilla.fecha_verificacion_afiliacion !== null"
+style=" pointer-events: none; opacity: 1; background-color: #e9e9e9; color: #009688; font-size: 12px;"
+class="p-button p-button-success mr-2"
+type="button">
+
+Última verificación: {{ planillaInfo.planilla.fecha_verificacion_afiliacion | date:'dd/MM/yyyy HH:mm' }}
+</button>
+    </ng-container> 
+    
+  </div>
+
+        
+        </div>
+    </div>
+</ng-template>
+  <ng-template pTemplate="header">
+    <tr style="background-color: #f8f9fa;">
+      <th style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nro</th>
+        <th style="width: 50px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">CI</th>
+        <th style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Regional</th>
+        <th style="width: 200px; text-align: left; padding: 5px; border: 1px solid #dee2e6;">Nombre Completo</th>
+        <th *ngIf="planillaInfo.planilla.empresa.tipo != 'PA'" style="width: 200px; text-align: left; padding: 5px; border: 1px solid #dee2e6;">Cargo</th>
+        <th *ngIf="planillaInfo.planilla.empresa.tipo != 'PA'" style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Dias Pagados</th>
+        <th style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Total Ganado</th>
+        <th style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Ingreso</th>
+        <th style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Retiro</th>
+        <th style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Observaciones Afiliación</th>
+        <th style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Matricula</th>
+        <th style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Tipo Afiliado</th>
+        <th style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Asegurado Estado</th>
+        <th style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">Asegurado Tipo</th>
+
+      
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-trabajador let-i="rowIndex">
+    <tr [ngClass]="getClaseEstadoAfiliacion(trabajador.asegurado_estado)">
+      <td style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.nro }}</td>
+        <td style="width: 50px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.ci }}</td>
+        <td style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.regional }}</td>
+        <td style="width: 200px; text-align: left; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }} {{ trabajador.nombres }}</td>
+        <td *ngIf="planillaInfo.planilla.empresa.tipo != 'PA'" style="width: 200px; text-align: left; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.cargo }}</td>
+        <td *ngIf="planillaInfo.planilla.empresa.tipo != 'PA'" style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.dias_pagados }}</td>
+        <td style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6; background-color: #eeffeb;">{{ trabajador.salario | number:'1.2-2' }}</td>
+        <td style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_ingreso }}</td>
+        <td style="width: 80px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro }}</td>
+        <td style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">
+      {{ trabajador.observaciones_afiliacion }}
+      </td>
+        <td style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">
+        {{ trabajador.matricula }}
+      </td>
+      <td style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">
+        {{ trabajador.tipo_afiliado }}
+      </td>
+      <td style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">
+      {{ trabajador.asegurado_tipo }}
+      </td>
+      <td style="width: 20px; text-align: center; padding: 5px; border: 1px solid #dee2e6;">
+      {{ trabajador.asegurado_estado }}
+      </td>
+  </ng-template>
+</p-table>
+  </p-tabPanel>
+  <p-tabPanel header="Resumen" leftIcon="pi pi-eye" >
+    <div class="dashboard-container" >
+      <!-- Contenedor principal de dos secciones -->
+      <div class="content-grid" style="display: grid; grid-template-columns: 4fr 4fr; background-color: #f5f5f5;">
+        <!-- Panel izquierdo: Tarjetas de información -->
+        <div class="summary-panel">
+          <!-- Diseño de tarjetas -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; padding: 15px; background-color: #f5f5f5;">
+            <!-- Tarjeta: Total Registros -->
+            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Registros</span>
+                  <i class="pi pi-users" style="color: #00796b; font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 2.2rem; font-weight: 700; color: #00695c;">
+                  {{ resumenData?.planilla?.total_trabaj }}
+                </div>
+                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Empleados registrados</div>
+              </div>
+            </div>
+            
+            <!-- Tarjeta: Total Altas -->
+            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Altas</span>
+                  <i class="pi pi-user-plus" style="color: #00796b; font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 2.2rem; font-weight: 700; color: #4caf50; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  {{ altas.length }}
+                  <i class="pi pi-arrow-up" style="font-size: 1.2rem;"></i>
+                </div>
+                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Nuevas incorporaciones</div>
+              </div>
+            </div>
+            
+            <!-- Tarjeta: Total Bajas por Retiro -->
+            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Bajas</span>
+                  <i class="pi pi-user-minus" style="color: #00796b; font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 2.2rem; font-weight: 700; color: #f44336; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  {{ bajasPorRetiro.length }}
+                  <i class="pi pi-arrow-down" style="font-size: 1.2rem;"></i>
+                </div>
+                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Retiros en el mes actual</div>
+              </div>
+            </div>
+            
+            <!-- Tarjeta: No encontrados -->
+            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">No Encontrados</span>
+                  <i class="pi pi-exclamation-triangle" style="color: #00796b; font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 2.2rem; font-weight: 700; color: #ff9800; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  {{ bajasNoEncontradas.length }}
+                  <i class="pi pi-question-circle" style="font-size: 1.2rem;"></i>
+                </div>
+                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Trabajadores no encontrados</div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Panel derecho: Tabla de resumen por regional -->
+        <div class="summary-panel">
+        
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <i class="pi pi-map-marker"></i>
+                  Regional
+                </th>
+                <th class="text-right">
+                  <i class="pi pi-users"></i>
+                  Cantidad
+                </th>
+                <th class="text-right">
+                  <i class="pi pi-money-bill"></i>
+                  Total Ganado
+                </th>
+                <th class="text-right">
+                  <i class="pi pi-percentage"></i>
+                  TASA (10% o 3%)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Filas de resumen por regional dinámicas -->
+              <tr *ngFor="let region of resumenData?.resumen">
+                <td>{{ region.regional }}</td>
+                <td class="text-right">{{ parseNumber(region.cantidad) | number:'1.0-0' }}</td>
+                <td class="text-right">{{ region.total_ganado }}</td>
+                <td class="text-right">{{ region.cotizacion }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr *ngIf="resumenData?.totales">
+                <td>
+                  <i class="pi pi-chart-bar"></i>
+                  Totales
+                </td>
+                <td style="text-align: right;">{{ parseNumber(resumenData.totales.cantidad_total) | number:'1.0-0' }}</td>
+                <td style="text-align: right;">{{ resumenData.totales.total_ganado }}</td>
+                <td style="text-align: right;">{{ resumenData.totales.cotizacion }}</td>
+              </tr>
+            </tfoot>
+          </table>
+          <div *ngIf="!resumenData?.resumen || resumenData?.resumen.length === 0" class="empty-message">
+            <i class="pi pi-info-circle"></i>
+            No hay datos para mostrar en este momento.
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-tabPanel>
+  <p-tabPanel header="Bajas" leftIcon="pi pi-arrow-down">
+<!--  Bajas por Fecha de Retiro -->
+<div style="display: flex; align-items: center; justify-content: space-between;  background-color: #e3e3e3; padding: 5px;">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <i class="pi pi-angle-double-down" style="color: #e45b5b; font-size: 1.5rem;"></i>
+    <span style="font-size: 1.25rem; font-weight: bold; color: #5f5f5f;">Bajas por fecha de retiro en el mes actual</span>
+  </div>
+  <button pButton type="button" class="p-button p-button-sm" style="display: flex; align-items: center; gap: 15px; padding: 5px 10px; font-size: large; background-color: #7d0000;">
+    <i class="pi pi-users"></i> <span>{{ bajasPorRetiro.length }}</span>
+  </button>
+</div>
+<p-table
+  [value]="bajasPorRetiro"
+  [paginator]="true"
+  [rows]="5"
+  [totalRecords]="bajasPorRetiro.length"
+  [rowsPerPageOptions]="[5, 10, 15, 20]"
+  [pageLinks]="5"
+  responsiveLayout="scroll"
+  styleClass="p-datatable-sm p-datatable-striped"
+  [style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando registros del {first} al {last} de un total de {totalRecords} registros"
+>
+
+
+
+  <ng-template pTemplate="header">
+    <tr style="background-color: #f8f9fa;">
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nro en Planilla</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">CI</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nombre Completo</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Cargo</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Haber Basico</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Total Ganado</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Ingreso</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Retiro</th>
+      <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Regional</th>
+     
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-trabajador let-i="rowIndex">
+    <tr style="background-color: #ffeded;">
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.nro }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.ci }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }} {{ trabajador.nombres }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.cargo }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.haber_basico | number:'1.2-2' }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.salario | number:'1.2-2' }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_ingreso }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro }}</td>
+      <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.regional }}</td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="9" style="text-align: center; padding: 20px; background-color: #fff;">
+        <div class="no-data-message">
+          <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+          <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay bajas por fecha de retiro.</p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- trabajdor no encontrado en el mes actual  -->
+<div style="display: flex; align-items: center; justify-content: space-between; background-color: #e3e3e3; padding: 5px;">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <i class="pi pi-angle-double-down" style="color: #e49d5b; font-size: 1.5rem;"></i>
+    <span style="font-size: 1.25rem; font-weight: bold; color: #5f5f5f;">Trabajador no encontrado en el mes actual</span>
+  </div>
+  <button pButton type="button" class="p-button p-button-sm" style="display: flex; align-items: center; gap: 15px; padding: 5px 10px; font-size: large; background-color: #7d4b00;">
+    <i class="pi pi-users"></i> <span>{{ bajasNoEncontradas.length }}</span>
+  </button>
+</div>
+
+<p-table
+[value]="bajasNoEncontradas"
+[paginator]="true"
+[rows]="5"
+[totalRecords]="bajasNoEncontradas.length"
+[rowsPerPageOptions]="[5, 10, 15, 20]"
+[pageLinks]="5"
+responsiveLayout="scroll"
+styleClass="p-datatable-sm p-datatable-striped"
+[style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+[showCurrentPageReport]="true"
+currentPageReportTemplate="Mostrando registros del {first} al {last} de un total de {totalRecords} registros"
+>
+
+
+<!-- Encabezado -->
+<ng-template pTemplate="header">
+<tr style="background-color: #f8f9fa;">
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nro en Planilla</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">CI</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nombre Completo</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Cargo</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Haber Basico</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Total Ganado</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Ingreso</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Retiro</th>
+  <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Regional</th>
+ 
+</tr>
+</ng-template>
+<ng-template pTemplate="body" let-trabajador let-i="rowIndex">
+<tr style="background-color: #fff4ed;">
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.nro }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.ci }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }} {{ trabajador.nombres }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.cargo }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.haber_basico | number:'1.2-2' }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.salario | number:'1.2-2' }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_ingreso }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro }}</td>
+  <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.regional }}</td>
+
+</tr>
+</ng-template>
+
+
+<ng-template pTemplate="emptymessage">
+  <tr>
+    <td colspan="9" style="text-align: center; padding: 20px; background-color: #fff;">
+      <div class="no-data-message">
+        <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+        <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay datos encontrados.</p>
+      </div>
+    </td>
+  </tr>
+</ng-template>
+</p-table>
+
+  </p-tabPanel>
+  <p-tabPanel header="Altas" leftIcon="pi pi-arrow-up">
+
+    <div style="display: flex; align-items: center; justify-content: space-between;  background-color: #e3e3e3; padding: 5px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="pi pi-angle-double-up" style="color: #5be479; font-size: 1.5rem;"></i>
+        <span style="font-size: 1.25rem; font-weight: bold; color: #5f5f5f;">Personal Nuevo</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button pButton style="border: 1px;" label="Exportar a Excel" class="p-button-outlined p-button-plain" icon="pi pi-file-excel" (click)="recargar()"></button>
+        <button pButton style="border: 1px;" label="Exportar a Pdf" class="p-button-outlined p-button-plain" icon="pi pi-file-pdf" (click)="recargar()"></button>
+        <button pButton type="button" class="p-button p-button-sm" style="display: flex; align-items: center; gap: 15px; padding: 7px 10px; font-size: large; background-color: #007d00;">
+          <i class="pi pi-users"></i> <span>{{ altas.length }}</span>
+        </button>
+        
+      </div>
+    </div>
+
+        <p-table
+          [value]="altas"
+          [paginator]="true"
+          [rows]="15"
+          [totalRecords]="altas.length"
+          [rowsPerPageOptions]="[5, 10, 15, 20]"
+          [pageLinks]="5"
+          responsiveLayout="scroll"
+          styleClass="p-datatable-sm p-datatable-striped"
+          [style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando registros del {first} al {last} de un total de {totalRecords} registros"
+        >
+
+    
+           <!-- Encabezado -->
+           <ng-template pTemplate="header">
+            <tr style="background-color: #f8faf8;">
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nro</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">CI</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nombre Completo</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Cargo</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Haber Basico</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Total Ganado</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Ingreso</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Retiro</th>
+              <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Regional</th>
+             
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-trabajador let-i="rowIndex">
+            <tr style="background-color: #e6ffe6;">
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.nro }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.ci }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }} {{ trabajador.nombres }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.cargo }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.haber_basico | number:'1.2-2' }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.salario | number:'1.2-2' }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_ingreso }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro }}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.regional }}</td>
+            
+            </tr>
+          </ng-template>
+    
+          <!-- Mensaje cuando no hay datos -->
+    
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 20px; background-color: #fff;">
+                <div class="no-data-message">
+                  <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+                  <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay nuevas altas en esta planilla.</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+  </p-tabPanel>
+  <p-tabPanel header="Pagos" leftIcon="pi pi-money-bill" *ngIf="planillaInfo?.planilla?.estado === 2">
+    <app-pagos-aportes [idPlanilla]="idPlanilla"></app-pagos-aportes>
+  </p-tabPanel>
+  <p-tabPanel header="Liquidación" leftIcon="pi pi-calculator">
+    <app-liquidaciones-aportes [idPlanilla]="idPlanilla"></app-liquidaciones-aportes>
+  </p-tabPanel>
+  <p-tabPanel header="Verificación Afiliaciones" leftIcon="pi pi-verified" *ngIf="planillaInfo?.planilla?.estado === 2" >
+  <app-verificacion-afiliaciones [idPlanilla]="idPlanilla"></app-verificacion-afiliaciones>
+  </p-tabPanel>
+<!--   <p-tabPanel header="Planillas Adicionales" leftIcon="pi pi-plus" class="right-align-tab">
+    <app-planillas-adicionales [idPlanilla]="idPlanilla"></app-planillas-adicionales>
+  </p-tabPanel> -->
+</p-tabView>
+
+
+<p-dialog [(visible)]="displayModal" [style]="{width: '500px'}" [modal]="true" 
+          [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [draggable]="false" 
+          [resizable]="false" [closable]="false" header="Validar Planilla">
+  
+  <div class="dialog-container p-fluid">
+    <div class="grid">
+      <div class="col-12">
+        <div class="field">
+          <label for="estado" class="block">Seleccione la acción a realizar</label>
+          <p-dropdown 
+            id="estado" 
+            [(ngModel)]="estadoSeleccionado" 
+            [options]="estados" 
+            placeholder="Seleccione una opción"
+            optionLabel="label" 
+            optionValue="value"
+            appendTo="body"
+            (onChange)="onEstadoChange($event)"
+            [class]="getEstadoClass()"
+            class="w-full">
+            <ng-template let-option pTemplate="item">
+              <div class="flex align-items-center">
+                <i [class]="getEstadoIcon(option.value)" class="mr-2"></i>
+                <div>{{option.label}}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <small *ngIf="estadoSeleccionado" class="block mt-1 text-500">
+            <i [class]="getEstadoIcon(estadoSeleccionado)" class="mr-1"></i>
+            {{getEstadoHelpText()}}
+          </small>
+        </div>
+      </div>
+      
+      <div class="col-12" *ngIf="estadoSeleccionado === 3">
+        <div class="field mt-3">
+          <label for="observaciones" class="block">
+            Observaciones <span class="text-red-500">*</span>
+            <small class="block text-500">(Detalle los motivos de la observación)</small>
+          </label>
+          <textarea 
+            id="observaciones" 
+            [(ngModel)]="observaciones" 
+            rows="4" 
+            pInputTextarea
+            [autoResize]="true"
+            class="w-full"
+            [class]="{'p-invalid': estadoSeleccionado === 3 && !observaciones}"
+            required>
+          </textarea>
+          <small *ngIf="estadoSeleccionado === 3 && !observaciones" class="p-error block">
+            Las observaciones son requeridas para esta acción
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between align-items-center w-full">
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        (click)="cerrarModal()" 
+        class="p-button-text p-button-secondary">
+      </p-button>
+      
+      <p-button 
+        [label]="estadoSeleccionado === 2 ? 'Aprobar Planilla' : 'Observar Planilla'" 
+        icon="pi pi-check" 
+        (click)="guardarEstado()" 
+        [disabled]="!estadoSeleccionado || (estadoSeleccionado === 3 && !observaciones)"
+        [class]="getConfirmButtonClass()">
+
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+ 
+
+
+
+
+
+<!-- dialog de cruce con afiliaciones -->
+
+<p-dialog 
+  header="ANÁLISIS DE CRUCE CON AFILIACIONES SIGAH" 
+  [(visible)]="mostrarAnalisisCompletoDialog" 
+  [modal]="true" 
+  [resizable]="true" 
+  [draggable]="true"
+  [maximizable]="true"
+  [styleClass]="'dialog-analisis-afiliaciones'"
+  [style]="{width: '98vw', height: '90vh', 'max-width': '1400px'}">
+  
+  <div class="analisis-container" *ngIf="casosAnalisis && resumenCompleto">
+    <!-- HEADER MEJORADO CON RESUMEN -->
+    <div class="header-resumen-mejorado">
+      <div class="titulo-principal">
+        <i class="pi pi-chart-bar"></i>
+        <h4>Resumen General de {{ resumenCompleto.total_planilla }} Trabajadores</h4>
+      </div>
+
+      <div class="fecha-verificacion" *ngIf="fechaUltimaVerificacion">
+        <i class="pi pi-clock"></i>
+        <span><strong>Última verificación:</strong> {{ fechaUltimaVerificacion | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      
+      <!-- TARJETAS DE RESUMEN MEJORADAS -->
+      <div class="tarjetas-resumen">
+        <div class="tarjeta-resumen tarjeta-vigentes">
+          <div class="tarjeta-icono">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          <div class="tarjeta-contenido">
+            <div class="tarjeta-numero">{{ resumenCompleto.vigentes }}</div>
+            <div class="tarjeta-label">Vigentes</div>
+            <div class="tarjeta-porcentaje">{{ calcularPorcentaje(resumenCompleto.vigentes, resumenCompleto.total_planilla) }}%</div>
+          </div>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-no-vigentes">
+          <div class="tarjeta-icono">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+          <div class="tarjeta-contenido">
+            <div class="tarjeta-numero">{{ resumenCompleto.no_vigentes }}</div>
+            <div class="tarjeta-label">No Vigentes</div>
+            <div class="tarjeta-porcentaje">{{ calcularPorcentaje(resumenCompleto.no_vigentes, resumenCompleto.total_planilla) }}%</div>
+          </div>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-no-encontrados">
+          <div class="tarjeta-icono">
+            <i class="pi pi-question-circle"></i>
+          </div>
+          <div class="tarjeta-contenido">
+            <div class="tarjeta-numero">{{ resumenCompleto.no_encontrados }}</div>
+            <div class="tarjeta-label">No Encontrados</div>
+            <div class="tarjeta-porcentaje">{{ calcularPorcentaje(resumenCompleto.no_encontrados, resumenCompleto.total_planilla) }}%</div>
+          </div>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-faltantes">
+          <div class="tarjeta-icono">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="tarjeta-contenido">
+            <div class="tarjeta-numero">{{ resumenCompleto.faltantes }}</div>
+            <div class="tarjeta-label">Faltantes</div>
+            <div class="tarjeta-descripcion">En SIGAH pero no en planilla</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑAS MEJORADAS CON LOS 4 CASOS -->
+    <p-tabView [styleClass]="'tabview-analisis'">
+      <!-- PESTAÑA 1: VIGENTES -->
+      <p-tabPanel [header]="'Vigentes (' + (casosAnalisis.vigentes?.length || 0) + ')'">
+        <div class="tab-content-wrapper">
+          <div class="tab-description vigentes-desc">
+            <i class="pi pi-info-circle"></i>
+            <p>Trabajadores que están correctamente afiliados y vigentes en el sistema SIGAH.</p>
+          </div>
+          
+          <p-table 
+            [value]="casosAnalisis.vigentes" 
+            [paginator]="true" 
+            [rows]="15"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} trabajadores vigentes"
+            [rowsPerPageOptions]="[10, 15, 25, 50]"
+            styleClass="p-datatable-sm tabla-analisis"
+            [style]="{'font-size': '13px'}"
+            [scrollable]="true"
+            scrollHeight="400px">
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="ci">CI <p-sortIcon field="ci"></p-sortIcon></th>
+                <th pSortableColumn="apellido_paterno">Nombre Completo <p-sortIcon field="apellido_paterno"></p-sortIcon></th>
+                <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon></th>
+                <th pSortableColumn="matricula">Matrícula <p-sortIcon field="matricula"></p-sortIcon></th>
+                <th>Estado</th>
+                <th pSortableColumn="tipo_afiliado">Tipo Afiliado <p-sortIcon field="tipo_afiliado"></p-sortIcon></th>
+                <th pSortableColumn="salario">Salario <p-sortIcon field="salario"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-trabajador>
+              <tr class="fila-vigente">
+                <td><strong>{{ trabajador.ci }}</strong></td>
+                <td>{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}, {{ trabajador.nombres }}</td>
+                <td>{{ trabajador.cargo }}</td>
+                <td>{{ trabajador.matricula }}</td>
+                <td>
+                  <span class="badge-estado vigente">
+                    <i class="pi pi-check-circle"></i>
+                    {{ trabajador.asegurado_estado }}
+                  </span>
+                </td>
+                <td>{{ trabajador.tipo_afiliado }}</td>
+                <td class="text-right">{{ trabajador.salario | number:'1.2-2' }} Bs</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+
+      <!-- PESTAÑA 2: NO VIGENTES -->
+      <p-tabPanel [header]="'No Vigentes (' + (casosAnalisis.no_vigentes?.length || 0) + ')'">
+        <div class="tab-content-wrapper">
+          <div class="tab-description no-vigentes-desc">
+            <i class="pi pi-exclamation-triangle"></i>
+            <p>Trabajadores que están en el sistema pero con estado diferente a VIGENTE (BAJA, CESANTÍA, etc.).</p>
+          </div>
+          
+          <p-table 
+            [value]="casosAnalisis.no_vigentes" 
+            [paginator]="true" 
+            [rows]="15"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} trabajadores no vigentes"
+            [rowsPerPageOptions]="[10, 15, 25, 50]"
+            styleClass="p-datatable-sm tabla-analisis"
+            [style]="{'font-size': '13px'}"
+            [scrollable]="true"
+            scrollHeight="400px">
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="ci">CI <p-sortIcon field="ci"></p-sortIcon></th>
+                <th pSortableColumn="apellido_paterno">Nombre Completo <p-sortIcon field="apellido_paterno"></p-sortIcon></th>
+                <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon></th>
+                <th>Estado en SIGAH</th>
+                <th>Observaciones</th>
+                <th pSortableColumn="salario">Salario <p-sortIcon field="salario"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-trabajador>
+              <tr class="fila-no-vigente">
+                <td><strong>{{ trabajador.ci }}</strong></td>
+                <td>{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}, {{ trabajador.nombres }}</td>
+                <td>{{ trabajador.cargo }}</td>
+                <td>
+                  <span class="badge-estado no-vigente">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    {{ trabajador.asegurado_estado }}
+                  </span>
+                </td>
+                <td>{{ trabajador.observaciones_afiliacion || 'Sin observaciones' }}</td>
+                <td class="text-right">{{ trabajador.salario | number:'1.2-2' }} Bs</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+
+      <!-- PESTAÑA 3: NO ENCONTRADOS -->
+      <p-tabPanel [header]="'No Encontrados (' + (casosAnalisis.no_encontrados?.length || 0) + ')'">
+        <div class="tab-content-wrapper">
+          <div class="tab-description no-encontrados-desc">
+            <i class="pi pi-question-circle"></i>
+            <p>Trabajadores que no aparecen en el sistema de afiliaciones SIGAH (pueden ser altas recientes o casos especiales).</p>
+          </div>
+          
+          <p-table 
+            [value]="casosAnalisis.no_encontrados" 
+            [paginator]="true" 
+            [rows]="15"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} trabajadores no encontrados"
+            [rowsPerPageOptions]="[10, 15, 25, 50]"
+            styleClass="p-datatable-sm tabla-analisis"
+            [style]="{'font-size': '13px'}"
+            [scrollable]="true"
+            scrollHeight="400px">
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="ci">CI <p-sortIcon field="ci"></p-sortIcon></th>
+                <th pSortableColumn="apellido_paterno">Nombre Completo <p-sortIcon field="apellido_paterno"></p-sortIcon></th>
+                <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon></th>
+                <th pSortableColumn="fecha_ingreso">Fecha Ingreso <p-sortIcon field="fecha_ingreso"></p-sortIcon></th>
+                <th>Observaciones</th>
+                <th pSortableColumn="salario">Salario <p-sortIcon field="salario"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-trabajador>
+              <tr class="fila-no-encontrado">
+                <td><strong>{{ trabajador.ci }}</strong></td>
+                <td>{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}, {{ trabajador.nombres }}</td>
+                <td>{{ trabajador.cargo }}</td>
+                <td>{{ trabajador.fecha_ingreso | date:'dd/MM/yyyy' }}</td>
+                <td>{{ trabajador.observaciones_afiliacion || 'No encontrado en SIGAH' }}</td>
+                <td class="text-right">{{ trabajador.salario | number:'1.2-2' }} Bs</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+
+      <!-- PESTAÑA 4: FALTANTES -->
+      <p-tabPanel [header]="'Faltantes (' + (casosAnalisis.faltantes?.length || 0) + ')'">
+        <div class="tab-content-wrapper">
+          <div class="tab-description faltantes-desc">
+            <i class="pi pi-users"></i>
+            <p>Trabajadores que están vigentes en el sistema de afiliaciones SIGAH pero NO están en esta planilla.</p>
+          </div>
+          
+          <p-table 
+            [value]="casosAnalisis.faltantes" 
+            [paginator]="true" 
+            [rows]="15"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} trabajadores faltantes"
+            [rowsPerPageOptions]="[10, 15, 25, 50]"
+            styleClass="p-datatable-sm tabla-analisis"
+            [style]="{'font-size': '13px'}"
+            [scrollable]="true"
+            scrollHeight="400px">
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="ci">CI <p-sortIcon field="ci"></p-sortIcon></th>
+                <th pSortableColumn="apellido_paterno">Nombre Completo <p-sortIcon field="apellido_paterno"></p-sortIcon></th>
+                <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon></th>
+                <th pSortableColumn="matricula">Matrícula <p-sortIcon field="matricula"></p-sortIcon></th>
+                <th>Estado</th>
+                <th pSortableColumn="haber">Haber <p-sortIcon field="haber"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-trabajador>
+              <tr class="fila-faltante">
+                <td><strong>{{ trabajador.ci }}</strong></td>
+                <td>{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}, {{ trabajador.nombres }}</td>
+                <td>{{ trabajador.cargo }}</td>
+                <td>{{ trabajador.matricula }}</td>
+                <td>
+                  <span class="badge-estado faltante">
+                    <i class="pi pi-info-circle"></i>
+                    {{ trabajador.asegurado_estado }}
+                  </span>
+                </td>
+                <td class="text-right">{{ trabajador.haber | number:'1.2-2' }} Bs</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer-mejorado">
+      <button 
+        type="button" 
+        pButton
+        icon="pi pi-file-excel"
+        label="Exportar a Excel"
+        class="p-button-success"
+        (click)="exportarAnalisisExcel()"
+        [disabled]="!casosAnalisis"
+        pTooltip="Exportar análisis completo a Excel con hojas separadas">
+      </button>
+      <button 
+        type="button" 
+        pButton
+        icon="pi pi-times"
+        label="Cerrar"
+        class="p-button-secondary"
+        (click)="mostrarAnalisisCompletoDialog = false">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+

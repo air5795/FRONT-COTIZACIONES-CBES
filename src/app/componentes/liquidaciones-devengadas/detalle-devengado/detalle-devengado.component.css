@@ -1,0 +1,569 @@
+/* Estilo principal */
+.perfil-empleador {
+    background: #ffffff;
+    /* border-radius: 12px; */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Estilo de la cabecera compacta */
+.header {
+    background: linear-gradient(135deg, #009688, #00695c);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 3px solid #004d40;
+    /* flex-direction: row-reverse; */
+}
+
+/* Estilo del título "Perfil de Empleador" a la izquierda */
+.header-left h2 {
+    /* margin: 0; */
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Estilo para Razón Social y N° Patronal */
+.header-right {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+/* Razón Social (Empresa) */
+.razon-social {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* N° Patronal */
+.numero-patronal {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Ajusta este valor para controlar la separación entre los botones */
+}
+
+.custom-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1rem;
+    /* padding: 1rem 2rem; */
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+}
+
+.custom-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.custom-icon {
+    font-size: 2rem;
+    padding-bottom: 10px;
+}
+
+/* Colores específicos para cada botón */
+.boton1 {
+    background-color: #6a8582;
+    color: white;
+}
+
+.boton1:hover {
+    background-color: #5a7572;
+}
+
+.boton2 {
+    background-color: #3a915d;
+    color: white;
+}
+
+.boton2:hover {
+    background-color: #007E33;
+}
+
+/* Diseño adaptable */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .header-right {
+        text-align: center;
+        margin-top: 5px;
+    }
+}
+
+/* ===== LOADING ===== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #6c757d;
+}
+
+/* ===== CONTENEDOR PRINCIPAL DEL REPORTE ===== */
+.excel-report-container {
+  background: white;
+  padding: 1.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* ===== TÍTULO PRINCIPAL ===== */
+.excel-title-section {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.excel-main-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  text-decoration: underline;
+  color: #000;
+}
+
+.excel-subtitle {
+  font-size: 11px;
+  margin: 2px 0;
+  color: #000;
+}
+
+.excel-rate-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 10px 0;
+}
+
+.excel-rate-label {
+  font-size: 11px;
+  color: #000;
+}
+
+.excel-rate-value {
+  background-color: #FFFF00;
+  padding: 2px 8px;
+  border: 1px solid #000;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/* ===== INFORMACIÓN DE EMPRESA ===== */
+.excel-company-section {
+  margin-bottom: 1rem;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.excel-company-row {
+  display: flex;
+  margin-bottom: 2px;
+}
+
+.excel-company-label {
+  background-color: #C0C0C0;
+  border: 1px solid #000;
+  padding: 4px 8px;
+  font-weight: bold;
+  min-width: 80px;
+  text-align: center;
+}
+
+.excel-company-value {
+  border: 1px solid #000;
+  padding: 4px 8px;
+  min-width: 200px;
+  text-align: center;
+  font-weight: bold;
+  color: #FF0000;
+}
+
+/* ===== TABLA PRINCIPAL ===== */
+.excel-main-table {
+  margin-bottom: 1rem;
+  border-collapse: collapse;
+  width: 100%;
+  display: table;
+}
+
+.excel-table-header {
+  display: table-row;
+  background-color: #000;
+  color: white;
+}
+
+.excel-table-row {
+  display: table-row;
+}
+
+.excel-table-total {
+  display: table-row;
+  background-color: #E6E6E6;
+  font-weight: bold;
+}
+
+.excel-header-cell,
+.excel-cell,
+.excel-total-cell {
+  display: table-cell;
+  border: 1px solid #000;
+  padding: 4px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 10px;
+}
+
+.excel-header-cell {
+  background-color: #000;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ANCHOS ESPECÍFICOS DE COLUMNAS */
+.excel-no { width: 30px; }
+.excel-regional { width: 60px; }
+.excel-concepto { width: 80px; }
+.excel-salario { width: 80px; }
+.excel-aporte { width: 70px; }
+.excel-ufv-fd { width: 70px; }
+.excel-ufv-pres { width: 70px; }
+.excel-ap-patronal { width: 80px; }
+.excel-monto-act { width: 70px; }
+.excel-multa-pla { width: 90px; }
+.excel-fecha-pres { width: 80px; }
+.excel-fecha-dep { width: 80px; }
+.excel-dias { width: 50px; }
+.excel-interes { width: 60px; }
+.excel-multas { width: 70px; }
+.excel-total { width: 80px; }
+
+
+
+.excel-dias-value {
+  font-weight: bold;
+  color: #FF0000;
+}
+
+.excel-total-value {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+/* ===== FILA TOTAL CORREGIDA ===== */
+.excel-total-label-main {
+  background-color: #C0C0C0;
+  font-weight: bold;
+  text-align: center;
+  width: 170px; /* Abarca No. + Regional + Concepto */
+}
+
+.excel-total-space {
+  background-color: #E6E6E6;
+}
+
+.excel-total-final {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+/* ===== SECCIÓN RESUMEN CORREGIDA ===== */
+.excel-summary-section {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.excel-summary-left {
+  width: 50%;
+}
+
+.excel-summary-right {
+  width: 50%;
+}
+
+/* ===== TABLA RESUMEN IZQUIERDA CORREGIDA ===== */
+.excel-summary-table {
+  display: table;
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #000;
+}
+
+.excel-summary-header,
+.excel-summary-row,
+.excel-summary-total-row {
+  display: table-row;
+}
+
+.excel-summary-header .excel-summary-cell {
+  background-color: #FFFF00;
+  border: 1px solid #000;
+  padding: 4px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.excel-summary-row .excel-summary-cell,
+.excel-summary-total-row .excel-summary-cell {
+  border: 1px solid #000;
+  padding: 4px;
+  text-align: center;
+  font-size: 10px;
+  display: table-cell;
+}
+
+/* Estilos específicos para celdas de la tabla resumen */
+.excel-regional-name {
+  background-color: #ADD8E6;
+  font-weight: bold;
+  text-align: center;
+}
+
+.excel-mes-name {
+  background-color: #FFA500;
+  font-weight: bold;
+  text-align: center;
+}
+
+.excel-summary-money {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.excel-summary-total {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+.excel-summary-final {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+.excel-empty-row .excel-summary-cell {
+  height: 20px;
+  background-color: white;
+}
+
+.excel-total-empty {
+  background-color: #E6E6E6;
+}
+
+/* Anchos específicos para tabla resumen */
+.excel-reg-header,
+.excel-regional-name { width: 80px; }
+.excel-mes-header,
+.excel-mes-name { width: 80px; }
+.excel-aporte-header { width: 80px; }
+.excel-int-header { width: 70px; }
+.excel-multa-header { width: 70px; }
+.excel-act-header { width: 80px; }
+.excel-pago-header { width: 80px; }
+
+/* ===== TABLA RECARGOS DERECHA CORREGIDA ===== */
+.excel-recargos-header {
+  background-color: #C0C0C0;
+  border: 1px solid #000;
+  padding: 4px 8px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 10px;
+  margin-bottom: 0;
+}
+
+.excel-recargos-table {
+  border: 1px solid #000;
+  background-color: white;
+  width: 100%;
+}
+
+.excel-recargos-row {
+  display: flex;
+  border-bottom: 1px solid #000;
+}
+
+.excel-recargos-row:last-child {
+  border-bottom: none;
+}
+
+.excel-recargos-label {
+  background-color: #E6E6E6;
+  border-right: 1px solid #000;
+  padding: 4px 8px;
+  font-weight: bold;
+  flex: 2;
+  text-align: left;
+  font-size: 15px;
+}
+
+.excel-recargos-value {
+  padding: 4px 8px;
+  flex: 1;
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  background-color: white;
+}
+
+.excel-recargos-total {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+.excel-recargos-total .excel-recargos-label {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+.excel-recargos-total .excel-recargos-value {
+  background-color: #FFFF00;
+  font-weight: bold;
+}
+
+/* ===== SECCIÓN PRESENTACIÓN ===== */
+.excel-presentation-section {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.excel-presentation-box {
+  border: 2px solid #000;
+  text-align: center;
+}
+
+.excel-presentation-header {
+  background-color: #000;
+  color: white;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.excel-presentation-date {
+  padding: 8px 16px;
+  font-weight: bold;
+  font-size: 12px;
+  min-width: 100px;
+}
+
+.excel-note-section {
+  display: flex;
+  align-items: center;
+}
+
+.excel-note-box {
+  border: 1px solid #000;
+  padding: 4px 8px;
+  background-color: #F0F0F0;
+}
+
+.excel-note-label {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .excel-report-container {
+    font-size: 9px;
+  }
+  
+  .excel-summary-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .excel-presentation-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .detalle-devengado-container {
+    padding: 0.5rem;
+  }
+  
+  .nav-section {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .nav-section .p-button {
+    width: 100%;
+  }
+  
+  .excel-report-container {
+    font-size: 8px;
+  }
+  
+  .excel-header-cell,
+  .excel-cell,
+  .excel-total-cell {
+    padding: 2px;
+  }
+}
+
+/* ===== ESTILOS PARA IMPRESIÓN ===== */
+@media print {
+  .detalle-devengado-container {
+    padding: 0;
+    background: white;
+  }
+  
+  .header-section {
+    display: none;
+  }
+  
+  .excel-report-container {
+    font-size: 10px;
+  }
+  
+  /* Evitar saltos de página en elementos importantes */
+  .excel-main-table,
+  .excel-summary-section,
+  .excel-presentation-section {
+    page-break-inside: avoid;
+  }
+  
+  /* Asegurar que los colores se impriman */
+  .excel-rate-value,
+  .excel-total-value,
+  .excel-summary-total,
+  .excel-summary-final,
+  .excel-recargos-total {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}

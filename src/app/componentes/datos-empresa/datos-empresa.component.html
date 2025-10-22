@@ -1,0 +1,148 @@
+
+
+<!-- ALERTA -->
+<!-- <p-toast position="top-center"></p-toast> -->
+
+<!-- VISTA PARA ADMINISTRADOR -->
+<div *ngIf="isAdmin" class="grid dashboard">
+    <div class="col-12" style="text-align: center;">
+      
+        <img src="../../../assets/demo/images/galleria/FONDO-ADMIN3.png" width="100%" height="700px" alt="">
+     
+    </div>
+  </div>
+
+<!-- PERFIL DE EMPRESA -->
+<div *ngIf="!isAdmin" class="grid dashboard">
+    <div class="col-12 md:col-12 lg:6">
+        <div class="perfil-empleador">
+            <div class="header">
+                <div class="header-left">
+                    <h2>Perfil de Empleador</h2>
+                </div>
+                <div class="header-right">
+                    <span class="razon-social">{{ empresa?.emp_nom || 'Cargando...' }}</span>
+                    <hr style="margin: 2px; border: 1px solid rgb(225 225 225 / 43%)">
+                    <span class="numero-patronal">Cod Patronal: {{ empresa?.cod_patronal?.slice(3) || '---' }}</span>
+                </div>
+            </div>
+
+
+
+            <div class=" grid">
+                <div class="col-12 md:col-12 lg:2" >
+                    <div class="p-4 border-round-lg" style="background-color: #fff8e6; border-bottom: 2px solid #ffc107; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 5px;">
+                        <div class="flex align-items-start">
+                            <div>
+                                <h4 style="margin: 0 0 0.5rem 0; color: #795548; font-weight: 600; font-size: 1rem;">
+                                    <i class="pi pi-bell" style="margin-right: 8px;"></i>Recordatorio importante
+                                </h4>
+                                <p style="margin: 0; color: #5d4037; font-size: 0.9rem; line-height: 1.5;">
+                                    Señor empleadora, no olvide mantener actualizados sus datos para evitar multas. En caso de no tener actualizados sus datos, favor regularizar en la Unidad de Seguros de la Caja Bancaria Estatal de Salud.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 md:col-6 lg:6" style="text-align: center;">
+                    <div class="perfil-contenido">
+            
+                        <h4 style="background: #f8f8f8;color: #357c75;padding: 20px;margin: 0;border: 1px solid #e3e3e3;">DATOS EMPRESA</h4>
+                        <table class="perfil-table" style="width: 100%; border-collapse: collapse;overflow: hidden; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);border: 1px solid #e1e1e1;">
+                            <tr style="background-color: #f1f1f1; border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-user" style="margin-right: 8px;"></i>Representante Legal:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_legal || '---' }}
+                                </td>
+                            </tr>
+                            <tr style=" border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-list" style="margin-right: 8px;"></i>N° Patronal:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.cod_patronal || '---' }}
+                                </td>
+                            </tr>
+                            <tr style="background-color: #f1f1f1; border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-id-card" style="margin-right: 8px;"></i>NIT:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_nit || '---' }}
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-map-marker" style="margin-right: 8px;"></i>Localidad:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_localidad || '---' }}
+                                </td>
+                            </tr> 
+
+                            <tr style="background-color: #f1f1f1;border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-home" style="margin-right: 8px;"></i>Dirección:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_calle || '---' }} # {{ empresa?.emp_num || '---' }}
+                                </td>
+                            </tr>
+                            <tr style=" border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-phone" style="margin-right: 8px;"></i>Teléfono:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_telf || '---' }}
+                                </td>
+                            </tr>
+                            <tr style="background-color: #f1f1f1; border-bottom: 1px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-map" style="margin-right: 8px;"></i>Zona:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_zona || '---' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f1f1f1; padding: 12px; text-align: left; font-weight: bold; color: #357c61;">
+                                    <i class="pi pi-briefcase" style="margin-right: 8px;"></i>Actividad Económica:
+                                </th> 
+                                <td style="padding: 12px; color: #666; font-size: 14px; border-left: 1px solid #ddd;">
+                                    {{ empresa?.emp_activ || '---' }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>              
+                <div class="col-6 md:col-6 lg:6" style="text-align: center;">
+                    
+                    <div>
+                        <div >
+                            <div class="grid">
+                                <!-- Tarjeta 1 : Planillas APORTES PRESENTADAS  -->
+                                
+                                <div class="col-12 md:col-12 lg:col-12">   
+                                    <!-- ✅ Reemplazar google-map por div nativo -->
+                                    <div *ngIf="mostrarMapa" 
+                                         id="native-map" 
+                                         style="height: 400px; width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                                    </div>
+                                    <div *ngIf="mapError" style="margin-top: 20px; color: red;">
+                                        <p><strong>No se pudo cargar el mapa.</strong></p>
+                                        <p>Verifique su conexión a Internet o que la dirección esté correctamente registrada.</p>
+                                      </div>
+                                      
+                                      
+                                      
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

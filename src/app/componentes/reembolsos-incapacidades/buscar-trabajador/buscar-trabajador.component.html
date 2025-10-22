@@ -1,0 +1,921 @@
+<div class="buscar-trabajador-container">
+  <!-- Modo Manual: Formulario con Stepper -->
+  <div class="formulario-manual-container" *ngIf="modoIngreso === 'manual'">
+    <form [formGroup]="formularioManual" (ngSubmit)="procesarIngresoManual()">
+      
+      <!-- Stepper -->
+      <div class="stepper-container">
+        <div class="stepper">
+          <div class="stepper-item" [class.active]="pasoActual >= 1" [class.completed]="pasoActual > 1">
+            <div class="stepper-number">1</div>
+            <div class="stepper-label">Datos de Incapacidad</div>
+          </div>
+          <div class="stepper-line" [class.completed]="pasoActual > 1"></div>
+          
+          <div class="stepper-item" [class.active]="pasoActual >= 2" [class.completed]="pasoActual > 2">
+            <div class="stepper-number">2</div>
+            <div class="stepper-label">Buscar Trabajador</div>
+          </div>
+          <div class="stepper-line" [class.completed]="pasoActual > 2"></div>
+          
+          <div class="stepper-item" [class.active]="pasoActual >= 3" [class.completed]="pasoActual > 3">
+            <div class="stepper-number">3</div>
+            <div class="stepper-label">Resumen y Cálculo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 1: Datos de la Incapacidad -->
+      <div class="form-card" *ngIf="pasoActual === 1">
+        <h6 class="form-card-title">
+          <i class="pi pi-calendar"></i>
+          Paso 1: Datos de la Incapacidad
+        </h6>
+        
+        <div class="form-grid">
+          <!-- Tipo de Incapacidad -->
+          <div class="form-field">
+            <label for="manual_tipo_baja">
+              <i class="pi pi-flag"></i>
+              Tipo de Incapacidad *
+            </label>
+            <p-dropdown 
+              id="manual_tipo_baja"
+              formControlName="tipo_baja"
+              [options]="[
+                  {label: 'ENFERMEDAD (75%)', value: 'ENFERMEDAD'},
+                  {label: 'MATERNIDAD (90%)', value: 'MATERNIDAD'},
+                  {label: 'PROFESIONAL (90%)', value: 'PROFESIONAL'}
+              ]"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seleccione tipo de incapacidad"
+              [class.p-invalid]="formularioManual.get('tipo_baja')?.invalid && formularioManual.get('tipo_baja')?.touched">
+            </p-dropdown>
+            <small class="p-error" *ngIf="formularioManual.get('tipo_baja')?.invalid && formularioManual.get('tipo_baja')?.touched">
+              Campo requerido
+            </small>
+          </div>
+
+          <!-- Fecha Inicio -->
+          <div class="form-field">
+            <label for="manual_fecha_inicio">
+              <i class="pi pi-calendar-plus"></i>
+              Fecha de Inicio *
+            </label>
+            <p-calendar 
+              id="manual_fecha_inicio"
+              formControlName="fecha_inicio"
+              dateFormat="dd/mm/yy"
+              placeholder="Seleccione fecha"
+              [showIcon]="true"
+              appendTo="body"
+              [class.p-invalid]="formularioManual.get('fecha_inicio')?.invalid && formularioManual.get('fecha_inicio')?.touched">
+            </p-calendar>
+            <small class="p-error" *ngIf="formularioManual.get('fecha_inicio')?.invalid && formularioManual.get('fecha_inicio')?.touched">
+              Campo requerido
+            </small>
+          </div>
+
+          <!-- Fecha Fin -->
+          <div class="form-field">
+            <label for="manual_fecha_fin">
+              <i class="pi pi-calendar-minus"></i>
+              Fecha de Fin *
+            </label>
+            <p-calendar 
+              id="manual_fecha_fin"
+              formControlName="fecha_fin"
+              dateFormat="dd/mm/yy"
+              placeholder="Seleccione fecha"
+              [showIcon]="true"
+              appendTo="body"
+              [class.p-invalid]="formularioManual.get('fecha_fin')?.invalid && formularioManual.get('fecha_fin')?.touched">
+            </p-calendar>
+            <small class="p-error" *ngIf="formularioManual.get('fecha_fin')?.invalid && formularioManual.get('fecha_fin')?.touched">
+              Campo requerido
+            </small>
+            <small class="p-hint" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value">
+              <i class="pi pi-info-circle"></i> Los días de impedimento se calcularán automáticamente
+            </small>
+          </div>
+        </div>
+
+        <!-- Datos Adicionales para Riesgo Profesional (Integrados en la misma tarjeta) -->
+        <div *ngIf="esRiesgoProfesional" class="datos-profesionales-section">
+          <div class="alert-warning">
+            <i class="pi pi-info-circle"></i>
+            <span>Para Riesgo Profesional se requieren datos adicionales de fecha de accidente y vigencia</span>
+          </div>
+
+          <div class="form-grid">
+            <!-- Fecha de Accidente -->
+            <div class="form-field">
+              <label for="manual_fecha_accidente">
+                <i class="pi pi-calendar"></i>
+                Fecha de Accidente *
+              </label>
+              <p-calendar 
+                id="manual_fecha_accidente"
+                formControlName="fecha_accidente"
+                dateFormat="dd/mm/yy"
+                placeholder="Seleccione fecha"
+                [showIcon]="true"
+                appendTo="body"
+                [class.p-invalid]="formularioManual.get('fecha_accidente')?.invalid && formularioManual.get('fecha_accidente')?.touched">
+              </p-calendar>
+              <small class="p-error" *ngIf="formularioManual.get('fecha_accidente')?.invalid && formularioManual.get('fecha_accidente')?.touched">
+                Campo requerido para Riesgo Profesional
+              </small>
+            </div>
+
+            <!-- Fecha de Vigencia -->
+            <div class="form-field">
+              <label for="manual_fecha_vigencia">
+                <i class="pi pi-calendar-check"></i>
+                Fecha de Vigencia *
+              </label>
+              <p-calendar 
+                id="manual_fecha_vigencia"
+                formControlName="fecha_vigencia"
+                dateFormat="dd/mm/yy"
+                placeholder="Seleccione fecha"
+                [showIcon]="true"
+                appendTo="body"
+                [class.p-invalid]="formularioManual.get('fecha_vigencia')?.invalid && formularioManual.get('fecha_vigencia')?.touched">
+              </p-calendar>
+              <small class="p-error" *ngIf="formularioManual.get('fecha_vigencia')?.invalid && formularioManual.get('fecha_vigencia')?.touched">
+                Campo requerido para Riesgo Profesional
+              </small>
+            </div>
+
+            <!-- Lugar de Accidente -->
+            <div class="form-field">
+              <label for="manual_lugar_accidente">
+                <i class="pi pi-map-marker"></i>
+                Lugar de Accidente *
+              </label>
+              <p-dropdown 
+                id="manual_lugar_accidente"
+                formControlName="lugar_accidente"
+                [options]="[
+                    {label: 'RURAL (10 días hábiles)', value: 'RURAL'},
+                    {label: 'URBANO (5 días hábiles)', value: 'URBANO'}
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccione lugar de accidente"
+                [class.p-invalid]="formularioManual.get('lugar_accidente')?.invalid && formularioManual.get('lugar_accidente')?.touched">
+              </p-dropdown>
+              <small class="p-error" *ngIf="formularioManual.get('lugar_accidente')?.invalid && formularioManual.get('lugar_accidente')?.touched">
+                Campo requerido para Riesgo Profesional
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de navegación Paso 1 -->
+        <div class="stepper-actions">
+          <button 
+            type="button" 
+            pButton 
+            pRipple 
+            label="Siguiente" 
+            icon="pi pi-arrow-right"
+            class="p-button-primary"
+            (click)="siguientePaso()"
+            [disabled]="!datosIncapacidadCompletos()">
+          </button>
+        </div>
+      </div>
+
+
+      <!-- Paso 2: Búsqueda del Trabajador -->
+      <div class="form-card" *ngIf="pasoActual === 2">
+        <h6 class="form-card-title">
+          <i class="pi pi-user"></i>
+          Paso 2: Buscar Trabajador
+        </h6>
+        
+        <!-- Opciones de ingreso -->
+        <div class="mb-3">
+          <p-button 
+            label="Buscar en Sistema" 
+            icon="pi pi-search" 
+            [class]="modoIngresoTrabajador === 'buscar' ? 'p-button-primary' : 'p-button-outlined'"
+            (onClick)="cambiarModoIngresoTrabajador('buscar')"
+            styleClass="p-button-sm mr-2">
+          </p-button>
+          <p-button 
+            label="Ingresar Manualmente" 
+            icon="pi pi-pencil" 
+            [class]="modoIngresoTrabajador === 'manual' ? 'p-button-primary' : 'p-button-outlined'"
+            (onClick)="cambiarModoIngresoTrabajador('manual')"
+            styleClass="p-button-sm">
+          </p-button>
+        </div>
+
+        <!-- Buscador de Asegurados -->
+        <div *ngIf="modoIngresoTrabajador === 'buscar'">
+          <form [formGroup]="buscadorAsegurado" (ngSubmit)="buscarAsegurado()">
+            <div class="p-inputgroup mb-3">
+              <p-dropdown 
+                formControlName="tipo_busqueda"
+                [options]="[
+                    {label: 'CI', value: 'ci'},
+                    {label: 'Matrícula', value: 'matricula'}
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Buscar por..."
+                (onChange)="cambiarTipoBusqueda($event.value)"
+                styleClass="p-inputgroup-addon"
+                [style]="{'width': '200px'}">
+              </p-dropdown>
+              <input 
+                type="text" 
+                pInputText 
+                formControlName="valor_busqueda"
+                [placeholder]="tipoBusqueda === 'ci' ? 'Ej: 12345678' : 'Ej: 61-5204 AAA'"
+                class="p-inputtext">
+              <button 
+                type="submit" 
+                pButton 
+                pRipple 
+                icon="pi pi-search"
+                class="p-button-primary"
+                [loading]="cargandoBusquedaAsegurado"
+                [disabled]="buscadorAsegurado.invalid || !fechasCompletas()">
+              </button>
+            </div>
+            <small class="text-muted" *ngIf="!fechasCompletas()">
+              <i class="pi pi-info-circle mr-1"></i>
+              Complete las fechas de inicio y fin antes de buscar
+            </small>
+          </form>
+
+          <!-- Resultado de búsqueda - Tabla Horizontal -->
+          <div *ngIf="aseguradoEncontrado" class="trabajador-encontrado-card">
+            <div class="trabajador-header">
+              <h6 class="m-0 text-primary">
+                <i class="pi pi-check-circle mr-2"></i>
+                Trabajador Encontrado
+              </h6>
+              <p-button 
+                icon="pi pi-times" 
+                class="p-button-rounded p-button-text p-button-sm"
+                pTooltip="Limpiar"
+                (onClick)="limpiarDatosAsegurado()">
+              </p-button>
+            </div>
+            
+            <!-- Tabla horizontal con datos del trabajador -->
+            <div class="trabajador-tabla">
+              <div class="trabajador-fila">
+                <div class="trabajador-celda">
+                  <strong>Nombre Completo:</strong>
+                  <span>{{ aseguradoEncontrado.ASE_APAT }} {{ aseguradoEncontrado.ASE_AMAT }} {{ aseguradoEncontrado.ASE_NOM }}</span>
+                </div>
+                <div class="trabajador-celda">
+                  <strong>CI:</strong>
+                  <span>{{ aseguradoEncontrado.ASE_CI }}</span>
+                </div>
+                <div class="trabajador-celda">
+                  <strong>Matrícula:</strong>
+                  <span>{{ aseguradoEncontrado.ASE_MAT }}</span>
+                </div>
+              </div>
+              
+              <!-- Información de Salario -->
+              <div class="trabajador-fila" *ngIf="salarioTrabajador || cargandoSalario">
+                <div class="trabajador-celda salario-info">
+                  <div class="salario-header">
+                    <i class="pi pi-money-bill text-success mr-2"></i>
+                    <strong class="text-success">Información Salarial</strong>
+                    <i *ngIf="cargandoSalario" class="pi pi-spin pi-spinner ml-2"></i>
+                  </div>
+                  
+                  <div *ngIf="cargandoSalario" class="text-muted">
+                    <small>Consultando salario del mes de inicio de baja...</small>
+                  </div>
+                  
+                  <div *ngIf="salarioTrabajador && !cargandoSalario" class="salario-datos">
+                    <div class="salario-item">
+                      <strong>Salario Total:</strong>
+                      <span class="text-success font-bold">{{ salarioTrabajador.salario_total | number:'1.2-2' }} Bs.</span>
+                    </div>
+                    <div class="salario-item">
+                      <strong>Haber Básico:</strong>
+                      <span>{{ salarioTrabajador.haber_basico | number:'1.2-2' }} Bs.</span>
+                    </div>
+                    <div class="salario-item">
+                      <strong>Días Pagados:</strong>
+                      <span class="text-primary font-bold">{{ salarioTrabajador.dias_pagados }} días</span>
+                    </div>
+                    <div class="salario-formula">
+                      <small class="text-muted">
+                        <i class="pi pi-info-circle mr-1"></i>
+                        <strong>Fórmula:</strong> {{ salarioTrabajador.salario_total | number:'1.2-2' }} ÷ {{ salarioTrabajador.dias_pagados }} = {{ (salarioTrabajador.salario_total / salarioTrabajador.dias_pagados) | number:'1.2-2' }} Bs. por día
+                      </small>
+                    </div>
+                  </div>
+                  
+                  <div *ngIf="!salarioTrabajador && !cargandoSalario" class="text-warning">
+                    <small><i class="pi pi-exclamation-triangle mr-1"></i>No se encontró salario en planillas para este período</small>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos manuales -->
+        <div *ngIf="modoIngresoTrabajador === 'manual'" class="form-grid">
+          <!-- CI -->
+          <div class="form-field">
+            <label for="manual_ci">
+              <i class="pi pi-id-card"></i>
+              Cédula de Identidad *
+            </label>
+            <input 
+              id="manual_ci"
+              type="text" 
+              pInputText 
+              formControlName="ci"
+              placeholder="Ej: 12345678"
+              [class.p-invalid]="formularioManual.get('ci')?.invalid && formularioManual.get('ci')?.touched">
+            <small class="p-error" *ngIf="formularioManual.get('ci')?.invalid && formularioManual.get('ci')?.touched">
+              <span *ngIf="formularioManual.get('ci')?.errors?.['required']">Campo requerido</span>
+              <span *ngIf="formularioManual.get('ci')?.errors?.['pattern']">Debe contener 7-8 dígitos</span>
+            </small>
+          </div>
+
+          <!-- Nombres -->
+          <div class="form-field">
+            <label for="manual_nombres">
+              <i class="pi pi-user"></i>
+              Nombres *
+            </label>
+            <input 
+              id="manual_nombres"
+              type="text" 
+              pInputText 
+              formControlName="nombres"
+              placeholder="Ej: JUAN CARLOS"
+              [class.p-invalid]="formularioManual.get('nombres')?.invalid && formularioManual.get('nombres')?.touched">
+            <small class="p-error" *ngIf="formularioManual.get('nombres')?.invalid && formularioManual.get('nombres')?.touched">
+              <span *ngIf="formularioManual.get('nombres')?.errors?.['required']">Campo requerido</span>
+              <span *ngIf="formularioManual.get('nombres')?.errors?.['minlength']">Mínimo 2 caracteres</span>
+            </small>
+          </div>
+
+          <!-- Apellido Paterno -->
+          <div class="form-field">
+            <label for="manual_apellido_paterno">
+              <i class="pi pi-user"></i>
+              Apellido Paterno *
+            </label>
+            <input 
+              id="manual_apellido_paterno"
+              type="text" 
+              pInputText 
+              formControlName="apellido_paterno"
+              placeholder="Ej: GONZALES"
+              [class.p-invalid]="formularioManual.get('apellido_paterno')?.invalid && formularioManual.get('apellido_paterno')?.touched">
+            <small class="p-error" *ngIf="formularioManual.get('apellido_paterno')?.invalid && formularioManual.get('apellido_paterno')?.touched">
+              <span *ngIf="formularioManual.get('apellido_paterno')?.errors?.['required']">Campo requerido</span>
+              <span *ngIf="formularioManual.get('apellido_paterno')?.errors?.['minlength']">Mínimo 2 caracteres</span>
+            </small>
+          </div>
+
+          <!-- Apellido Materno -->
+          <div class="form-field">
+            <label for="manual_apellido_materno">
+              <i class="pi pi-user"></i>
+              Apellido Materno *
+            </label>
+            <input 
+              id="manual_apellido_materno"
+              type="text" 
+              pInputText 
+              formControlName="apellido_materno"
+              placeholder="Ej: LOPEZ"
+              [class.p-invalid]="formularioManual.get('apellido_materno')?.invalid && formularioManual.get('apellido_materno')?.touched">
+            <small class="p-error" *ngIf="formularioManual.get('apellido_materno')?.invalid && formularioManual.get('apellido_materno')?.touched">
+              <span *ngIf="formularioManual.get('apellido_materno')?.errors?.['required']">Campo requerido</span>
+              <span *ngIf="formularioManual.get('apellido_materno')?.errors?.['minlength']">Mínimo 2 caracteres</span>
+            </small>
+          </div>
+
+          <!-- Matrícula -->
+          <div class="form-field">
+            <label for="manual_matricula">
+              <i class="pi pi-id-card"></i>
+              Matrícula *
+            </label>
+            <input 
+              id="manual_matricula"
+              type="text" 
+              pInputText 
+              formControlName="matricula"
+              placeholder="Ej: 61-5204 AAA"
+              [class.p-invalid]="formularioManual.get('matricula')?.invalid && formularioManual.get('matricula')?.touched">
+            <small class="p-error" *ngIf="formularioManual.get('matricula')?.invalid && formularioManual.get('matricula')?.touched">
+              <span *ngIf="formularioManual.get('matricula')?.errors?.['required']">Campo requerido</span>
+              <span *ngIf="formularioManual.get('matricula')?.errors?.['pattern']">Formato: XX-XXXX XXX</span>
+            </small>
+          </div>
+
+          <!-- Salario -->
+          <div class="form-field">
+            <label for="manual_salario">
+              <i class="pi pi-wallet"></i>
+              Salario Total Ganado (Bs.) *
+            </label>
+            <p-inputNumber 
+              id="manual_salario" 
+              formControlName="salario" 
+              mode="currency" 
+              currency="BOB" 
+              locale="es-BO"
+              placeholder="Ingrese el salario"
+              [class.p-invalid]="formularioManual.get('salario')?.invalid && formularioManual.get('salario')?.touched">
+            </p-inputNumber>
+            <small class="p-error" *ngIf="formularioManual.get('salario')?.invalid && formularioManual.get('salario')?.touched">
+              Campo requerido (debe ser mayor a 0)
+            </small>
+          </div>
+        </div>
+
+        <!-- Botones de navegación Paso 2 -->
+        <div class="stepper-actions">
+          <button 
+            type="button" 
+            pButton 
+            pRipple 
+            label="Anterior" 
+            icon="pi pi-arrow-left"
+            class="p-button-outlined"
+            (click)="anteriorPaso()">
+          </button>
+          <button 
+            type="button" 
+            pButton 
+            pRipple 
+            label="Siguiente" 
+            icon="pi pi-arrow-right"
+            class="p-button-primary"
+            (click)="siguientePaso()"
+            [disabled]="!datosTrabajadorCompletos()">
+          </button>
+        </div>
+      </div>
+
+       <!-- Paso 3: Resumen y Cálculo -->
+       <div class="form-card resumen-card" *ngIf="pasoActual === 3">
+         <!-- Resumen Compacto en Tabla -->
+         <div class="resumen-compacto">
+           <div class="resumen-tabla">
+             <div class="tabla-header">
+               <h6><i class="pi pi-info-circle"></i> Resumen de Datos</h6>
+             </div>
+             <div class="tabla-body">
+               <!-- Fila 1: Tipo, Período y Trabajador -->
+               <div class="tabla-fila">
+                 <div class="tabla-celda">
+                   <span class="celda-label">Tipo de Incapacidad</span>
+                   <span class="tipo-badge-compacto" [ngClass]="getTipoIncapacidadClass(formularioManual.get('tipo_baja')?.value)">
+                     {{ formularioManual.get('tipo_baja')?.value }}
+                   </span>
+                 </div>
+                 <div class="tabla-celda">
+                   <span class="celda-label">Período</span>
+                   <span class="celda-valor">
+                     {{ formularioManual.get('fecha_inicio')?.value | date:'dd/MM/yyyy' }} - {{ formularioManual.get('fecha_fin')?.value | date:'dd/MM/yyyy' }}
+                   </span>
+                 </div>
+                 <div class="tabla-celda" *ngIf="aseguradoEncontrado">
+                   <span class="celda-label">Trabajador</span>
+                   <span class="celda-valor nombre-trabajador">
+                     {{ aseguradoEncontrado.ASE_APAT }} {{ aseguradoEncontrado.ASE_AMAT }} {{ aseguradoEncontrado.ASE_NOM }}
+                   </span>
+                 </div>
+               </div>
+
+               <!-- Fila 2: CI/Matrícula, Salario y Días -->
+               <div class="tabla-fila">
+                 <div class="tabla-celda" *ngIf="aseguradoEncontrado">
+                   <span class="celda-label">CI / Matrícula</span>
+                   <span class="celda-valor">
+                     {{ aseguradoEncontrado.ASE_CI }} / {{ aseguradoEncontrado.ASE_MAT }}
+                   </span>
+                 </div>
+                 <div class="tabla-celda" *ngIf="salarioTrabajador">
+                   <span class="celda-label">Salario Total</span>
+                   <span class="celda-valor salario-valor">
+                     {{ salarioTrabajador.salario_total | number:'1.2-2' }} Bs.
+                   </span>
+                 </div>
+                 <div class="tabla-celda" *ngIf="salarioTrabajador">
+                   <span class="celda-label">Días Pagados</span>
+                   <span class="celda-valor dias-valor">
+                     {{ salarioTrabajador.dias_pagados }} días
+                   </span>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+
+        <!-- Botones de navegación Paso 3 -->
+        <div class="stepper-actions">
+          <button 
+            type="button" 
+            pButton 
+            pRipple 
+            label="Anterior" 
+            icon="pi pi-arrow-left"
+            class="p-button-outlined"
+            (click)="anteriorPaso()">
+          </button>
+          <button 
+            type="submit" 
+            pButton 
+            pRipple 
+            label="Calcular Reembolso" 
+            icon="pi pi-calculator"
+            class="p-button-success p-button-lg"
+            [disabled]="formularioManual.invalid">
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Resultados de la Búsqueda o Contenedor de Búsqueda -->
+<div class="resultados-container" *ngIf="modoIngreso === 'automatico'">
+  <div class="calculo-header">
+    <div class="header-content">
+      <i class="pi pi-list header-icon"></i>
+      <h4 class="calculo-title">Grupos de Bajas Médicas</h4>
+      <span class="calculo-subtitle" *ngIf="mostrarDialogBajas && !cargandoBusqueda">({{ gruposBajasEncontradas.length }} grupos de {{ bajasEncontradas.length }} bajas)</span>
+    </div>
+    
+    <!-- Buscador de Matrícula en el Header -->
+    <div class="header-search" *ngIf="modoIngreso === 'automatico'">
+      <form [formGroup]="buscarForm" (ngSubmit)="buscarBajasMedicas()">
+        <div class="p-inputgroup">
+          <input 
+            id="matricula"
+            type="text" 
+            pInputText 
+            formControlName="matricula"
+            placeholder="Ej: 61-5204 AAA"
+            class="p-inputtext-sm"
+            [class.p-invalid]="buscarForm.get('matricula')?.invalid && buscarForm.get('matricula')?.touched">
+          <button 
+            type="submit" 
+            pButton 
+            pRipple 
+            label="" 
+            icon="pi pi-search"
+            class="p-button-primary p-button-sm"
+            [loading]="cargandoBusqueda"
+            [disabled]="buscarForm.invalid">
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Botón de limpiar (solo cuando hay resultados) -->
+    <button 
+      *ngIf="mostrarDialogBajas && !cargandoBusqueda"
+      pButton 
+      pRipple 
+      type="button" 
+      icon="pi pi-times" 
+      class="p-button-rounded p-button-sm p-button-outlined" 
+      pTooltip="Limpiar resultados"
+      tooltipPosition="left"
+      (click)="limpiarResultados()">
+    </button>
+  </div>
+
+  <!-- Contenido: Líneas punteadas o Tabla de resultados -->
+  <div class="bajas-content-container">
+    
+    <!-- Mensaje con líneas punteadas cuando no hay búsqueda -->
+    <div class="no-search-container" *ngIf="!mostrarDialogBajas && !cargandoBusqueda && modoIngreso === 'automatico'">
+      <div class="dotted-message">
+        <i class="pi pi-search search-icon"></i>
+        <p>Realiza una búsqueda de matrícula para ver los grupos de bajas médicas disponibles</p>
+      </div>
+    </div>
+
+    <!-- Mensaje de carga -->
+    <div class="loading-container" *ngIf="cargandoBusqueda">
+      <div class="loading-message">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Buscando bajas médicas...</p>
+      </div>
+    </div>
+  
+    <!-- Tabla de Grupos de Bajas Médicas -->
+    <div class="bajas-table-container" *ngIf="mostrarDialogBajas && !cargandoBusqueda">
+      <p-table 
+        [value]="gruposBajasEncontradas" 
+        [paginator]="gruposBajasEncontradas.length > 5" 
+        [rows]="5"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        styleClass="p-datatable-sm p-datatable-striped"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} grupos"
+        [globalFilterFields]="['tipo_baja', 'matricula', 'especialidades']">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Tipo</th>
+            <th>Matrícula</th>
+            <th>Período Consolidado</th>
+            <th>Días Totales</th>
+            <th>Bajas Agrupadas</th>
+            <th>Acción</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-grupo>
+          <tr class="grupo-row" [ngClass]="getTipoIncapacidadClass(grupo.tipo_baja)">
+            <td>
+              <span class="tipo-badge" [ngClass]="getTipoIncapacidadClass(grupo.tipo_baja)">
+                {{ grupo.tipo_baja }}
+              </span>
+            </td>
+            <td>
+              <div class="matricula-cell">
+                <i class="pi pi-user"></i>
+                <span>{{ grupo.matricula }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="periodo-cell">
+                <small>{{ formatDate(grupo.fecha_inicio) }}</small>
+                <i class="pi pi-arrow-right periodo-arrow"></i>
+                <small>{{ formatDate(grupo.fecha_fin) }}</small>
+              </div>
+            </td>
+            <td>
+              <div class="dias-cell">
+                <span class="dias-numero">{{ grupo.dias_totales }}</span>
+                <small>días</small>
+              </div>
+            </td>
+            <td>
+              <div class="bajas-agrupadas-cell">
+                <button 
+                  pButton 
+                  pRipple 
+                  type="button" 
+                  icon="pi pi-eye" 
+                  [label]="'Ver detalle ' + grupo.bajas.length + ' baja(s)' + (grupo.bajas.length > 1 ? '' : '')"
+                  class="p-button-sm p-button" 
+                  pTooltip="Ver detalles de las bajas agrupadas"
+                  (click)="mostrarDetallesGrupo(grupo)">
+                </button>
+              </div>
+            </td>
+            <td>
+              <button 
+                pButton 
+                pRipple 
+                type="button" 
+                icon="pi pi-calculator" 
+                label="Calcular"
+                class="p-button-sm p-button-success w-100" 
+                pTooltip="Calcular reembolso para este grupo"
+                (click)="seleccionarGrupo(grupo)">
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center p-4">
+              <i class="pi pi-info-circle text-muted"></i>
+              <p class="text-muted mt-2">No se encontraron grupos de bajas médicas</p>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+  
+<!-- Sección de Cálculo de Reembolso - INTEGRADA SIN MODAL -->
+<div class="calculo-reembolso-section" *ngIf="detalleCalculado" [@slideInOut]>
+  <div class="calculo-header">
+    <div class="header-content">
+      <i class="pi pi-calculator header-icon"></i>
+      <h4 class="calculo-title">Cálculo de Reembolso</h4>
+      <span class="calculo-subtitle">Detalle del reembolso calculado</span>
+    </div>
+    <div class="header-actions">
+      <!-- Botón de alerta para ajuste de fechas -->
+      <button 
+        *ngIf="esAjusteFechasAplicado()"
+        pButton 
+        pRipple 
+        type="button" 
+        icon="pi pi-exclamation-triangle" 
+        class="p-button-rounded p-button-sm p-button-warning mr-2" 
+        pTooltip="Ver motivo del ajuste de fechas"
+        tooltipPosition="left"
+        (click)="mostrarMotivoAjuste()">
+      </button>
+      <!-- Botón de cerrar -->
+      <button 
+        pButton 
+        pRipple 
+        type="button" 
+        icon="pi pi-times" 
+        class="p-button-rounded p-button-sm p-button-outlined" 
+        pTooltip="Cerrar cálculo"
+        tooltipPosition="left"
+        (click)="cerrarDialogCalculo()">
+      </button>
+    </div>
+  </div>
+
+  <!-- TABLA ESTILO EXCEL INTEGRADA -->
+  <div class="tabla-excel-reembolso-integrada">
+    <div class="tabla-wrapper">
+      <p-table [value]="[detalleCalculado]" styleClass="p-datatable-sm tabla-calculo-reembolso-moderna">
+        <ng-template pTemplate="header">
+          <tr>
+            <th rowspan="2" class="excel-header">N°</th>
+            <th rowspan="2" class="excel-header">NOMBRE</th>
+            <th colspan="2" class="excel-header excel-header-group">BAJA MÉDICA</th>
+            <th rowspan="2" class="excel-header">día</th>
+            <th colspan="2" class="excel-header excel-header-group">CORRESPONDIENTE AL MES</th>
+            <th rowspan="2" class="excel-header">DIA</th>
+            <th rowspan="2" class="excel-header">día -3</th>
+            <th rowspan="2" class="excel-header">TOTAL<br>GANADO</th>
+            <th rowspan="2" class="excel-header">TOTAL<br>DIA</th>
+            <th rowspan="2" class="excel-header">DIAS<br>CBES</th>
+            <th rowspan="2" class="excel-header">TOTAL</th>
+            <th rowspan="2" class="excel-header excel-total-75">TOTAL ({{detalleCalculado.porcentaje_reembolso}}%)</th>
+          </tr>
+          <tr>
+            <th class="excel-subheader">Empiezo</th>
+            <th class="excel-subheader">Termino</th>
+            <th class="excel-subheader">DE</th>
+            <th class="excel-subheader">A</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-detalle let-rowIndex="rowIndex">
+          <tr>
+            <td class="excel-cell text-center">{{ rowIndex + 1 }}</td>
+            <td class="excel-cell excel-nombre">
+              {{ detalle.apellido_paterno }} {{ detalle.apellido_materno }} {{ detalle.nombres }}
+            </td>
+            <td class="excel-cell text-center">{{ formatDateShort(detalle.fecha_inicio_baja) }}</td>
+            <td class="excel-cell text-center">{{ formatDateShort(detalle.fecha_fin_baja) }}</td>
+            <td class="excel-cell text-center excel-numero">{{ getDiasTotalesBaja(detalle) }}</td>
+            <td class="excel-cell text-center">{{ formatDateShort(detalle.correspondiente_al_mes?.fecha_inicio || detalle.fecha_inicio_baja) }}</td>
+            <td class="excel-cell text-center">{{ formatDateShort(detalle.correspondiente_al_mes?.fecha_fin || detalle.fecha_fin_baja) }}</td>
+            <td class="excel-cell text-center excel-numero">{{ getDiasEnMes(detalle) }}</td>
+            <td class="excel-cell text-center excel-numero-info">{{ getDiasMenos3(detalle) }}</td>
+            <td class="excel-cell text-right excel-monto">{{ detalle.salario | number:'1.2-2' }}</td>
+            <td class="excel-cell text-right excel-monto">{{ detalle.monto_dia | number:'1.2-2' }}</td>
+            <td class="excel-cell text-center excel-numero">{{ detalle.dias_reembolso }}</td>
+            <td class="excel-cell text-right excel-monto">{{ detalle.monto_subtotal | number:'1.2-2' }}</td>
+            <td class="excel-cell text-right excel-total">{{ detalle.monto_reembolso | number:'1.2-2' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    
+    <!-- Resumen del cálculo -->
+    <div class="calculo-resumen">
+      <div class="resumen-item total">
+        <span class="resumen-label">Monto total del reembolso:</span>
+        <span class="resumen-valor-final">{{ detalleCalculado.monto_reembolso | number:'1.2-2' }} Bs.</span>
+      </div>
+    </div>
+    
+    <!-- Botones de acción -->
+    <div class="acciones-calculo-integradas">
+      <button 
+        pButton 
+        pRipple 
+        label="Confirmar y Agregar a la Planilla" 
+        icon="pi pi-check" 
+        class="p-button-success p-button-lg" 
+        (click)="confirmarYAgregar()">
+      </button>
+      <button 
+        pButton 
+        pRipple 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        class="p-button-outlined p-button-lg" 
+        (click)="cerrarDialogCalculo()">
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Formulario de Datos Adicionales para Riesgo Profesional (Modo Automático) -->
+<div class="datos-adicionales-section" *ngIf="mostrarDatosAdicionales" [@slideInOut]>
+
+
+  <div class="datos-adicionales-content">
+    <div class="info-mensaje mb-3" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px;">
+      <i class="pi pi-info-circle" style="color: #856404;"></i>
+      <span style="color: #856404; font-weight: 500;">
+        Para Riesgo Profesional se requieren datos adicionales de fecha de accidente y vigencia según el lugar del accidente
+      </span>
+    </div>
+
+    <form [formGroup]="formularioDatosAdicionales" (ngSubmit)="procesarDatosAdicionales()">
+      <div class="datos-adicionales-row">
+        <!-- Fecha de Accidente -->
+        <div class="datos-adicionales-field">
+          <label for="fecha_accidente_auto">Fecha de Accidente *</label>
+          <p-calendar 
+            id="fecha_accidente_auto"
+            formControlName="fecha_accidente"
+            dateFormat="dd/mm/yy"
+            placeholder="Seleccione fecha"
+            [showIcon]="true"
+            appendTo="body"
+            [class.p-invalid]="formularioDatosAdicionales.get('fecha_accidente')?.invalid && formularioDatosAdicionales.get('fecha_accidente')?.touched">
+          </p-calendar>
+          <small class="p-error" *ngIf="formularioDatosAdicionales.get('fecha_accidente')?.invalid && formularioDatosAdicionales.get('fecha_accidente')?.touched">
+            Campo requerido
+          </small>
+        </div>
+
+        <!-- Fecha de Vigencia -->
+        <div class="datos-adicionales-field">
+          <label for="fecha_vigencia_auto">Fecha de Vigencia *</label>
+          <p-calendar 
+            id="fecha_vigencia_auto"
+            formControlName="fecha_vigencia"
+            dateFormat="dd/mm/yy"
+            placeholder="Seleccione fecha"
+            [showIcon]="true"
+            appendTo="body"
+            [class.p-invalid]="formularioDatosAdicionales.get('fecha_vigencia')?.invalid && formularioDatosAdicionales.get('fecha_vigencia')?.touched">
+          </p-calendar>
+          <small class="p-error" *ngIf="formularioDatosAdicionales.get('fecha_vigencia')?.invalid && formularioDatosAdicionales.get('fecha_vigencia')?.touched">
+            Campo requerido
+          </small>
+        </div>
+
+        <!-- Lugar de Accidente -->
+        <div class="datos-adicionales-field">
+          <label for="lugar_accidente_auto">Lugar de Accidente *</label>
+          <p-dropdown 
+            id="lugar_accidente_auto"
+            formControlName="lugar_accidente"
+            [options]="[
+                {label: 'URBANO', value: 'URBANO'},
+                {label: 'RURAL', value: 'RURAL'}
+            ]"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccione lugar"
+            [class.p-invalid]="formularioDatosAdicionales.get('lugar_accidente')?.invalid && formularioDatosAdicionales.get('lugar_accidente')?.touched">
+          </p-dropdown>
+          <small class="p-error" *ngIf="formularioDatosAdicionales.get('lugar_accidente')?.invalid && formularioDatosAdicionales.get('lugar_accidente')?.touched">
+            Campo requerido
+          </small>
+        </div>
+      </div>
+
+      <div class="datos-adicionales-botones">
+        <button 
+          type="button" 
+          pButton 
+          pRipple 
+          label="Cancelar" 
+          icon="pi pi-times"
+          class="p-button-outlined p-button-sm"
+          (click)="cancelarDatosAdicionales()">
+        </button>
+        <button 
+          type="submit" 
+          pButton 
+          pRipple 
+          label="Continuar" 
+          icon="pi pi-check"
+          class="p-button-sm"
+          [disabled]="formularioDatosAdicionales.invalid">
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

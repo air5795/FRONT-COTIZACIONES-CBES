@@ -1,0 +1,179 @@
+<div class="grid dashboard">
+  <div class="col-12 md:col-12 lg:6">
+      <div class="perfil-empleador">
+        <div class="header">
+          <div class="header-left">
+            <h2 style="font-size: 30px;">  LIQUIDACIONES DEVENGADAS </h2>
+            <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+            <span class="numero-patronal">Planillas con multas y recargos de ley</span>
+          </div>
+          <div class="header-right">
+            <!-- Estadísticas rápidas -->
+            <div class="stats-cards" *ngIf="estadisticas && !loadingEstadisticas">
+              <div class="stat-card total">
+                <div class="stat-content">
+                  <span class="stat-number">{{ estadisticas.total_devengadas }}</span>
+                  <span class="stat-label">Total Devengadas</span>
+                </div>
+              </div>
+              
+              <div class="stat-card amount">
+                <div class="stat-content">
+                  <span class="stat-number">
+                    {{ obtenerTotalMultas() | currency:'BOB':'symbol':'1.0-2' }}
+                  </span>
+                  <span class="stat-label">Total Multas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<p-table 
+[value]="liquidacionesFiltradas" 
+[paginator]="true"
+[rows]="limite" 
+[totalRecords]="totalRegistros" 
+(onPage)="onPageChange($event)"
+[rowsPerPageOptions]="[5,10,20,25,30]"
+[pageLinks]="3" 
+[lazy]="true"
+class="tabla-centrada" 
+[loading]="loading"
+#tablaLiquidacionesDevengadas
+>
+
+<ng-template pTemplate="caption" >
+  <div class="flex justify-content-between flex-column sm:flex-row align-items-center" >
+    <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+    <div class="flex flex-column sm:flex-row gap-2 mb-2">
+
+      <p-dropdown
+        [options]="meses"
+        [(ngModel)]="mesFiltro"
+        placeholder="Filtrar por mes"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <p-dropdown
+        [options]="gestiones"
+        [(ngModel)]="anioFiltro"
+        placeholder="Filtrar por año"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <span class="p-input-icon-left w-full sm:w-auto">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          #filter
+          (input)="buscar(filter.value)"
+          placeholder="Buscar ..."
+          class="w-full"
+        />
+      </span>
+    </div>
+  </div>
+</ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Código Patronal</th>
+        <th>Empresa</th>
+        
+        <th>Período</th>
+        <th>Fecha Planilla</th>
+        <th>Días Mora</th>
+        <th>Total Multas</th>
+        <th>Total a Pagar</th>
+        <th style="width: 120px;">Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+  
+    <ng-template pTemplate="body" let-liquidacion>
+     
+    <tr>
+
+      <td>
+        <span class="codigo-patronal">{{ liquidacion.cod_patronal }}</span>
+      </td> 
+    <td>
+      <div >
+        {{ liquidacion.empresa }}
+      </div>
+    </td>
+
+    
+    
+    <td>
+      <div class="periodo-info">
+        <span class="mes">{{ liquidacion.mes }}</span>
+        <span class="gestion">{{ liquidacion.gestion }}</span>
+      </div>
+    </td> 
+    
+    <td>
+      {{ formatearFecha(liquidacion.fecha_planilla) }}
+    </td>
+    
+    <td>
+      <span class="dias-mora" [class]="obtenerClaseDiasMora(liquidacion.dias_mora_categoria)">
+        {{ liquidacion.dias_retraso }} días
+      </span>
+    </td>
+
+    <td style="background-color: #f3fff7;">
+      <span>{{ formatearMoneda(liquidacion.total_multas) }}</span>
+
+    </td>
+    
+    <td>
+      <strong class="total-pagar">{{ formatearMoneda(liquidacion.total_a_cancelar) }}</strong>
+    </td>
+
+    <td style=" text-align: center;">
+      <button class="estado-btn devengado">DEVENGADA</button>
+    </td>
+    
+    <td>
+      <div class="action-buttons-container">
+        <button 
+          type="button" 
+          class="action-btn btn-view"
+          (click)="verDetalle(liquidacion.id_planilla_aportes)"
+          title="Ver detalles de la liquidación devengada"
+        >
+          <i class="pi pi-eye"></i>
+          <span>Ver Detalle</span>
+        </button>
+      </div>
+    </td>
+  </tr>
+    </ng-template>
+  
+      
+      
+      
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" style="text-align: center; padding: 20px; background-color: #fff;">
+          <div class="no-data-message">
+            <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+            <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay Liquidaciones Devengadas.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+      
+      
+  </p-table>
+  
+
+
+
+  </div>
+</div>
+  

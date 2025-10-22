@@ -1,0 +1,455 @@
+<div class="grid dashboard">
+  <div class="col-12 md:col-12 lg:6">
+      <div class="perfil-empleador">
+        <div class="header">
+          <div class="header-left">
+            <h2 style="font-size: 30px;"> <i class="pi pi-briefcase" style="font-size: 2.5rem"></i> PLANILLAS DE APORTES </h2>
+            <hr style="margin: 2px; border: 1px solid rgba(83, 83, 83, 0.43)">
+            <span class="numero-patronal">Control Historico Aportes </span>
+          </div>
+          <div class="header-right">
+            <div class="button-container">
+
+              <button pButton label="PLANTILLAS" class="boton1" (click)="toggleMenuPlantillas($event)">
+                <span class="pi pi-download" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">Descargar</span>
+              </button>
+              
+              <p-overlayPanel #menuPlantillasPanel [showCloseIcon]="false" [style]="{'width': '160px'}">
+                <div class="menu-plantillas">
+                  <button pButton class="p-button-text menu-item" (click)="seleccionarPlantilla('corta')">
+                    <span class="pi pi-download" style="margin-right: 8px;"></span>
+                    Resumida
+                  </button>
+                  <button pButton class="p-button-text menu-item" (click)="seleccionarPlantilla('extendida')">
+                    <span class="pi pi-download" style="margin-right: 8px;"></span>
+                    Extendida
+                  </button>
+                </div>
+              </p-overlayPanel> 
+        
+              <button pButton label="PLANILLA" class="boton2" (click)="mostrarModal = true">
+                <span class="pi pi-book" style="font-size: 2rem; padding-bottom: 10px;"></span>
+                <span style="font-size: 13px;color: #ffffff;margin-bottom: 2px;">Nueva</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+<p-table 
+[value]="planillas" 
+[paginator]="true"
+[rows]="limite" 
+[totalRecords]="totalRegistros" 
+(onPage)="onPageChange($event)"
+[rowsPerPageOptions]="[5,10,20,25,30]"
+[pageLinks]="3" 
+[lazy]="true"
+class="tabla-centrada" 
+
+#tablaPlanillasAportes
+>
+
+<ng-template pTemplate="caption" >
+  <div class="flex justify-content-between flex-column sm:flex-row align-items-center" >
+    <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+    <div class="flex flex-column sm:flex-row gap-2 mb-2">
+
+      <p-dropdown
+        [options]="meses"
+        [(ngModel)]="mesFiltro"
+        placeholder="Filtrar por mes"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <p-dropdown
+        [options]="anios"
+        [(ngModel)]="anioFiltro"
+        placeholder="Filtrar por año"
+        (onChange)="aplicarFiltros()"
+        styleClass="w-full sm:w-auto"
+      ></p-dropdown>
+
+      <span class="p-input-icon-left w-full sm:w-auto">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          #filter
+          (input)="buscar(filter.value)"
+          placeholder="Buscar ..."
+          class="w-full"
+        />
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        
+        <th>N° de Comprobante</th>
+        
+        <th>Mes</th>
+        <th>Gestión</th>
+        <th>Total Registros </th>
+        <th >Total importe</th>
+        <!-- <th>Fecha Declarada</th> -->
+        
+        <th style="width: 80px;">Declarado</th>
+        <!-- <th style="width: 80px;">Pagado</th> -->
+        <th style="width: 80px;">Liquidado</th>
+        <th style="width: 170px;">Tipo Planilla</th>
+        <th style="width: 120px;">Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-planilla>
+     
+    <tr>
+    <td>COM-{{ planilla.com_nro }}</td>
+
+    <td>{{ planilla.mes }}</td> 
+    <td>{{ planilla.gestion }}</td> 
+    <td style="text-align: center;">
+      <button class="btn btn-primary" style="color: #009688; font-size: 18px; font-weight: 600; border: none; background-color: white;">
+        {{ planilla.total_trabaj }}
+      </button>
+    </td>
+    <td style="background-color: #f3fff7;">
+      <span>{{ planilla.total_importe | number:'1.2-2' }} Bs</span>
+    </td>
+<!--     <td>
+      <span *ngIf="planilla.fecha_declarada; else sinFechad"> 
+        <span style="color: green;">
+          {{ planilla.fecha_declarada | date: 'd \'de\' MMMM \'de\' yyyy' : 'UTC' }}
+        </span>
+      </span>
+      <ng-template #sinFechad>
+        <span style="color: red;">
+          <i class="pi pi-ban check-icon red-x"></i> 
+        </span>
+      </ng-template>
+
+    
+    </td> -->
+
+    <td>
+      <span *ngIf="planilla.fecha_declarada; else sinFecha"> 
+        <span style="color: green;">
+          <i class="pi pi-check check-icon green-check"></i> 
+        </span>
+      </span>
+      <ng-template #sinFecha>
+        <span style="color: red;">
+          <i class="pi pi-times check-icon red-x"></i> 
+        </span>
+      </ng-template>
+    </td>
+<!--     <td>
+      <span *ngIf="planilla.fecha_liquidacion; else sinPago">
+        <span style="color: green;">
+          <i class="pi pi-check check-icon green-check"></i> 
+        </span>
+      </span>
+      <ng-template #sinPago>
+        <span style="color: red;">
+          <i class="pi pi-times check-icon red-x"></i> 
+        </span>
+      </ng-template>
+    </td> -->
+    <td>
+      <span *ngIf="planilla.valido_cotizacion; else validacion">
+        <span style="color: green;">
+          <i class="pi pi-check check-icon green-check"></i> 
+        </span>
+      </span>
+      <ng-template #validacion>
+        <span style="color: red;">
+          <i class="pi pi-times check-icon red-x"></i> 
+        </span>
+      </ng-template>
+    </td>
+
+    <td>
+      <ng-container [ngSwitch]="planilla.tipo_planilla">
+        <!-- Mensual - Verde -->
+        <span *ngSwitchCase="'Mensual'" class="tipo-planilla-text tipo-mensual">
+          {{planilla.tipo_planilla}}
+        </span>
+    
+        <!-- Planilla Adicional - Azul -->
+        <span *ngSwitchCase="'Planilla Adicional'" class="tipo-planilla-text tipo-adicional">
+          {{planilla.tipo_planilla}}
+        </span>
+    
+        <!-- Beneficio Social - Púrpura -->
+        <span *ngSwitchCase="'Beneficio Social'" class="tipo-planilla-text tipo-beneficio">
+          {{planilla.tipo_planilla}}
+        </span>
+    
+        <!-- Reintegro - Naranja -->
+        <span *ngSwitchCase="'Reintegro'" class="tipo-planilla-text tipo-reintegro">
+          {{planilla.tipo_planilla}}
+        </span>
+
+        <!-- Retroactivo - Teal -->
+        <span *ngSwitchCase="'Retroactivo'" class="tipo-planilla-text tipo-retroactivo">
+          {{planilla.tipo_planilla}}
+        </span>
+    
+        <!-- Default - Gris -->
+        <span *ngSwitchDefault class="tipo-planilla-text tipo-default">
+          {{planilla.tipo_planilla}}
+        </span>
+      </ng-container>
+    </td>
+    <td style=" text-align: center;">
+
+         
+            <button *ngIf="planilla.estado === 0" class="estado-btn borrador" >BORRADOR</button>
+            <button *ngIf="planilla.estado === 1" class="estado-btn pendiente" >PRESENTADO</button>
+            <button *ngIf="planilla.estado === 2" class="estado-btn aprobado" >APROBADO</button>
+            <button *ngIf="planilla.estado === 3" class="estado-btn observado" >OBSERVADO</button>
+       
+        
+      </td>
+    <td>
+      <div class="action-buttons-container">
+        <button 
+          type="button" 
+          class="action-btn btn-view"
+          (click)="verDetalle(planilla.id_planilla_aportes)"
+          title="Ver detalles de la planilla"
+        >
+          <i class="pi pi-eye"></i>
+          <span>Ver Planilla</span>
+        </button>
+        
+        <button 
+          type="button" 
+          class="action-btn btn-delete"
+          [class.enabled]="planilla.estado === 0"
+          [class.disabled]="planilla.estado !== 0"
+          [disabled]="planilla.estado !== 0"
+          (click)="planilla.estado === 0 && eliminarPlanilla(planilla.id_planilla_aportes)"
+          [title]="planilla.estado === 0 ? 'Eliminar planilla (solo disponible en estado BORRADOR)' : 'Solo se pueden eliminar planillas en estado BORRADOR'"
+        >
+          <i class="pi pi-trash"></i>
+          <span></span>
+        </button>
+      </div>
+    </td>
+  </tr>
+    </ng-template>
+      
+      
+      
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11" style="text-align: center; padding: 20px; background-color: #fff;">
+          <div class="no-data-message">
+            <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+            <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay Planillas Cargadas.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+      
+      
+  </p-table>
+  
+
+
+<!-- Modal con Stepper para Declarar Planilla -->
+<p-dialog [(visible)]="mostrarModal" [modal]="true" header="Subir Planilla " [closable]="true" [style]="{width: '1400px'}">
+    <p-steps [model]="steps" [(activeIndex)]="activeIndex" [style]="{padding: '20px'}"></p-steps>
+
+
+    <!-- Paso 1: Elegir Mes y Gestión y tipo planilla-->
+    <div *ngIf="activeIndex === 0">
+      <div class="flex flex-column" style="height: calc(100% - 50px);">
+        <div class="grid">
+          <div class="col">
+            <div class="text-center p-3 border-round-sm font-bold" style="background-color: #e2f5e7;">
+              <h5>Mes</h5>
+              <p-dropdown
+                id="mes"
+                [options]="meses"
+                [(ngModel)]="mesSeleccionado"
+                placeholder="Seleccione el mes"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+          </div>
+          <div class="col">
+            <div class="text-center p-3 border-round-sm font-bold" style="background-color: #e2f5e7;">
+              <h5>Gestión</h5>
+              <p-dropdown
+                id="gestion"
+                [options]="gestiones"
+                [(ngModel)]="gestionSeleccionada"
+                placeholder="Seleccione la gestión"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+          </div>
+          <div class="col">
+            <div class="text-center p-3 border-round-sm font-bold" style="background-color: #e2f5e7;">
+              <h5>Tipo de Planilla</h5>
+              <p-dropdown
+                id="tipoPlanilla"
+                [options]="tiposPlanilla"
+                [(ngModel)]="tipoPlanilla"
+                placeholder="Seleccione el tipo"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="p-d-flex p-jc-end" style="margin-top: auto; padding-top: 50px;">
+        <button pButton label="Siguiente" icon="pi pi-arrow-right" (click)="nextStep()"></button>
+      </div>
+    </div>
+  
+
+    <!-- Paso 2: Importar Planilla y Ver Datos -->
+    <div *ngIf="activeIndex === 1">
+        <div class="p-field" style="background-color: #f0fff2;text-align: center;">
+            <label for="archivo" class="p-d-block font-bold">Seleccionar archivo (solo .xlsx) (Excel) </label>
+            <div class="file-upload-container">
+              <!-- El input file sigue oculto -->
+              <input 
+                type="file" 
+                id="archivo" 
+                accept=".xlsx, .xls" 
+                (change)="seleccionarArchivo($event)" 
+                class="file-upload-input" 
+                #fileInput
+              />
+              <!-- Botón que simula el clic en el input -->
+              <button type="button" class="file-upload-button" (click)="fileInput.click()">
+                <i class="pi pi-upload"></i> Cargar archivo
+              </button>
+            </div>
+            <small class="p-d-block text-muted">Por favor, sube un archivo en formato .xlsx o .xls</small>
+          </div>
+          
+          
+          
+    
+
+          <div *ngIf="planillaDatos.length > 0">
+            <p-table [value]="planillaDatos" responsiveLayout="scroll" styleClass="p-datatable-gridlines" scrollable="true" [scrollHeight]="'200px'">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Nro</th>
+                  <th>CI</th>
+                  <th>Apellido Paterno</th>
+                  <th>Apellido Materno</th>
+                  <th>Nombres</th>
+                  <th>Cargo</th>
+                  <th >Haber Básico</th> 
+                  <th >Bono de antigüedad</th> 
+                  <th >Monto horas extra</th> 
+                  <th >Monto horas extra nocturnas</th> 
+                  <th >Otros bonos y pagos</th>
+                  <th style="width: 200px;">Total Ganado</th>
+                  <th>Fecha Ingreso</th>
+                  <th>Fecha Retiro</th>
+                  <th>Regional</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-trabajador>
+                <tr>
+                  <td>{{ trabajador['Nro.'] }}</td>
+                  <td>{{ trabajador['Número documento de identidad'] }}</td>
+                  <td>{{ trabajador['Apellido Paterno'] }}</td>
+                  <td>{{ trabajador['Apellido Materno'] }}</td>
+                  <td>{{ trabajador['Nombres'] }}</td>
+                  <td>{{ trabajador['Cargo'] }}</td>
+                  <td>{{ trabajador['Haber Básico'] | number:'1.2-2' }}</td>
+                  <td>{{ trabajador['Bono de antigüedad'] | number:'1.2-2' }}</td>
+                  <td>{{ trabajador['Monto horas extra'] | number:'1.2-2' }}</td>
+                  <td>{{ trabajador['Monto horas extra nocturnas'] | number:'1.2-2' }}</td>
+                  <td>{{ trabajador['Otros bonos y pagos'] | number:'1.2-2' }}</td>
+                  <td style="background-color: #f3fff7;">{{ trabajador['Bono de antigüedad'] + trabajador['Monto horas extra'] + trabajador['Monto horas extra nocturnas'] + trabajador['Otros bonos y pagos'] + trabajador['Haber Básico'] | number:'1.2-2' }}</td>
+                  <td>{{ trabajador['Fecha de ingreso'] | date: 'dd/MM/yyyy ' }}</td>
+                  <td>{{ trabajador['Fecha de retiro'] | date: 'dd/MM/yyyy ' }}</td>
+                  <td>{{ trabajador['regional'] }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+          
+          
+
+      <div class="p-d-flex p-jc-between" style="margin-top: auto; padding-top: 50px;">
+        <button pButton label="Atrás" icon="pi pi-arrow-left" (click)="prevStep()" style="margin-right: 15px;background-color: #6a8582;"></button>
+        <button pButton label="Siguiente" icon="pi pi-arrow-right" (click)="nextStep()" [disabled]="!planillaDatos.length"></button>
+    </div>
+    
+    
+    </div>
+
+<!-- Paso 3: Verificar Datos y Declarar Planilla -->
+<div *ngIf="activeIndex === 2">
+    <div class="p-card p-mb-3" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; margin: 0 auto;">
+        <div class="p-card-body" style="padding: 20px; text-align: center;">
+            <div class="p-d-flex p-flex-column">
+                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 20px;">Resumen de Planilla Cargada</h3>
+                <p>Verifique su información</p>
+
+                <div class="p-d-flex p-ai-center" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                  <i class="pi pi-user p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                  <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Usuario : <strong style="color: #2c3e50;">{{ persona.nombres }} {{ persona.primerApellido }} {{ persona.segundoApellido }}</strong></label>
+              </div>
+                
+                <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                    <i class="pi pi-calendar p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                    <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Mes: <strong style="color: #2c3e50;">{{ mesSeleccionado }}</strong></label>
+                </div>
+                
+                <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                    <i class="pi pi-calendar-plus p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                    <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Gestión: <strong style="color: #2c3e50;">{{ gestionSeleccionada }}</strong></label>
+                </div>
+                
+                <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                    <i class="pi pi-users p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                    <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Cantidad de Trabajadores: <strong style="color: #2c3e50;">{{ contarTrabajadores() }}</strong></label>
+                </div>
+                
+                <div class="p-d-flex p-ai-center" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+                    <i class="pi pi-money-bill p-mr-2" style="font-size: 1.5rem; color: #009688; margin-right: 5px;"></i>
+                    <label class="p-mb-0" style="font-size: 1rem; color: #34495e;">Suma Total Ganado: <strong style="color: #2c3e50;">{{ obtenerTotalImporte() | currency:'Bs ':'symbol':'1.2-2' }}</strong></label>
+                </div>
+
+               
+
+
+            </div>
+
+            <hr>
+
+            <button  pButton label="Subir Planilla" icon="pi pi-check" (click)="declararPlanilla()" [disabled]="!planillaDatos.length"></button>
+        </div>
+    </div>
+      
+  
+    <div class="p-d-flex p-jc-between">
+      <button pButton label="Atrás" icon="pi pi-arrow-left" (click)="prevStep()" style="margin-right: 15px;background-color: #6a8582;"></button>
+      <!-- <button pButton label="Declarar Planilla" icon="pi pi-check" (click)="declararPlanilla()" [disabled]="!planillaDatos.length"></button> -->
+    </div>
+  </div>
+  
+  
+
+
+  </p-dialog>
+
+
+  <app-loading-componente *ngIf="isLoading" [progress]="loadingProgress" [message]="loadingMessage"></app-loading-componente>

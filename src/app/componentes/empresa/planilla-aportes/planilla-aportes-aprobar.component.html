@@ -1,0 +1,187 @@
+<p-toast key="planilla-aprobar" [baseZIndex]="99999"></p-toast>
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5><i class="pi pi-money-bill" style="font-size: 1.5rem"></i> LISTA DE PLANILLAS DE APORTES PARA SU APROBACION
+            </h5>
+            <div class="card">
+                <div class="grid p-fluid mt-3">
+                    <div class="col-12 mb-4 lg:col-2 lg:mb-0">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="meses" [(ngModel)]="mesSelect"
+                                optionValue="value" optionLabel="name"
+                                (onChange)="listaAportesSelect()"
+                                [showClear]="true"></p-dropdown>
+                            <label for="float-input">Mes</label>
+                        </span>
+                    </div>
+                    <div class="col-12 mb-4 lg:col-2 lg:mb-0">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="anios" [(ngModel)]="gestionSelect"
+                                optionValue="value" optionLabel="gestion"
+                                (onChange)="listaAportesSelect()"
+                               [showClear]="true"></p-dropdown>
+                            <label for="float-input">Gestión</label>
+                        </span>
+                    </div>
+                    <div class="col-12 mb-4 lg:col-2 lg:mb-0">
+                        <span class="p-float-label">
+                            <button 
+                            pButton pRipple 
+                            label="::Importar Planilla::" 
+                            icon="pi pi-upload" 
+                            (click)="abrirMigrarPlanilla()"
+                              class="p-button-info mr-2"></button>
+                          </span>
+                    </div>
+                    <div class="col-12 mb-4 lg:col-2 lg:mb-0">
+                    <span class="p-float-label">
+                        <button 
+                        pButton pRipple 
+                        label="Descargar Planilla" 
+                        icon="pi pi-download" 
+                        (click)="descargarPlanilla()"
+                          class="p-button-success mr-2"></button>
+                      </span>
+                    </div>
+                    <div class="col-12 mb-4 lg:col-2 lg:mb-0">
+                        <span class="p-float-label">
+                            <button 
+                            pButton pRipple 
+                            label="Valida Afiliación" 
+                            icon="pi pi-check-circle" 
+                            (click)="validaAfiliacion()"
+                              class="mr-2"></button>
+                          </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <p-table #tablaAportes [value]="planillaAportes" [columns]="columnas"
+                    [tableStyle]="{ 'min-width': '50rem' }" responsiveLayout="scroll" [rows]="10" [paginator]="true"
+                    [rowsPerPageOptions]="[10,20,30]">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" placeholder="Buscar..." class="w-full sm:w-auto" (input)="buscarEmpleado(tablaAportes, $event)"/>
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pFrozenColumn>ID</th>
+                            <th>Nº Carnet</th>
+                            <th>Nº Matricula</th>
+                            <th>Nombre Completo</th>
+                            <th>Cargo</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Fecha Retiro</th>
+                            <th>Días Trabaj.</th>
+                            <th>Total Ganado (Bs.)</th>
+                            <th>Aporte (Bs.)</th>
+                            <th>Verificación SIIGA</th>
+                            <th>Estado Asegurado</th>
+                            <th>Observaciones</th>
+                            <th>Acciones</th>
+                        </tr>
+                        
+                    </ng-template>
+                    <ng-template pTemplate="body" let-planillaAportes>
+                        <tr>
+                            <td pFrozenColumn alignFrozen="right">{{ planillaAportes.idPlanilla }}</td>
+                            <td>{{ planillaAportes.aseCi }}</td>
+                            <td>{{ planillaAportes.aseMatTit }}</td>
+                            <td>{{ planillaAportes.aseNom +" "+ planillaAportes.aseApat +" "+ planillaAportes.aseAmat}}</td>
+                            <td class="table-centered">{{ planillaAportes.cargo }}</td>
+                            <td class="table-centered">{{ planillaAportes.fechaIngreso }}</td>
+                            <td class="align-items-center">{{ planillaAportes.fechaRetiro}}</td>
+                            <td style="text-align: center;">{{ planillaAportes.diasTrabajados }}</td>
+                            <td style="text-align: right;">{{ planillaAportes.totalGanado | number : '1.2-2' }}</td>
+                            <td style="text-align: right;">{{ planillaAportes.totalDescuento | number : '1.2-2' }}</td>
+                            <td class="text-center">
+                                <i class="pi" style="font-size: 1.5rem;" 
+                                [ngClass]="{'true-icon pi-check-circle text-green-500': planillaAportes.estadoRegistro =='ESTADO_VERIFICADO', 'false-icon pi-times-circle text-pink-500 ': planillaAportes.estadoRegistro=='ESTADO_NO_VERIFICADO'}"></i>
+                            </td>
+                            <td>{{ planillaAportes.estadoAfiliacion }}</td>
+                            <td>{{ planillaAportes.observaciones }}</td>
+                            <td>
+                                <!--<button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"></button>
+                                <button pButton pRipple icon="pi pi-trash"
+                                    class="p-button-rounded p-button-danger"></button>-->
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <p-dialog [(visible)]="guardarIncapacidadDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #009688;"></i>
+                    <span>Desea Guardar Los Cambios</span>
+                </div>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"
+                        (click)="guardarIncapacidadDialog= false"></button>
+                    <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger" label="Si"
+                       ></button>
+                </ng-template>
+            </p-dialog>
+            <p-dialog header="Confirm" [modal]="true" [style]="{width:'450px'}">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem;color: #D32F2F;"></i>
+                </div>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple icon="pi pi-times" class="p-button-rounded" label="No"></button>
+                    <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-danger"
+                        label="Si"></button>
+                </ng-template>
+            </p-dialog>
+            <!--/***FORMULARIO PARA MIGRACION DE DATOS DESDE EXCEL***/-->
+            <p-dialog [(visible)]="nuevaPlanillaDialog" [style]="{width: '25%',height:'45%' }"
+                header="Migración de Planillas de Pago" [modal]="true" class="p-fluid">
+                <form novalidate [formGroup]="planillaForm">
+                    <div class="col-12 mb-4 lg:col-12 lg:mb-12">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="mesCotizable" [(ngModel)]="mesCotizableSelect"
+                                optionValue="value" optionLabel="name" formControlName="mesCotizableSelect"
+                                appendTo="body"
+                                [showClear]="true"></p-dropdown>
+                            <label for="float-input">Mes</label>
+                        </span>
+                    </div>
+                    <div class="col-12 mb-4 lg:col-12 lg:mb-12">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="anios" [(ngModel)]="gestionCotizableSelect"
+                                optionValue="value" optionLabel="gestion" formControlName="gestionCotizableSelect"
+                                appendTo="body"
+                               [showClear]="true"></p-dropdown>
+                            <label for="float-input">Gestión</label>
+                        </span>
+                    </div>
+                <div class="col-12">
+                    <div class="card">
+                        <input
+                        type="file"
+                        class="form-control-file"
+                        formControlName="filePlanilla"
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        (change)="onUpload($event)"
+                    />
+
+                    <!--<input id="ASE_FOTO" name="ASE_FOTO" type="file" class="attachment_upload"
+                              (change)="onSelectImagen($event.target.files[0])" required="required"
+                              [disabled]="flag_visualizar" accept="image/jpeg" capture />-->
+                    </div>
+                </div>
+            </form>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple type="button" label="Cancelar" (click)="cerrarRegistroIncapacidad()"
+                        icon="pi pi-times" class="p-button-text"></button>
+                    <button pButton pRipple type="button" [disabled]="planillaForm.invalid" label="Guardar"
+                        icon="pi pi-check" class="p-button-text" (click)="handleUpload()"></button>
+                </ng-template>
+            </p-dialog>
+        </div>
+    </div>
+</div>

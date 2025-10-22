@@ -1,0 +1,205 @@
+
+<!-- Tabla de Historial -->
+<p-table 
+  [value]="planillas" 
+  [paginator]="true"
+  [rows]="limite" 
+  [totalRecords]="totalRegistros" 
+  (onPage)="onPageChange($event)"
+  [rowsPerPageOptions]="[5,10,20,25,30]"
+  [pageLinks]="3" 
+  [lazy]="true"
+  class="tabla-centrada" 
+  #tablaPlanillasAdicionales
+>
+  <ng-template pTemplate="caption">
+    <div class="flex justify-content-between flex-column sm:flex-row align-items-center">
+      <button pButton label="Recargar" class="p-button-outlined mb-2" icon="pi pi-sync" (click)="recargar()"></button>
+      <div class="flex flex-column sm:flex-row gap-2 mb-2">
+        <p-dropdown
+          [options]="meses"
+          [(ngModel)]="mesFiltro"
+          placeholder="Filtrar por mes"
+          (onChange)="aplicarFiltros()"
+          styleClass="w-full sm:w-auto"
+        ></p-dropdown>
+        <p-dropdown
+          [options]="anios"
+          [(ngModel)]="anioFiltro"
+          placeholder="Filtrar por año"
+          (onChange)="aplicarFiltros()"
+          styleClass="w-full sm:w-auto"
+        ></p-dropdown>
+        <span class="p-input-icon-left w-full sm:w-auto">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            #filter
+            (input)="buscar(filter.value)"
+            placeholder="Buscar ..."
+            class="w-full"
+          />
+        </span>
+        <button pButton label="Nueva Planilla Adicional" class="p-button-primary p-button-sm" icon="pi pi-plus" (click)="abrirModal()"></button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="text-align: center;">COD Planilla Adicional</th>
+      <th style="text-align: center;">Total Registros</th>
+      <th style="text-align: center;">Total Importe</th>
+      <!-- <th style="text-align: center;">Fecha Creación</th> -->
+      <th style="text-align: center;">Motivo Adicional</th>
+      <th style="text-align: center;">Fecha Declarada</th>
+      <th style="width: 80px; text-align: center;">Planilla Declarada</th>
+      <th style="width: 80px; text-align: center;">Planilla Pagada</th>
+      <th style="width: 120px; text-align: center;">Estado</th>
+      <th style="text-align: center;">Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-planilla>
+    <tr>
+      <td style="text-align: center;">AD-{{ planilla.id_planilla_aportes }}-{{ planilla.id_planilla_adicional }}</td>
+      
+      <td style="text-align: center;">
+        <button class="btn btn-primary" style="color: #009688; font-size: 18px; font-weight: 600; border: none; background-color: white;">
+          {{ planilla.total_trabaj }}
+        </button>
+      </td>
+      <td style="background-color: #f3fff7; text-align: center;">
+        <span>{{ planilla.total_importe | number:'1.2-2' }} Bs</span>
+      </td>
+      <!-- <td style="text-align: center;">{{ planilla.fecha_creacion | date: 'd \'de\' MMMM \'de\' yyyy' }}</td> -->
+      <td style="text-align: center;">{{ planilla.motivo_adicional }}</td>
+      <td style="text-align: center;">
+        <span *ngIf="planilla.fecha_declarada; else sinFechad">
+          <span style="color: green;">
+            {{ planilla.fecha_declarada | date: 'd \'de\' MMMM \'de\' yyyy' }}
+          </span>
+        </span>
+        <ng-template #sinFechad>
+          <span style="color: red;">
+            <i class="pi pi-ban check-icon red-x"></i>
+          </span>
+        </ng-template>
+      </td>
+      <td style="text-align: center;">
+        <span *ngIf="planilla.fecha_declarada; else sinFecha">
+          <span style="color: green;">
+            <i class="pi pi-check check-icon green-check"></i>
+          </span>
+        </span>
+        <ng-template #sinFecha>
+          <span style="color: red;">
+            <i class="pi pi-times check-icon red-x"></i>
+          </span>
+        </ng-template>
+      </td>
+      <td style="text-align: center;">
+        <span *ngIf="planilla.fecha_pago; else sinPago">
+          <span style="color: green;">
+            <i class="pi pi-check check-icon green-check"></i>
+          </span>
+        </span>
+        <ng-template #sinPago>
+          <span style="color: red;">
+            <i class="pi pi-times check-icon red-x"></i>
+          </span>
+        </ng-template>
+      </td>
+      <td style="text-align: center;">
+        <button *ngIf="planilla.estado === 0" class="estado-btn borrador">BORRADOR</button>
+        <button *ngIf="planilla.estado === 1" class="estado-btn pendiente">PRESENTADO</button>
+        <button *ngIf="planilla.estado === 2" class="estado-btn aprobado">APROBADO</button>
+        <button *ngIf="planilla.estado === 3" class="estado-btn observado">OBSERVADO</button>
+      </td>
+      <td>
+        <button 
+          pButton 
+          type="button" 
+          label="Ver Planilla"
+          icon="pi pi-eye" 
+          (click)="verDetalle(planilla.id_planilla_adicional)"
+          [style]="{backgroundColor: '#007063', color: 'white', width: '100%', borderRadius: '0px'}"
+        ></button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+
+  
+
+<p-dialog [(visible)]="mostrarModal" [modal]="true" header="Nueva Planilla Adicional" [closable]="true" [style]="{width: '500px'}">
+    <p-steps [model]="steps" [(activeIndex)]="activeIndex" [style]="{padding: '20px'}"></p-steps>
+  
+    <!-- Paso 1: Cargar Archivo y Motivo -->
+    <div *ngIf="activeIndex === 0">
+      <div class="p-field" style="background-color: #f0fff2; text-align: center;">
+        <label for="motivo" class="p-d-block font-bold">Motivo Adicional</label>
+        <input pInputText id="motivo" [(ngModel)]="motivoAdicional" placeholder="Ingrese el motivo" class="p-d-block" />
+      </div>
+      <div class="p-field" style="background-color: #f0fff2; text-align: center;">
+        <label for="archivo" class="p-d-block font-bold">Seleccionar archivo (solo .xlsx)</label>
+        <div class="file-upload-container">
+          <input 
+            type="file" 
+            id="archivo" 
+            accept=".xlsx, .xls" 
+            (change)="seleccionarArchivo($event)" 
+            class="file-upload-input" 
+            #fileInput
+          />
+          <button type="button" class="file-upload-button" (click)="fileInput.click()">
+            <i class="pi pi-upload"></i> Cargar archivo
+          </button>
+        </div>
+        <small class="p-d-block text-muted">Por favor, sube un archivo en formato .xlsx o .xls</small>
+      </div>
+      <div class="p-d-flex p-jc-end" style="margin-top: auto; padding-top: 50px;">
+        <button pButton label="Siguiente" icon="pi pi-arrow-right" (click)="nextStep()"></button>
+      </div>
+    </div>
+  
+    <!-- Paso 2: Verificar y Guardar -->
+    <div *ngIf="activeIndex === 1">
+      <div class="p-card p-mb-3" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; margin: 0 auto;">
+        <div class="p-card-body" style="padding: 20px; text-align: center;">
+          <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 20px;">Resumen de Planilla Adicional</h3>
+          <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+            <i class="pi pi-file p-mr-2" style="font-size: 1.5rem; color: #009688;"></i>
+            <label>ID Planilla Aportes: <strong>{{ idPlanilla }}</strong></label>
+          </div>
+          <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+            <i class="pi pi-info-circle p-mr-2" style="font-size: 1.5rem; color: #009688;"></i>
+            <label>Motivo: <strong>{{ motivoAdicional }}</strong></label>
+          </div>
+          <div class="p-d-flex p-ai-center p-mb-3" style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; justify-content: center;">
+            <i class="pi pi-upload p-mr-2" style="font-size: 1.5rem; color: #009688;"></i>
+            <label>Archivo: <strong>{{ archivoSeleccionado?.name }}</strong></label>
+          </div>
+        </div>
+      </div>
+      <div class="p-d-flex p-jc-between">
+        <button pButton label="Atrás" icon="pi pi-arrow-left" (click)="prevStep()" style="margin-right: 15px; background-color: #6a8582;"></button>
+        <button pButton label="Guardar Planilla" icon="pi pi-check" (click)="guardarPlanilla()"></button>
+      </div>
+    </div>
+</p-dialog>
+
+<p-dialog 
+  [(visible)]="mostrarModalDetalles" 
+  [modal]="true" 
+  
+  [closable]="true" 
+  [style]="{width: '90%' , height: '650px'}"
+  (onHide)="idPlanillaAdicionalSeleccionada = null"
+>
+  <app-planillas-adicionales-detalles [idPlanillaAdicional]="idPlanillaAdicionalSeleccionada"></app-planillas-adicionales-detalles>
+</p-dialog>
+
+<p-toast></p-toast> 

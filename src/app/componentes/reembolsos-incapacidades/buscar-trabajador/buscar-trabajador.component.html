@@ -32,8 +32,8 @@
           Paso 1: Datos de la Incapacidad
         </h6>
         
-        <div class="form-grid">
-          <!-- Tipo de Incapacidad -->
+        <!-- Fila 1: Tipo de Incapacidad -->
+        <div class="form-row">
           <div class="form-field">
             <label for="manual_tipo_baja">
               <i class="pi pi-flag"></i>
@@ -56,8 +56,10 @@
               Campo requerido
             </small>
           </div>
+        </div>
 
-          <!-- Fecha Inicio -->
+        <!-- Fila 2: Fecha Inicio -->
+        <div class="form-row">
           <div class="form-field">
             <label for="manual_fecha_inicio">
               <i class="pi pi-calendar-plus"></i>
@@ -76,8 +78,10 @@
               Campo requerido
             </small>
           </div>
+        </div>
 
-          <!-- Fecha Fin -->
+        <!-- Fila 3: Fecha Fin -->
+        <div class="form-row">
           <div class="form-field">
             <label for="manual_fecha_fin">
               <i class="pi pi-calendar-minus"></i>
@@ -93,10 +97,27 @@
               [class.p-invalid]="formularioManual.get('fecha_fin')?.invalid && formularioManual.get('fecha_fin')?.touched">
             </p-calendar>
             <small class="p-error" *ngIf="formularioManual.get('fecha_fin')?.invalid && formularioManual.get('fecha_fin')?.touched">
-              Campo requerido
+              <span *ngIf="formularioManual.get('fecha_fin')?.errors?.['required']">Campo requerido</span>
+              <span *ngIf="formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMinimo']">
+                {{ formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMinimo']?.mensaje }} 
+                (Actual: {{ formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMinimo']?.actual }} días)
+              </span>
+              <span *ngIf="formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMaximo']">
+                {{ formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMaximo']?.mensaje }} 
+                (Actual: {{ formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMaximo']?.actual }} días)
+              </span>
             </small>
-            <small class="p-hint" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value">
+            <small class="p-hint" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value && formularioManual.get('tipo_baja')?.value !== 'MATERNIDAD'">
               <i class="pi pi-info-circle"></i> Los días de impedimento se calcularán automáticamente
+            </small>
+            <small class="p-hint" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value && formularioManual.get('tipo_baja')?.value === 'MATERNIDAD'">
+              <i class="pi pi-info-circle"></i> Para maternidad: período debe ser entre 45 y 90 días
+              <br>
+              <i class="pi pi-calendar text-primary"></i> 
+              <strong>Días calculados: {{ calcularDiasMaternidad() }} días</strong>
+              <span *ngIf="calcularDiasMaternidad() < 45" class="text-danger"> (Mínimo: 45 días)</span>
+              <span *ngIf="calcularDiasMaternidad() > 90" class="text-danger"> (Máximo: 90 días)</span>
+              <span *ngIf="calcularDiasMaternidad() >= 45 && calcularDiasMaternidad() <= 90" class="text-success"> ✓ Rango válido</span>
             </small>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ReembolsosIncapacidadesService } from '../../../servicios/reembolsos-incapacidades/reembolsos-incapacidades.service';
 import { 
@@ -100,7 +100,7 @@ export class BuscarTrabajadorComponent {
       // Datos de la incapacidad
       tipo_baja: ['', Validators.required],
       fecha_inicio: ['', Validators.required],
-      fecha_fin: ['', Validators.required],
+      fecha_fin: ['', [Validators.required, this.validarRangoMaternidad.bind(this)]],
       salario: [0, [Validators.required, Validators.min(0)]],
       // Campos adicionales para riesgo profesional
       fecha_accidente: [''],
@@ -120,6 +120,52 @@ export class BuscarTrabajadorComponent {
       tipo_busqueda: ['ci', Validators.required],
       valor_busqueda: ['', Validators.required]
     });
+
+    // Suscribirse a cambios en tipo_baja y fecha_inicio para revalidar fecha_fin
+    this.formularioManual.get('tipo_baja')?.valueChanges.subscribe(() => {
+      this.formularioManual.get('fecha_fin')?.updateValueAndValidity();
+    });
+
+    this.formularioManual.get('fecha_inicio')?.valueChanges.subscribe(() => {
+      this.formularioManual.get('fecha_fin')?.updateValueAndValidity();
+    });
+  }
+
+  /**
+   * Validador personalizado para verificar el rango de días de maternidad (45-90 días)
+   */
+  private validarRangoMaternidad(control: AbstractControl): ValidationErrors | null {
+    const tipoBaja = this.formularioManual?.get('tipo_baja')?.value;
+    const fechaInicio = this.formularioManual?.get('fecha_inicio')?.value;
+    const fechaFin = control.value;
+
+    // Solo aplicar validación si es MATERNIDAD y ambas fechas están presentes
+    if (tipoBaja === 'MATERNIDAD' && fechaInicio && fechaFin) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+      
+      // Calcular la diferencia en días
+      const diferenciaTiempo = fin.getTime() - inicio.getTime();
+      const diasDiferencia = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir ambos días
+      
+      if (diasDiferencia < 45) {
+        return { rangoMaternidadMinimo: { 
+          actual: diasDiferencia, 
+          minimo: 45,
+          mensaje: 'El período de maternidad debe ser de al menos 45 días'
+        }};
+      }
+      
+      if (diasDiferencia > 90) {
+        return { rangoMaternidadMaximo: { 
+          actual: diasDiferencia, 
+          maximo: 90,
+          mensaje: 'El período de maternidad no puede exceder 90 días'
+        }};
+      }
+    }
+
+    return null;
   }
 
   // Getter para verificar si el tipo de incapacidad es PROFESIONAL
@@ -1508,6 +1554,27 @@ calcularYMostrarReembolso() {
   // ========== MÉTODOS PARA STEPPER ==========
 
   /**
+   * Calcula los días de maternidad entre fecha inicio y fin
+   */
+  calcularDiasMaternidad(): number {
+    const fechaInicio = this.formularioManual.get('fecha_inicio')?.value;
+    const fechaFin = this.formularioManual.get('fecha_fin')?.value;
+    
+    if (!fechaInicio || !fechaFin) {
+      return 0;
+    }
+    
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+    
+    // Calcular la diferencia en días
+    const diferenciaTiempo = fin.getTime() - inicio.getTime();
+    const diasDiferencia = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir ambos días
+    
+    return diasDiferencia;
+  }
+
+  /**
    * Verifica si los datos de incapacidad están completos
    */
   datosIncapacidadCompletos(): boolean {
@@ -1517,6 +1584,14 @@ calcularYMostrarReembolso() {
     
     if (!tipoBaja || !fechaInicio || !fechaFin) {
       return false;
+    }
+    
+    // Validación específica para maternidad: rango de 45-90 días
+    if (tipoBaja === 'MATERNIDAD') {
+      const diasMaternidad = this.calcularDiasMaternidad();
+      if (diasMaternidad < 45 || diasMaternidad > 90) {
+        return false;
+      }
     }
     
     // Si es riesgo profesional, verificar campos adicionales

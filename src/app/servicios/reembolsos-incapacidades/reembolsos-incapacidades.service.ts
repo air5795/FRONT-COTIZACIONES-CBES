@@ -132,6 +132,22 @@ export class ReembolsosIncapacidadesService {
     return this.http.get<any>(`${environment.url}reembolsos-incapacidades/obtener-salario-trabajador/${codPatronal}/${mes}/${gestion}/${matriculaEncoded}`);
   }
 
+  // Validar cotizaciones previas según tipo de incapacidad
+  validarCotizacionesPrevias(
+    codPatronal: string, 
+    matricula: string, 
+    mes: string, 
+    gestion: string, 
+    tipoIncapacidad: string
+  ): Observable<any> {
+    const matriculaEncoded = encodeURIComponent(matricula);
+    const tipoIncapacidadEncoded = encodeURIComponent(tipoIncapacidad);
+    
+    return this.http.get<any>(
+      `${environment.url}reembolsos-incapacidades/validar-cotizaciones/${codPatronal}/${matriculaEncoded}/${mes}/${gestion}/${tipoIncapacidadEncoded}`
+    );
+  }
+
   // Método para calcular el reembolso basado en una baja médica seleccionada
   calcularReembolso(bajaMedica: BajaMedica, datosWorker: any, codPatronal: string, mes: string, gestion: string): Observable<any> {
     const calcularDto = {
@@ -147,8 +163,8 @@ export class ReembolsosIncapacidadesService {
   }
 
   // Método para calcular reembolso en modo prueba (sin validar planilla)
-  calcularReembolsoPrueba(datosWorker: any, bajaMedica: any, mes: string, gestion: string): Observable<any> {
-    const calcularDto = {
+  calcularReembolsoPrueba(datosWorker: any, bajaMedica: any, mes: string, gestion: string, codPatronal?: string): Observable<any> {
+    const calcularDto: any = {
       datos_trabajador: {
         ci: datosWorker.ci,
         apellido_paterno: datosWorker.apellido_paterno,
@@ -165,11 +181,19 @@ export class ReembolsosIncapacidadesService {
         dias_impedimento: bajaMedica.dias_impedimento,
         especialidad: bajaMedica.especialidad,
         medico: bajaMedica.medico,
-        comprobante: bajaMedica.comprobante
+        comprobante: bajaMedica.comprobante,
+        fecha_accidente: bajaMedica.fecha_accidente || null,
+        fecha_vigencia: bajaMedica.fecha_vigencia || null,
+        lugar_accidente: bajaMedica.lugar_accidente || null
       },
       mes: mes,
       gestion: gestion
     };
+
+    // Agregar código patronal si está disponible para validación de cotizaciones
+    if (codPatronal) {
+      calcularDto.cod_patronal = codPatronal;
+    }
 
     return this.http.post<any>(`${environment.url}reembolsos-incapacidades/calcular-reembolso-prueba`, calcularDto);
   }
@@ -179,8 +203,9 @@ export class ReembolsosIncapacidadesService {
     return date.toISOString().split('T')[0];
   }
 
-  // Método para validar si un trabajador cumple con las cotizaciones mínimas
-  validarCotizacionesPrevias(tipoIncapacidad: string, cotizacionesPrevias: number): boolean {
+  // Método auxiliar para validar localmente si un trabajador cumple con las cotizaciones mínimas
+  // (Este método ya no se usa, la validación se hace en el backend)
+  private cumpleRequisitosCotizaciones(tipoIncapacidad: string, cotizacionesPrevias: number): boolean {
     switch (tipoIncapacidad) {
       case 'ENFERMEDAD':
       case 'PROFESIONAL':

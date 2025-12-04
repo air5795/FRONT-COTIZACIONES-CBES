@@ -103,7 +103,7 @@
           <div class="button-container">
             <!-- Botón Aprobar Planilla (solo visible si toda la planilla está revisada) -->
             <button
-              *ngIf="todaLaPlanillaRevisada() && solicitudReembolso?.estado !== 3 && solicitudReembolso?.estado !== 2"
+              *ngIf="puedeGestionarPlanilla() && solicitudReembolso?.estado !== 3 && solicitudReembolso?.estado !== 2"
               pButton
               label="Aprobar"
               class="boton-aprobar"
@@ -117,7 +117,7 @@
             
             <!-- Botón Observar Planilla (solo visible si toda la planilla está revisada) -->
             <button
-              *ngIf="todaLaPlanillaRevisada() && solicitudReembolso?.estado !== 3 && solicitudReembolso?.estado !== 2"
+              *ngIf="puedeGestionarPlanilla() && solicitudReembolso?.estado !== 3 && solicitudReembolso?.estado !== 2"
               pButton
               label="Observar"
               class="boton-observar"
@@ -130,11 +130,13 @@
             </button>
 
             <!-- Mensaje de advertencia si faltan detalles por revisar -->
-            <div *ngIf="!todaLaPlanillaRevisada()" 
+            <div *ngIf="!puedeGestionarPlanilla()" 
                  style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; background: #fff8f0; border: 1px solid #d55c25; border-radius: 4px; width: auto; max-width: 200px;">
               <i class="pi pi-exclamation-triangle" style="color: #d55c25; font-size: 1.5rem; margin-bottom: 5px;"></i>
               <span style="font-size: 0.75rem; color: #8b3a1a; text-align: center; line-height: 1.3;">
-                Revise todos los detalles para validar la planilla
+                <ng-container *ngFor="let mensaje of getMensajesBloqueoPlanilla(); let last = last">
+                  {{ mensaje }}<span *ngIf="!last"><br></span>
+                </ng-container>
               </span>
             </div>
           </div>
@@ -306,7 +308,18 @@
                     />
                   </span>
                 </div>
-                <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                <div class="flex gap-2">
+                  <button 
+                    *ngIf="conflictosDetectados.length > 0"
+                    pButton 
+                    [label]="existenConflictosActivos ? 'Ver Solapes (' + conflictosDetectados.length + ')' : 'Solapes Resueltos'" 
+                    [class]="existenConflictosActivos ? 'p-button-warning' : 'p-button-success'"
+                    [icon]="existenConflictosActivos ? 'pi pi-exclamation-triangle' : 'pi pi-check-circle'"
+                    (click)="mostrarModalSolapes = true"
+                    [pTooltip]="existenConflictosActivos ? 'Hay solapes pendientes de resolver' : 'Todos los solapes están resueltos'"
+                    tooltipPosition="bottom"></button>
+                  <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                </div>
               </div>
             </ng-template>
             
@@ -336,9 +349,31 @@
             </ng-template>
             
             <ng-template pTemplate="body" let-detalle let-i="rowIndex">
-              <tr [style.background-color]="obtenerColorFilaRevision(detalle)">
+              <tr 
+                [style.background-color]="obtenerColorFilaRevision(detalle)"
+                [ngClass]="{
+                  'fila-conflicto-activo': tieneConflictoPendiente(detalle),
+                  'fila-conflicto-resuelto': tieneConflicto(detalle) && !tieneConflictoPendiente(detalle)
+                }">
                 <td class="col-numero" style="text-align: center;">{{ detalle.nro }}</td>
-                <td class="col-nombre" style="text-align: center;">{{ obtenerNombreCompleto(detalle) }}</td>
+                <td class="col-nombre" style="text-align: center;">
+                  <div class="nombre-detalle">
+                    <span>{{ obtenerNombreCompleto(detalle) }}</span>
+                    <span
+                      *ngIf="tieneConflicto(detalle)"
+                      class="badge-conflicto"
+                      [ngClass]="{
+                        'badge-conflicto-pendiente': tieneConflictoPendiente(detalle),
+                        'badge-conflicto-resuelto': !tieneConflictoPendiente(detalle)
+                      }"
+                      [pTooltip]="obtenerDescripcionConflictos(detalle)"
+                      [tooltipDisabled]="!obtenerDescripcionConflictos(detalle)"
+                      tooltipPosition="top">
+                      <i class="pi pi-link"></i>
+                      {{ tieneConflictoPendiente(detalle) ? 'Solape' : 'Solape resuelto' }}
+                    </span>
+                  </div>
+                </td>
                 <td class="col-fecha" style="text-align: center;">{{ formatearFecha(detalle.fecha_inicio_baja) }}</td>
                 <td class="col-fecha" style="text-align: center;">{{ formatearFecha(detalle.fecha_fin_baja) }}</td>
                 <td class="col-numero" style="text-align: center;">{{ detalle.dias_incapacidad }}</td>
@@ -460,7 +495,18 @@
                     />
                   </span>
                 </div>
-                <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                <div class="flex gap-2">
+                  <button 
+                    *ngIf="conflictosDetectados.length > 0"
+                    pButton 
+                    [label]="existenConflictosActivos ? 'Ver Solapes (' + conflictosDetectados.length + ')' : 'Solapes Resueltos'" 
+                    [class]="existenConflictosActivos ? 'p-button-warning' : 'p-button-success'"
+                    [icon]="existenConflictosActivos ? 'pi pi-exclamation-triangle' : 'pi pi-check-circle'"
+                    (click)="mostrarModalSolapes = true"
+                    [pTooltip]="existenConflictosActivos ? 'Hay solapes pendientes de resolver' : 'Todos los solapes están resueltos'"
+                    tooltipPosition="bottom"></button>
+                  <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                </div>
               </div>
             </ng-template>
             
@@ -490,9 +536,31 @@
             </ng-template>
             
             <ng-template pTemplate="body" let-detalle let-i="rowIndex">
-              <tr [style.background-color]="obtenerColorFilaRevision(detalle)">
+              <tr 
+                [style.background-color]="obtenerColorFilaRevision(detalle)"
+                [ngClass]="{
+                  'fila-conflicto-activo': tieneConflictoPendiente(detalle),
+                  'fila-conflicto-resuelto': tieneConflicto(detalle) && !tieneConflictoPendiente(detalle)
+                }">
                 <td class="col-numero" style="text-align: center;">{{ detalle.nro }}</td>
-                <td class="col-nombre" style="text-align: center;">{{ obtenerNombreCompleto(detalle) }}</td>
+                <td class="col-nombre" style="text-align: center;">
+                  <div class="nombre-detalle">
+                    <span>{{ obtenerNombreCompleto(detalle) }}</span>
+                    <span
+                      *ngIf="tieneConflicto(detalle)"
+                      class="badge-conflicto"
+                      [ngClass]="{
+                        'badge-conflicto-pendiente': tieneConflictoPendiente(detalle),
+                        'badge-conflicto-resuelto': !tieneConflictoPendiente(detalle)
+                      }"
+                      [pTooltip]="obtenerDescripcionConflictos(detalle)"
+                      [tooltipDisabled]="!obtenerDescripcionConflictos(detalle)"
+                      tooltipPosition="top">
+                      <i class="pi pi-link"></i>
+                      {{ tieneConflictoPendiente(detalle) ? 'Solape' : 'Solape resuelto' }}
+                    </span>
+                  </div>
+                </td>
                 <td class="col-fecha" style="text-align: center;">{{ formatearFecha(detalle.fecha_inicio_baja) }}</td>
                 <td class="col-fecha" style="text-align: center;">{{ formatearFecha(detalle.fecha_fin_baja) }}</td>
                 <td class="col-numero" style="text-align: center;">{{ detalle.dias_incapacidad }}</td>
@@ -614,7 +682,18 @@
                     />
                   </span>
                 </div>
-                <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                <div class="flex gap-2">
+                  <button 
+                    *ngIf="conflictosDetectados.length > 0"
+                    pButton 
+                    [label]="existenConflictosActivos ? 'Ver Solapes (' + conflictosDetectados.length + ')' : 'Solapes Resueltos'" 
+                    [class]="existenConflictosActivos ? 'p-button' : 'p-button-success'"
+                    [icon]="existenConflictosActivos ? 'pi pi-exclamation-triangle' : 'pi pi-check-circle'"
+                    (click)="mostrarModalSolapes = true"
+                    [pTooltip]="existenConflictosActivos ? 'Hay solapes pendientes de resolver' : 'Todos los solapes están resueltos'"
+                    tooltipPosition="bottom"></button>
+                  <button pButton label="Recargar" class="p-button-outlined" icon="pi pi-sync" (click)="cargarDetallesReembolso()"></button>
+                </div>
               </div>
             </ng-template>
             
@@ -645,9 +724,31 @@
             </ng-template>
             
             <ng-template pTemplate="body" let-detalle let-i="rowIndex">
-              <tr [style.background-color]="obtenerColorFilaRevision(detalle)">
+              <tr 
+                [style.background-color]="obtenerColorFilaRevision(detalle)"
+                [ngClass]="{
+                  'fila-conflicto-activo': tieneConflictoPendiente(detalle),
+                  'fila-conflicto-resuelto': tieneConflicto(detalle) && !tieneConflictoPendiente(detalle)
+                }">
                 <td class="col-numero" style="text-align: center;">{{ detalle.nro }}</td>
-                <td class="col-nombre" style="text-align: center;">{{ obtenerNombreCompleto(detalle) }}</td>
+                <td class="col-nombre" style="text-align: center;">
+                  <div class="nombre-detalle">
+                    <span>{{ obtenerNombreCompleto(detalle) }}</span>
+                    <span
+                      *ngIf="tieneConflicto(detalle)"
+                      class="badge-conflicto"
+                      [ngClass]="{
+                        'badge-conflicto-pendiente': tieneConflictoPendiente(detalle),
+                        'badge-conflicto-resuelto': !tieneConflictoPendiente(detalle)
+                      }"
+                      [pTooltip]="obtenerDescripcionConflictos(detalle)"
+                      [tooltipDisabled]="!obtenerDescripcionConflictos(detalle)"
+                      tooltipPosition="top">
+                      <i class="pi pi-link"></i>
+                      {{ tieneConflictoPendiente(detalle) ? 'Solape' : 'Solape resuelto' }}
+                    </span>
+                  </div>
+                </td>
                 <td class="col-fecha" style="text-align: center;">{{ formatearFecha(detalle.fecha_inicio_baja) }}</td>
                 <td class="col-fecha" style="text-align: center;">{{ formatearFecha(detalle.fecha_fin_baja) }}</td>
                 <td class="col-numero" style="text-align: center;">{{ detalle.dias_incapacidad }}</td>
@@ -1072,6 +1173,158 @@
         class="boton-observar"
         style="padding: 8px 16px; font-size: 0.9rem;"
         (click)="confirmarObservarPlanilla()">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Modal de Solapes Detectados -->
+  <p-dialog 
+    [(visible)]="mostrarModalSolapes" 
+    [modal]="true" 
+    [style]="{width: '90vw', maxWidth: '900px', maxHeight: '85vh'}"
+    [closable]="true"
+    [header]="'Solapes Detectados en la Planilla'"
+    (onShow)="activeTabSolapes = 0">
+    
+    <div class="solapes-modal-container" style="padding: 15px;">
+      <!-- Pestañas de Pendientes y Resueltos -->
+      <p-tabView [(activeIndex)]="activeTabSolapes" [style]="{ padding: '0' }">
+        
+        <!-- PESTAÑA PENDIENTES -->
+        <p-tabPanel>
+          <ng-template pTemplate="header">
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <i class="pi pi-exclamation-triangle" style="color: #d55c25;"></i>
+              <span>Pendientes</span>
+              <span *ngIf="getConflictosPendientes().length > 0" 
+                    style="background: #d55c25; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">
+                {{ getConflictosPendientes().length }}
+              </span>
+            </span>
+          </ng-template>
+          
+          <!-- Lista de conflictos pendientes -->
+          <div *ngIf="getConflictosPendientes().length > 0" 
+               class="conflictos-list-modal" 
+               style="max-height: 60vh; overflow-y: auto; margin-top: 10px;">
+            <div class="conflicto-item-modal" *ngFor="let conflicto of getConflictosPendientes()">
+              <div class="conflicto-item-header-modal">
+                <div class="conflicto-trabajador-info">
+                  <span class="conflicto-trabajador-nombre">{{ conflicto.trabajador || 'Trabajador sin nombre' }}</span>
+                  <small class="conflicto-ci">CI: {{ conflicto.ci || 'N/A' }}</small>
+                </div>
+                <span class="conflicto-estado-badge conflicto-estado-pendiente">
+                  <i class="pi pi-exclamation-triangle"></i>
+                  Pendiente
+                </span>
+              </div>
+              <div class="conflicto-detalles-list">
+                <div class="conflicto-detalle-item" *ngFor="let detalle of conflicto.detalles">
+                  <div class="conflicto-detalle-info">
+                    <span class="conflicto-tipo-badge" [ngStyle]="{'background-color': obtenerColorTipoIncapacidad(detalle.tipo_incapacidad) + '20', 'color': obtenerColorTipoIncapacidad(detalle.tipo_incapacidad)}">
+                      {{ obtenerTipoIncapacidadTexto(detalle.tipo_incapacidad) }}
+                    </span>
+                    <span class="conflicto-fechas-text">
+                      <i class="pi pi-calendar"></i>
+                      {{ formatearFecha(detalle.fecha_inicio_baja) }} - {{ formatearFecha(detalle.fecha_fin_baja) }}
+                    </span>
+                    <span class="conflicto-dias-text">
+                      <i class="pi pi-clock"></i>
+                      {{ detalle.dias_incapacidad }} días
+                    </span>
+                  </div>
+                  <span class="conflicto-detalle-estado-badge" [ngClass]="obtenerEstadoRevision(detalle)">
+                    <i [class]="obtenerEstadoRevision(detalle) === 'aprobado' ? 'pi pi-check' : 
+                               obtenerEstadoRevision(detalle) === 'observado' ? 'pi pi-times' : 'pi pi-minus'"></i>
+                    {{ obtenerEstadoRevision(detalle) === 'aprobado' ? 'Aprobado' : 
+                       obtenerEstadoRevision(detalle) === 'observado' ? 'Observado' : 'Sin revisar' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mensaje cuando no hay pendientes -->
+          <div *ngIf="getConflictosPendientes().length === 0" class="no-conflictos-message">
+            <i class="pi pi-check-circle" style="color: #28a745; font-size: 3rem;"></i>
+            <p style="font-size: 1rem; font-weight: 600; color: #28a745; margin-top: 15px;">Sin pendientes/p>
+            <p style="font-size: 0.9rem; color: #6c757d; margin-top: 5px;">Todos los solapes de bajas médicas han sido resueltos correctamente.</p>
+          </div>
+        </p-tabPanel>
+        
+        <!-- PESTAÑA RESUELTOS -->
+        <p-tabPanel>
+          <ng-template pTemplate="header">
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <i class="pi pi-check-circle" style="color: #28a745;"></i>
+              <span>Resueltos</span>
+              <span *ngIf="getConflictosResueltos().length > 0" 
+                    style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">
+                {{ getConflictosResueltos().length }}
+              </span>
+            </span>
+          </ng-template>
+          
+          <!-- Lista de conflictos resueltos -->
+          <div *ngIf="getConflictosResueltos().length > 0" 
+               class="conflictos-list-modal" 
+               style="max-height: 60vh; overflow-y: auto; margin-top: 10px;">
+            <div class="conflicto-item-modal" *ngFor="let conflicto of getConflictosResueltos()">
+              <div class="conflicto-item-header-modal">
+                <div class="conflicto-trabajador-info">
+                  <span class="conflicto-trabajador-nombre">{{ conflicto.trabajador || 'Trabajador sin nombre' }}</span>
+                  <small class="conflicto-ci">CI: {{ conflicto.ci || 'N/A' }}</small>
+                </div>
+                <span class="conflicto-estado-badge conflicto-estado-resuelto">
+                  <i class="pi pi-check-circle"></i>
+                  Resuelto
+                </span>
+              </div>
+              <div class="conflicto-detalles-list">
+                <div class="conflicto-detalle-item" *ngFor="let detalle of conflicto.detalles">
+                  <div class="conflicto-detalle-info">
+                    <span class="conflicto-tipo-badge" [ngStyle]="{'background-color': obtenerColorTipoIncapacidad(detalle.tipo_incapacidad) + '20', 'color': obtenerColorTipoIncapacidad(detalle.tipo_incapacidad)}">
+                      {{ obtenerTipoIncapacidadTexto(detalle.tipo_incapacidad) }}
+                    </span>
+                    <span class="conflicto-fechas-text">
+                      <i class="pi pi-calendar"></i>
+                      {{ formatearFecha(detalle.fecha_inicio_baja) }} - {{ formatearFecha(detalle.fecha_fin_baja) }}
+                    </span>
+                    <span class="conflicto-dias-text">
+                      <i class="pi pi-clock"></i>
+                      {{ detalle.dias_incapacidad }} días
+                    </span>
+                  </div>
+                  <span class="conflicto-detalle-estado-badge" [ngClass]="obtenerEstadoRevision(detalle)">
+                    <i [class]="obtenerEstadoRevision(detalle) === 'aprobado' ? 'pi pi-check' : 
+                               obtenerEstadoRevision(detalle) === 'observado' ? 'pi pi-times' : 'pi pi-minus'"></i>
+                    {{ obtenerEstadoRevision(detalle) === 'aprobado' ? 'Aprobado' : 
+                       obtenerEstadoRevision(detalle) === 'observado' ? 'Observado' : 'Sin revisar' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mensaje cuando no hay resueltos -->
+          <div *ngIf="getConflictosResueltos().length === 0" class="no-conflictos-message">
+            <i class="pi pi-info-circle" style="font-size: 3rem; color: #dee2e6;"></i>
+            <p>No hay solapes resueltos aún.</p>
+          </div>
+        </p-tabPanel>
+        
+      </p-tabView>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button 
+        pButton 
+        type="button" 
+        label="Cerrar" 
+        icon="pi pi-times" 
+        class="p-button-secondary"
+        style="padding: 8px 16px; font-size: 0.9rem;"
+        (click)="mostrarModalSolapes = false">
       </button>
     </ng-template>
   </p-dialog>

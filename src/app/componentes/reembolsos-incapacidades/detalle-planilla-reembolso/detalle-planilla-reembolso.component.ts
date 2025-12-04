@@ -21,6 +21,10 @@ interface DetalleReembolso {
   tipo_incapacidad: string;
   fecha_inicio_baja: string;
   fecha_fin_baja: string;
+  fecha_atencion?: string | null;
+  hora_atencion?: string | null; // Formato HH:mm:ss
+  fecha_emision_certificado?: string | null;
+  fecha_sello_vigencia?: string | null;
   dias_incapacidad: number;
   dias_reembolso: number;
   salario: number;
@@ -259,6 +263,10 @@ export class DetallePlanillaReembolsoComponent implements OnInit {
       tipo_incapacidad: detalle.tipo_incapacidad,
       fecha_inicio_baja: detalle.fecha_inicio_baja,
       fecha_fin_baja: detalle.fecha_fin_baja,
+      fecha_atencion: detalle.fecha_atencion || null,
+      hora_atencion: detalle.hora_atencion || null,
+      fecha_emision_certificado: detalle.fecha_emision_certificado || null,
+      fecha_sello_vigencia: detalle.fecha_sello_vigencia || null,
       dias_incapacidad: this.parseNumber(detalle.dias_incapacidad),
       dias_reembolso: this.parseNumber(detalle.dias_reembolso),
       salario: this.parseNumber(detalle.salario),
@@ -274,6 +282,12 @@ export class DetallePlanillaReembolsoComponent implements OnInit {
       fecha_inicio_mes_reembolso: detalle.correspondiente_al_mes?.fecha_inicio,
       fecha_fin_mes_reembolso: detalle.correspondiente_al_mes?.fecha_fin
     };
+  
+    // Log para depuración
+    console.log('📤 ENVIANDO DETALLE AL BACKEND:', nuevoDetalle);
+    console.log('   • fecha_atencion:', nuevoDetalle.fecha_atencion);
+    console.log('   • fecha_emision_certificado:', nuevoDetalle.fecha_emision_certificado);
+    console.log('   • fecha_sello_vigencia:', nuevoDetalle.fecha_sello_vigencia);
   
     // Guardar en el backend
     this.reembolsosService.crearDetalle(nuevoDetalle).subscribe({

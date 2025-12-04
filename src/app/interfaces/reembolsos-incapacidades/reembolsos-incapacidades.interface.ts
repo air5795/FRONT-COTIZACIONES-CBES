@@ -108,6 +108,10 @@ export interface DetalleReembolsoCalculado {
   tipo_incapacidad: string;
   fecha_inicio_baja: string;
   fecha_fin_baja: string;
+  fecha_atencion?: string | null;
+  hora_atencion?: string | null; // Formato HH:mm:ss
+  fecha_emision_certificado?: string | null;
+  fecha_sello_vigencia?: string | null;
   dias_incapacidad: number;
   dias_reembolso: number;
   salario: number;

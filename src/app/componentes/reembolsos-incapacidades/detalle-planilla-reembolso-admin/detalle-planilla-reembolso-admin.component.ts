@@ -20,6 +20,9 @@ interface DetalleReembolso {
   tipo_incapacidad: string;
   fecha_inicio_baja: string;
   fecha_fin_baja: string;
+  fecha_atencion?: string | null;
+  fecha_emision_certificado?: string | null;
+  fecha_sello_vigencia?: string | null;
   dias_incapacidad: number;
   dias_reembolso: number;
   salario: number;
@@ -39,6 +42,15 @@ interface DetalleReembolso {
   ruta_file_denuncia?: string;
   // Campos para revisión
   estado_revision?: 'neutro' | 'aprobado' | 'observado' | null;
+  conflictosRelacionados?: number[];
+}
+
+interface ConflictoBaja {
+  id: number;
+  ci: string;
+  trabajador: string;
+  detalles: DetalleReembolso[];
+  tipos: string[];
 }
 
 @Component({
@@ -128,6 +140,13 @@ export class DetallePlanillaReembolsoAdminComponent implements OnInit {
   observacionesPlanilla = '';
   detallesObservadosEnPlanilla: DetalleReembolso[] = [];
   
+  // ===== PROPIEDADES PARA DETECCIÓN DE SOLAPES =====
+  conflictosDetectados: ConflictoBaja[] = [];
+  conflictosMap = new Map<number, ConflictoBaja>();
+  existenConflictosActivos = false;
+  mostrarModalSolapes = false;
+  activeTabSolapes = 0; // 0 = Pendientes, 1 = Resueltos
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -159,6 +178,7 @@ export class DetallePlanillaReembolsoAdminComponent implements OnInit {
         this.totalesPorTipo = response.totalesPorTipo;
         this.totalTrabajadores = response.totalTrabajadores;
         this.totalReembolso = response.totalMonto;
+        this.detectarConflictosEnPlanilla();
         
         // Actualizar paginación para cada tipo
         this.actualizarPaginacionPorTipo();
@@ -364,6 +384,208 @@ export class DetallePlanillaReembolsoAdminComponent implements OnInit {
       currency: 'BOB',
       minimumFractionDigits: 2
     }).format(monto);
+  }
+
+  // ===== VALIDACIÓN DE SOLAPES =====
+
+  detectarConflictosEnPlanilla() {
+    this.conflictosDetectados = [];
+    this.conflictosMap = new Map<number, ConflictoBaja>();
+    this.existenConflictosActivos = false;
+
+    if (!this.detallesReembolso || this.detallesReembolso.length === 0) {
+      return;
+    }
+
+    this.detallesReembolso.forEach(detalle => {
+      detalle.conflictosRelacionados = [];
+    });
+
+    const grupos = this.agruparDetallesPorTrabajador();
+    let contador = 1;
+
+    grupos.forEach(grupo => {
+      const componentes = this.obtenerComponentesSolapados(grupo);
+      componentes.forEach(component => {
+        const conflictoId = contador++;
+        component.forEach(detalle => {
+          if (!detalle.conflictosRelacionados) {
+            detalle.conflictosRelacionados = [];
+          }
+          detalle.conflictosRelacionados.push(conflictoId);
+        });
+
+        const conflicto: ConflictoBaja = {
+          id: conflictoId,
+          ci: component[0].ci,
+          trabajador: this.obtenerNombreCompleto(component[0]),
+          detalles: component,
+          tipos: Array.from(new Set(component.map(d => d.tipo_incapacidad)))
+        };
+
+        this.conflictosDetectados.push(conflicto);
+        this.conflictosMap.set(conflictoId, conflicto);
+      });
+    });
+
+    this.existenConflictosActivos = this.conflictosDetectados.some(conflicto => !this.conflictoResuelto(conflicto));
+  }
+
+  private agruparDetallesPorTrabajador(): DetalleReembolso[][] {
+    const mapa = new Map<string, DetalleReembolso[]>();
+
+    this.detallesReembolso.forEach(detalle => {
+      const key = (detalle.ci || detalle.matricula || detalle.id_detalle_reembolso || this.obtenerNombreCompleto(detalle)).toString();
+      if (!mapa.has(key)) {
+        mapa.set(key, []);
+      }
+      mapa.get(key)!.push(detalle);
+    });
+
+    return Array.from(mapa.values());
+  }
+
+  private obtenerComponentesSolapados(grupo: DetalleReembolso[]): DetalleReembolso[][] {
+    const componentes: DetalleReembolso[][] = [];
+    const visitados = new Set<number>();
+    const elegibles = grupo.filter(detalle => detalle.id_detalle_reembolso && detalle.fecha_inicio_baja && detalle.fecha_fin_baja);
+
+    elegibles.forEach(detalle => {
+      const id = detalle.id_detalle_reembolso!;
+      if (visitados.has(id)) {
+        return;
+      }
+
+      const componente = this.expandirConflicto(detalle, elegibles, visitados);
+      if (componente.length > 1) {
+        componentes.push(componente);
+      } else {
+        visitados.delete(id);
+      }
+    });
+
+    return componentes;
+  }
+
+  private expandirConflicto(
+    inicial: DetalleReembolso,
+    grupo: DetalleReembolso[],
+    visitados: Set<number>
+  ): DetalleReembolso[] {
+    const pila: DetalleReembolso[] = [inicial];
+    const componente: DetalleReembolso[] = [];
+
+    while (pila.length > 0) {
+      const actual = pila.pop()!;
+      const idActual = actual.id_detalle_reembolso!;
+      if (visitados.has(idActual)) {
+        continue;
+      }
+
+      visitados.add(idActual);
+      componente.push(actual);
+
+      grupo.forEach(candidato => {
+        if (!candidato.id_detalle_reembolso || visitados.has(candidato.id_detalle_reembolso)) {
+          return;
+        }
+
+        if (this.hayTraslape(actual, candidato)) {
+          pila.push(candidato);
+        }
+      });
+    }
+
+    return componente;
+  }
+
+  private hayTraslape(a: DetalleReembolso, b: DetalleReembolso): boolean {
+    if (!a.fecha_inicio_baja || !a.fecha_fin_baja || !b.fecha_inicio_baja || !b.fecha_fin_baja) {
+      return false;
+    }
+
+    const inicioA = new Date(a.fecha_inicio_baja).getTime();
+    const finA = new Date(a.fecha_fin_baja).getTime();
+    const inicioB = new Date(b.fecha_inicio_baja).getTime();
+    const finB = new Date(b.fecha_fin_baja).getTime();
+
+    if ([inicioA, finA, inicioB, finB].some(value => isNaN(value))) {
+      return false;
+    }
+
+    return inicioA <= finB && inicioB <= finA;
+  }
+
+  tieneConflicto(detalle: DetalleReembolso): boolean {
+    return !!(detalle.conflictosRelacionados && detalle.conflictosRelacionados.length > 0);
+  }
+
+  tieneConflictoPendiente(detalle: DetalleReembolso): boolean {
+    if (!this.tieneConflicto(detalle)) {
+      return false;
+    }
+
+    return detalle.conflictosRelacionados!.some(id => {
+      const conflicto = this.conflictosMap.get(id);
+      return conflicto ? !this.conflictoResuelto(conflicto) : false;
+    });
+  }
+
+  getConflictosDetalle(detalle: DetalleReembolso): ConflictoBaja[] {
+    if (!this.tieneConflicto(detalle)) {
+      return [];
+    }
+
+    return detalle.conflictosRelacionados!
+      .map(id => this.conflictosMap.get(id))
+      .filter((conflicto): conflicto is ConflictoBaja => !!conflicto);
+  }
+
+  conflictoResuelto(conflicto: ConflictoBaja): boolean {
+    return conflicto.detalles.some(detalle => this.obtenerEstadoRevision(detalle) === 'observado');
+  }
+
+  obtenerDescripcionConflictos(detalle: DetalleReembolso): string {
+    const conflictos = this.getConflictosDetalle(detalle);
+    if (conflictos.length === 0) {
+      return '';
+    }
+
+    return conflictos.map(conflicto => {
+      const estado = this.conflictoResuelto(conflicto) ? 'resuelto' : 'pendiente';
+      const rangos = conflicto.detalles.map(det => {
+        const tipo = this.obtenerTipoIncapacidadTexto(det.tipo_incapacidad);
+        const inicio = this.formatearFecha(det.fecha_inicio_baja);
+        const fin = this.formatearFecha(det.fecha_fin_baja);
+        return `${tipo}: ${inicio} - ${fin}`;
+      }).join(' | ');
+      return `Conflicto ${conflicto.id} (${estado}) - ${rangos}`;
+    }).join('\n');
+  }
+
+  puedeGestionarPlanilla(): boolean {
+    return this.todaLaPlanillaRevisada() && !this.existenConflictosActivos;
+  }
+
+  // Obtener conflictos pendientes
+  getConflictosPendientes(): ConflictoBaja[] {
+    return this.conflictosDetectados.filter(conflicto => !this.conflictoResuelto(conflicto));
+  }
+
+  // Obtener conflictos resueltos
+  getConflictosResueltos(): ConflictoBaja[] {
+    return this.conflictosDetectados.filter(conflicto => this.conflictoResuelto(conflicto));
+  }
+
+  getMensajesBloqueoPlanilla(): string[] {
+    const mensajes: string[] = [];
+    if (!this.todaLaPlanillaRevisada()) {
+      mensajes.push('Revise y marque cada baja antes de continuar.');
+    }
+    if (this.existenConflictosActivos) {
+      mensajes.push('Resuelva los solapes observando al menos una de las bajas traslapadas.');
+    }
+    return mensajes;
   }
   
   // ===== MÉTODOS PARA OBTENER DETALLES POR TIPO =====
@@ -627,6 +849,9 @@ export class DetallePlanillaReembolsoAdminComponent implements OnInit {
           }
           this.detallesReembolso[index].observaciones = observacionesFinal;
         }
+        
+        // Recalcular conflictos con la información local actualizada
+        this.detectarConflictosEnPlanilla();
         
         // ===== RECARGAR DATOS PARA ACTUALIZAR TOTALES DE CABECERA =====
         console.log('🔄 Recargando datos para actualizar totales...');

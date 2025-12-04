@@ -32,8 +32,9 @@
           Paso 1: Datos de la Incapacidad
         </h6>
         
-        <!-- Fila 1: Tipo de Incapacidad -->
-        <div class="form-row">
+        <!-- Fila única: Tipo de Incapacidad, Fecha Inicio y Fecha Fin -->
+        <div class="form-grid form-grid-principal">
+          <!-- Tipo de Incapacidad -->
           <div class="form-field">
             <label for="manual_tipo_baja">
               <i class="pi pi-flag"></i>
@@ -49,17 +50,16 @@
               ]"
               optionLabel="label"
               optionValue="value"
-              placeholder="Seleccione tipo de incapacidad"
+              placeholder="Seleccione tipo"
+              (onChange)="onTipoBajaChange()"
               [class.p-invalid]="formularioManual.get('tipo_baja')?.invalid && formularioManual.get('tipo_baja')?.touched">
             </p-dropdown>
             <small class="p-error" *ngIf="formularioManual.get('tipo_baja')?.invalid && formularioManual.get('tipo_baja')?.touched">
               Campo requerido
             </small>
           </div>
-        </div>
 
-        <!-- Fila 2: Fecha Inicio -->
-        <div class="form-row">
+          <!-- Fecha Inicio -->
           <div class="form-field">
             <label for="manual_fecha_inicio">
               <i class="pi pi-calendar-plus"></i>
@@ -69,19 +69,18 @@
               id="manual_fecha_inicio"
               formControlName="fecha_inicio"
               dateFormat="dd/mm/yy"
-              placeholder="Seleccione fecha"
+              placeholder="dd/mm/aa"
               [showIcon]="true"
               appendTo="body"
-              [class.p-invalid]="formularioManual.get('fecha_inicio')?.invalid && formularioManual.get('fecha_inicio')?.touched">
+              [inputStyle]="{'width': '100%'}"
+              [class.p-invalid]="(formularioManual.get('fecha_inicio')?.invalid && formularioManual.get('fecha_inicio')?.touched && formularioManual.get('fecha_inicio')?.errors?.['required']) || (formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && !validarFechasIguales())">
             </p-calendar>
-            <small class="p-error" *ngIf="formularioManual.get('fecha_inicio')?.invalid && formularioManual.get('fecha_inicio')?.touched">
+            <small class="p-error" *ngIf="formularioManual.get('fecha_inicio')?.invalid && formularioManual.get('fecha_inicio')?.touched && formularioManual.get('fecha_inicio')?.errors?.['required']">
               Campo requerido
             </small>
           </div>
-        </div>
 
-        <!-- Fila 3: Fecha Fin -->
-        <div class="form-row">
+          <!-- Fecha Fin -->
           <div class="form-field">
             <label for="manual_fecha_fin">
               <i class="pi pi-calendar-minus"></i>
@@ -91,9 +90,10 @@
               id="manual_fecha_fin"
               formControlName="fecha_fin"
               dateFormat="dd/mm/yy"
-              placeholder="Seleccione fecha"
+              placeholder="dd/mm/aa"
               [showIcon]="true"
               appendTo="body"
+              [inputStyle]="{'width': '100%'}"
               [class.p-invalid]="formularioManual.get('fecha_fin')?.invalid && formularioManual.get('fecha_fin')?.touched">
             </p-calendar>
             <small class="p-error" *ngIf="formularioManual.get('fecha_fin')?.invalid && formularioManual.get('fecha_fin')?.touched">
@@ -107,19 +107,147 @@
                 (Actual: {{ formularioManual.get('fecha_fin')?.errors?.['rangoMaternidadMaximo']?.actual }} días)
               </span>
             </small>
-            <small class="p-hint" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value && formularioManual.get('tipo_baja')?.value !== 'MATERNIDAD'">
-              <i class="pi pi-info-circle"></i> Los días de impedimento se calcularán automáticamente
+          </div>
+        </div>
+
+        <!-- Segunda fila: Fecha Atención con Hora, Fecha Emisión Certificado y Fecha Sello Vigencia -->
+        <div class="form-grid form-grid-secundario">
+          <!-- Fecha Atención -->
+          <div class="form-field">
+            <label for="manual_fecha_atencion">
+              <i class="pi pi-calendar"></i>
+              Fecha de Atención *
+            </label>
+            <p-calendar 
+              id="manual_fecha_atencion"
+              formControlName="fecha_atencion"
+              dateFormat="dd/mm/yy"
+              placeholder="dd/mm/aa"
+              [showIcon]="true"
+              appendTo="body"
+              [inputStyle]="{'width': '100%'}"
+              [class.p-invalid]="(formularioManual.get('fecha_atencion')?.invalid && formularioManual.get('fecha_atencion')?.touched && formularioManual.get('fecha_atencion')?.errors?.['required']) || (formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && !validarFechasIguales())">
+            </p-calendar>
+            <small class="p-error" *ngIf="formularioManual.get('fecha_atencion')?.invalid && formularioManual.get('fecha_atencion')?.touched && formularioManual.get('fecha_atencion')?.errors?.['required']">
+              Campo requerido
             </small>
-            <small class="p-hint" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value && formularioManual.get('tipo_baja')?.value === 'MATERNIDAD'">
-              <i class="pi pi-info-circle"></i> Para maternidad: período debe ser entre 45 y 90 días
-              <br>
+          </div>
+
+          <!-- Hora de Atención -->
+          <div class="form-field">
+            <label for="manual_hora_atencion">
+              <i class="pi pi-clock"></i>
+              Hora de Atención *
+            </label>
+            <p-calendar 
+              id="manual_hora_atencion"
+              formControlName="hora_atencion"
+              [timeOnly]="true"
+              [showIcon]="true"
+              [showTime]="true"
+              [hourFormat]="'24'"
+              placeholder="HH:mm"
+              appendTo="body"
+              [inputStyle]="{'width': '100%'}"
+              [class.p-invalid]="formularioManual.get('hora_atencion')?.invalid && formularioManual.get('hora_atencion')?.touched">
+            </p-calendar>
+            <small class="p-error" *ngIf="formularioManual.get('hora_atencion')?.invalid && formularioManual.get('hora_atencion')?.touched">
+              Campo requerido
+            </small>
+            <small class="p-hint" *ngIf="formularioManual.get('hora_atencion')?.value && calcularFechaInicioDesdeHora()">
+              <i class="pi pi-info-circle"></i>
+              <span *ngIf="esHoraMayorIgual20()" class="text-warning">
+                La atención es a las {{ formatearHora(formularioManual.get('hora_atencion')?.value) }}, 
+                la fecha de inicio de baja será: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }} (día siguiente)
+              </span>
+              <span *ngIf="!esHoraMayorIgual20()" class="text-success">
+                La atención es a las {{ formatearHora(formularioManual.get('hora_atencion')?.value) }}, 
+                la fecha de inicio de baja será: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }} (mismo día)
+              </span>
+            </small>
+          </div>
+
+          <!-- Fecha Emisión Certificado -->
+          <div class="form-field">
+            <label for="manual_fecha_emision_certificado">
+              <i class="pi pi-file"></i>
+              Fecha Emisión Certificado *
+            </label>
+            <p-calendar 
+              id="manual_fecha_emision_certificado"
+              formControlName="fecha_emision_certificado"
+              dateFormat="dd/mm/yy"
+              placeholder="dd/mm/aa"
+              [showIcon]="true"
+              appendTo="body"
+              [inputStyle]="{'width': '100%'}"
+              [class.p-invalid]="(formularioManual.get('fecha_emision_certificado')?.invalid && formularioManual.get('fecha_emision_certificado')?.touched && formularioManual.get('fecha_emision_certificado')?.errors?.['required']) || (formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && !validarFechasIguales())">
+            </p-calendar>
+            <small class="p-error" *ngIf="formularioManual.get('fecha_emision_certificado')?.invalid && formularioManual.get('fecha_emision_certificado')?.touched && formularioManual.get('fecha_emision_certificado')?.errors?.['required']">
+              Campo requerido
+            </small>
+          </div>
+
+          <!-- Fecha Sello Vigencia -->
+          <div class="form-field">
+            <label for="manual_fecha_sello_vigencia">
+              <i class="pi pi-check-circle"></i>
+              Fecha Sello Vigencia *
+            </label>
+            <p-calendar 
+              id="manual_fecha_sello_vigencia"
+              formControlName="fecha_sello_vigencia"
+              dateFormat="dd/mm/yy"
+              placeholder="dd/mm/aa"
+              [showIcon]="true"
+              appendTo="body"
+              [inputStyle]="{'width': '100%'}"
+              [class.p-invalid]="(formularioManual.get('fecha_sello_vigencia')?.invalid && formularioManual.get('fecha_sello_vigencia')?.touched && formularioManual.get('fecha_sello_vigencia')?.errors?.['required']) || (formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && !validarFechasIguales())">
+            </p-calendar>
+            <small class="p-error" *ngIf="formularioManual.get('fecha_sello_vigencia')?.invalid && formularioManual.get('fecha_sello_vigencia')?.touched && formularioManual.get('fecha_sello_vigencia')?.errors?.['required']">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <!-- Mensaje de validación de fechas iguales -->
+        <div class="form-hints-container form-hints-error" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && !validarFechasIguales()">
+          <small class="p-error">
+            <i class="pi pi-exclamation-triangle"></i>
+            <strong>Las fechas deben ser iguales:</strong> Fecha de Inicio, Fecha de Atención, Fecha Emisión Certificado y Fecha Sello Vigencia deben tener el mismo valor.
+          </small>
+        </div>
+        
+        <!-- Mensaje informativo sobre el ajuste de fecha según la hora -->
+        <div class="form-hints-container" *ngIf="formularioManual.get('hora_atencion')?.value && formularioManual.get('fecha_atencion')?.value && validarFechasIguales()">
+          <small class="p-hint">
+            <i class="pi pi-info-circle"></i>
+            <span *ngIf="esHoraMayorIgual20()" class="text-warning">
+              <strong>Nota:</strong> La hora de atención es {{ formatearHora(formularioManual.get('hora_atencion')?.value) }} (>= 20:00). 
+              En el cálculo, la fecha de inicio de baja será ajustada al día siguiente: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }}.
+            </span>
+            <span *ngIf="!esHoraMayorIgual20()" class="text-success">
+              <strong>Nota:</strong> La hora de atención es {{ formatearHora(formularioManual.get('hora_atencion')?.value) }} (< 20:00). 
+              La fecha de inicio de baja será la misma: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }}.
+            </span>
+          </small>
+        </div>
+
+        <!-- Mensajes informativos debajo de las fechas -->
+        <div class="form-hints-container" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value">
+          <small class="p-hint" *ngIf="formularioManual.get('tipo_baja')?.value !== 'MATERNIDAD'">
+            <i class="pi pi-info-circle"></i> Los días de impedimento se calcularán automáticamente
+          </small>
+          <small class="p-hint" *ngIf="formularioManual.get('tipo_baja')?.value === 'MATERNIDAD'">
+            <i class="pi pi-info-circle"></i> Para maternidad: período debe ser entre 45 y 90 días
+            <span class="dias-maternidad-info">
               <i class="pi pi-calendar text-primary"></i> 
               <strong>Días calculados: {{ calcularDiasMaternidad() }} días</strong>
               <span *ngIf="calcularDiasMaternidad() < 45" class="text-danger"> (Mínimo: 45 días)</span>
               <span *ngIf="calcularDiasMaternidad() > 90" class="text-danger"> (Máximo: 90 días)</span>
               <span *ngIf="calcularDiasMaternidad() >= 45 && calcularDiasMaternidad() <= 90" class="text-success"> ✓ Rango válido</span>
-            </small>
-          </div>
+            </span>
+          </small>
         </div>
 
         <!-- Datos Adicionales para Riesgo Profesional (Integrados en la misma tarjeta) -->
@@ -346,6 +474,54 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Validación de Cotizaciones Previas -->
+              <div class="trabajador-fila" *ngIf="(validacionCotizaciones || cargandoCotizaciones) && formularioManual.get('tipo_baja')?.value">
+                <div class="trabajador-celda cotizaciones-info" [ngClass]="{'cotizaciones-valido': validacionCotizaciones?.cumple, 'cotizaciones-invalido': validacionCotizaciones && !validacionCotizaciones.cumple}">
+                  <div class="cotizaciones-header">
+                    <i class="pi" [ngClass]="validacionCotizaciones?.cumple ? 'pi-check-circle text-success' : 'pi-times-circle text-danger'" *ngIf="!cargandoCotizaciones"></i>
+                    <i class="pi pi-spin pi-spinner" *ngIf="cargandoCotizaciones"></i>
+                    <strong [ngClass]="validacionCotizaciones?.cumple ? 'text-success' : 'text-danger'">
+                      Validación de Cotizaciones Previas
+                    </strong>
+                  </div>
+                  
+                  <div *ngIf="cargandoCotizaciones" class="text-muted">
+                    <small>Validando cotizaciones previas...</small>
+                  </div>
+                  
+                  <div *ngIf="validacionCotizaciones && !cargandoCotizaciones" class="cotizaciones-datos">
+                    <div class="cotizaciones-item">
+                      <strong>Tipo de Incapacidad:</strong>
+                      <span>{{ formularioManual.get('tipo_baja')?.value }}</span>
+                    </div>
+                    <div class="cotizaciones-item" *ngIf="validacionCotizaciones.cotizaciones_requeridas > 0">
+                      <strong>Cotizaciones Requeridas:</strong>
+                      <span>{{ validacionCotizaciones.cotizaciones_requeridas }}</span>
+                    </div>
+                    <div class="cotizaciones-item" *ngIf="validacionCotizaciones.cotizaciones_requeridas > 0">
+                      <strong>Cotizaciones Encontradas:</strong>
+                      <span [ngClass]="validacionCotizaciones.cumple ? 'text-success font-bold' : 'text-danger font-bold'">
+                        {{ validacionCotizaciones.cotizaciones_encontradas }}
+                      </span>
+                    </div>
+                    <div class="cotizaciones-mensaje" [ngClass]="validacionCotizaciones.cumple ? 'text-success' : 'text-danger'">
+                      <small>
+                        <i class="pi" [ngClass]="validacionCotizaciones.cumple ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+                        {{ validacionCotizaciones.mensaje }}
+                      </small>
+                    </div>
+                    <div class="cotizaciones-detalle" *ngIf="validacionCotizaciones.cotizaciones && validacionCotizaciones.cotizaciones.length > 0">
+                      <small class="text-muted">
+                        <strong>Cotizaciones encontradas:</strong>
+                        <span *ngFor="let cot of validacionCotizaciones.cotizaciones; let last = last">
+                          {{ cot.mes }}/{{ cot.gestion }}<span *ngIf="!last">, </span>
+                        </span>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
             </div>
           </div>
@@ -368,7 +544,7 @@
               [class.p-invalid]="formularioManual.get('ci')?.invalid && formularioManual.get('ci')?.touched">
             <small class="p-error" *ngIf="formularioManual.get('ci')?.invalid && formularioManual.get('ci')?.touched">
               <span *ngIf="formularioManual.get('ci')?.errors?.['required']">Campo requerido</span>
-              <span *ngIf="formularioManual.get('ci')?.errors?.['pattern']">Debe contener 7-8 dígitos</span>
+              <span *ngIf="formularioManual.get('ci')?.errors?.['pattern']">Debe contener hasta 10 dígitos</span>
             </small>
           </div>
 
@@ -545,6 +721,44 @@
                    </span>
                  </div>
                </div>
+
+               <!-- Fila 3: Validación de Cotizaciones Previas -->
+               <div class="tabla-fila" *ngIf="validacionCotizaciones && formularioManual.get('tipo_baja')?.value">
+                 <div class="tabla-celda" [style.grid-column]="'1 / -1'" 
+                      [ngClass]="{'cotizaciones-cumple': validacionCotizaciones.cumple, 'cotizaciones-no-cumple': !validacionCotizaciones.cumple}">
+                   <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                     <i class="pi" [ngClass]="validacionCotizaciones.cumple ? 'pi-check-circle' : 'pi-times-circle'" 
+                        [style.font-size]="'1.2rem'"
+                        [ngStyle]="{'color': validacionCotizaciones.cumple ? '#28a745' : '#dc3545'}"></i>
+                     <span class="celda-label" style="font-weight: 600; margin: 0;">
+                       Validación de Cotizaciones Previas
+                     </span>
+                   </div>
+                   <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 0.9rem;">
+                     <span style="font-weight: 500;">Estado:</span>
+                     <span [ngClass]="validacionCotizaciones.cumple ? 'text-success font-bold' : 'text-danger font-bold'">
+                       {{ validacionCotizaciones.cumple ? '✓ Cumple' : '✗ No Cumple' }}
+                     </span>
+                     <span style="font-weight: 500;" *ngIf="validacionCotizaciones.cotizaciones_requeridas > 0">Cotizaciones:</span>
+                     <span *ngIf="validacionCotizaciones.cotizaciones_requeridas > 0">
+                       <span [ngClass]="validacionCotizaciones.cumple ? 'text-success font-bold' : 'text-danger font-bold'">
+                         {{ validacionCotizaciones.cotizaciones_encontradas }}
+                       </span>
+                       / {{ validacionCotizaciones.cotizaciones_requeridas }} requeridas
+                     </span>
+                     <span style="font-weight: 500;">Mensaje:</span>
+                     <span [ngClass]="validacionCotizaciones.cumple ? 'text-success' : 'text-danger'">
+                       {{ validacionCotizaciones.mensaje }}
+                     </span>
+                     <span style="font-weight: 500;" *ngIf="validacionCotizaciones.cotizaciones && validacionCotizaciones.cotizaciones.length > 0">Encontradas:</span>
+                     <span *ngIf="validacionCotizaciones.cotizaciones && validacionCotizaciones.cotizaciones.length > 0" class="text-muted">
+                       <span *ngFor="let cot of validacionCotizaciones.cotizaciones; let last = last">
+                         {{ cot.mes }}/{{ cot.gestion }}<span *ngIf="!last">, </span>
+                       </span>
+                     </span>
+                   </div>
+                 </div>
+               </div>
              </div>
            </div>
          </div>
@@ -567,7 +781,7 @@
             label="Calcular Reembolso" 
             icon="pi pi-calculator"
             class="p-button-success p-button-lg"
-            [disabled]="formularioManual.invalid">
+            [disabled]="!puedeCalcularReembolso()">
           </button>
         </div>
       </div>

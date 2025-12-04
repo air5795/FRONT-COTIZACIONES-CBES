@@ -77,6 +77,8 @@ export class BuscarTrabajadorComponent {
   aseguradoEncontrado: DatosAsegurado | null = null;
   salarioTrabajador: any = null;
   cargandoSalario = false;
+  validacionCotizaciones: any = null;
+  cargandoCotizaciones = false;
 
   // Control del stepper
   pasoActual: number = 1;
@@ -92,15 +94,19 @@ export class BuscarTrabajadorComponent {
     // Formulario para ingreso manual (simplificado para pruebas)
     this.formularioManual = this.fb.group({
       // Datos del trabajador
-      ci: ['', [Validators.required, Validators.pattern(/^\d{7,8}$/)]],
+      ci: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
       nombres: ['', [Validators.required, Validators.minLength(2)]],
-      apellido_paterno: ['', [Validators.required, Validators.minLength(2)]],
+      apellido_paterno: [''],
       apellido_materno: ['', [Validators.required, Validators.minLength(2)]],
       matricula: ['', [Validators.required, Validators.pattern(/^\d{2}-\d{4}\s[A-Z]{3}$/)]],
       // Datos de la incapacidad
       tipo_baja: ['', Validators.required],
       fecha_inicio: ['', Validators.required],
       fecha_fin: ['', [Validators.required, this.validarRangoMaternidad.bind(this)]],
+      fecha_atencion: ['', Validators.required],
+      hora_atencion: ['', Validators.required], // Campo de hora obligatorio (formato HH:mm)
+      fecha_emision_certificado: ['', Validators.required],
+      fecha_sello_vigencia: ['', Validators.required],
       salario: [0, [Validators.required, Validators.min(0)]],
       // Campos adicionales para riesgo profesional
       fecha_accidente: [''],
@@ -124,11 +130,27 @@ export class BuscarTrabajadorComponent {
     // Suscribirse a cambios en tipo_baja y fecha_inicio para revalidar fecha_fin
     this.formularioManual.get('tipo_baja')?.valueChanges.subscribe(() => {
       this.formularioManual.get('fecha_fin')?.updateValueAndValidity();
+      this.onTipoBajaChange();
     });
 
     this.formularioManual.get('fecha_inicio')?.valueChanges.subscribe(() => {
       this.formularioManual.get('fecha_fin')?.updateValueAndValidity();
+      if (this.aseguradoEncontrado && this.mes && this.gestion) {
+        const tipoBaja = this.formularioManual.get('tipo_baja')?.value;
+        
+        if (tipoBaja) {
+          // Usar el mes y gestión de la solicitud, NO la fecha de inicio de la baja
+          this.validarCotizacionesPreviasTrabajador(
+            this.aseguradoEncontrado.ASE_MAT,
+            this.mes,
+            this.gestion
+          );
+        }
+      }
     });
+
+    // NO actualizar automáticamente fecha_inicio cuando cambia hora_atencion
+    // La fecha_inicio se ajustará solo en los cálculos, no en el formulario
   }
 
   /**
@@ -166,6 +188,42 @@ export class BuscarTrabajadorComponent {
     }
 
     return null;
+  }
+
+  /**
+   * Verifica si las fechas son iguales (método auxiliar para validación y mensajes)
+   * Las 4 fechas (fecha_inicio, fecha_atencion, fecha_emision_certificado, fecha_sello_vigencia) deben ser iguales
+   * La hora solo afectará el cálculo posterior, no la validación del formulario
+   */
+  validarFechasIguales(): boolean {
+    if (!this.formularioManual) return true;
+
+    const fechaInicio = this.formularioManual.get('fecha_inicio')?.value;
+    const fechaAtencion = this.formularioManual.get('fecha_atencion')?.value;
+    const fechaEmisionCertificado = this.formularioManual.get('fecha_emision_certificado')?.value;
+    const fechaSelloVigencia = this.formularioManual.get('fecha_sello_vigencia')?.value;
+
+    // Si alguna fecha no está presente, no validar aún
+    if (!fechaInicio || !fechaAtencion || !fechaEmisionCertificado || !fechaSelloVigencia) {
+      return true; // No hay error si faltan campos (eso lo maneja el required)
+    }
+
+    // Convertir todas las fechas a Date y comparar solo la fecha (sin hora)
+    const normalizarFecha = (fecha: any): string => {
+      if (!fecha) return '';
+      const d = new Date(fecha);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    const fechaInicioNorm = normalizarFecha(fechaInicio);
+    const fechaAtencionNorm = normalizarFecha(fechaAtencion);
+    const fechaEmisionNorm = normalizarFecha(fechaEmisionCertificado);
+    const fechaSelloNorm = normalizarFecha(fechaSelloVigencia);
+
+    // Verificar que TODAS las 4 fechas sean iguales (sin importar la hora)
+    return fechaInicioNorm === fechaAtencionNorm && 
+           fechaInicioNorm === fechaEmisionNorm && 
+           fechaInicioNorm === fechaSelloNorm;
   }
 
   // Getter para verificar si el tipo de incapacidad es PROFESIONAL
@@ -660,11 +718,47 @@ calcularYMostrarReembolso() {
       
       // Ahora procesar la respuesta con los datos actualizados
       this.procesarRespuestaCalculo(response, bajaSeleccionada, 'DATOS REALES DE PLANILLA');
-    },
+    }, 
     error: (error) => {
-      console.warn('No se encontró en planilla, intentando con modo de prueba:', error.message);
+      console.warn('No se encontró en planilla, intentando con modo de prueba:', error);
       
-      // Si falla, usar el modo de prueba como fallback
+      // Verificar si el error es por cotizaciones previas
+      const mensajeError = error?.error?.message || error?.message || '';
+      if (mensajeError.includes('cotizaciones') || mensajeError.includes('Cotizaciones')) {
+        // Si es error de cotizaciones, mostrar el error completo y no intentar modo prueba
+        Swal.fire({
+          title: 'Error al Calcular Reembolso',
+          html: `
+            <div style="text-align: left;">
+              <p><strong>${mensajeError}</strong></p>
+              ${this.validacionCotizaciones && !this.validacionCotizaciones.cumple ? `
+                <hr>
+                <div style="background-color: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                  <p style="margin: 0; color: #856404;">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <strong>Validación de Cotizaciones:</strong><br>
+                    ${this.validacionCotizaciones.mensaje}
+                  </p>
+                </div>
+              ` : ''}
+            </div>
+          `,
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+          customClass: {
+            popup: 'swal-high-zindex'
+          },
+          didOpen: () => {
+            const swalContainer = document.querySelector('.swal2-container') as HTMLElement;
+            if (swalContainer) {
+              swalContainer.style.zIndex = '10000';
+            }
+          }
+        });
+        return;
+      }
+      
+      // Si falla por otra razón, usar el modo de prueba como fallback
       this.calcularConModoPrueba(bajaSeleccionada);
     }
   });
@@ -698,25 +792,54 @@ calcularYMostrarReembolso() {
       salario: 5000 // Salario por defecto
     };
 
-    this.reembolsosService.calcularReembolsoPrueba(datosWorkerPrueba, bajaMedicaPrueba, this.mes, this.gestion).subscribe({
+    this.reembolsosService.calcularReembolsoPrueba(datosWorkerPrueba, bajaMedicaPrueba, this.mes, this.gestion, this.codPatronal).subscribe({
       next: (response) => {
         console.log('Cálculo exitoso con modo de prueba:', response);
         this.procesarRespuestaCalculo(response, bajaSeleccionada, 'MODO PRUEBA (No encontrado en planilla)');
       },
       error: (error) => {
+        console.error('❌ Error en cálculo automático:', error);
+        
+        // Extraer mensaje de error del backend
+        let mensajeError = 'No se pudo calcular el reembolso';
+        let detallesError = [];
+        
+        if (error?.error?.message) {
+          mensajeError = error.error.message;
+        } else if (error?.message) {
+          mensajeError = error.message;
+        } else if (typeof error?.error === 'string') {
+          mensajeError = error.error;
+        }
+        
+        // Agregar detalles adicionales
+        detallesError.push('❌ No se encontró en la planilla del período');
+        detallesError.push('❌ Falló el cálculo de prueba');
+        
         Swal.fire({
           title: 'Error en el Cálculo',
           html: `
             <div style="text-align: left;">
-              <p><strong>No se pudo calcular el reembolso:</strong></p>
+              <p><strong>${mensajeError}</strong></p>
               <ul>
-                <li>❌ No se encontró en la planilla del período</li>
-                <li>❌ Falló el cálculo de prueba</li>
+                ${detallesError.map(d => `<li>${d}</li>`).join('')}
               </ul>
+              ${this.validacionCotizaciones && !this.validacionCotizaciones.cumple ? `
+                <hr>
+                <div style="background-color: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                  <p style="margin: 0; color: #856404;">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <strong>Validación de Cotizaciones:</strong><br>
+                    ${this.validacionCotizaciones.mensaje}
+                  </p>
+                </div>
+              ` : ''}
               <hr>
               <small>Verifique los datos y vuelva a intentar</small>
             </div>
           `,
+          icon: 'error',
+          confirmButtonText: 'Entendido',
           customClass: {
             popup: 'swal-high-zindex'
           },
@@ -733,7 +856,23 @@ calcularYMostrarReembolso() {
   }
 
   private procesarRespuestaCalculo(response: any, bajaSeleccionada: BajaMedica, origen: string) {
-
+    // Obtener valores de fecha del formulario antes de crear el objeto
+    const fechaAtencion = this.formularioManual?.get('fecha_atencion')?.value;
+    const horaAtencion = this.formularioManual?.get('hora_atencion')?.value;
+    const fechaEmisionCertificado = this.formularioManual?.get('fecha_emision_certificado')?.value;
+    const fechaSelloVigencia = this.formularioManual?.get('fecha_sello_vigencia')?.value;
+    
+    // Calcular fecha_inicio_baja basada en hora_atencion
+    const fechaInicioBajaCalculada = this.calcularFechaInicioDesdeHora();
+    const fechaInicioBajaFinal = fechaInicioBajaCalculada ? this.formatDateToISO(fechaInicioBajaCalculada) : response.calculo.fecha_inicio_baja;
+    
+    // Log para depuración
+    console.log('📋 VALORES DEL FORMULARIO EN procesarRespuestaCalculo:');
+    console.log('   • fecha_atencion (raw):', fechaAtencion);
+    console.log('   • hora_atencion (raw):', horaAtencion);
+    console.log('   • fecha_emision_certificado (raw):', fechaEmisionCertificado);
+    console.log('   • fecha_sello_vigencia (raw):', fechaSelloVigencia);
+    console.log('   • fecha_inicio_baja calculada:', fechaInicioBajaFinal);
     
     // Usar los datos del backend
     this.detalleCalculado = {
@@ -743,8 +882,12 @@ calcularYMostrarReembolso() {
       nombres: response.datos_trabajador.nombres,
       matricula: response.datos_trabajador.matricula,
       tipo_incapacidad: response.calculo.tipo_incapacidad,
-      fecha_inicio_baja: response.calculo.fecha_inicio_baja,
+      fecha_inicio_baja: fechaInicioBajaFinal, // Usar la fecha calculada
       fecha_fin_baja: response.calculo.fecha_fin_baja,
+      fecha_atencion: fechaAtencion ? this.formatDateToISO(fechaAtencion) : null,
+      hora_atencion: horaAtencion ? this.formatearHoraParaBackend(horaAtencion) : null,
+      fecha_emision_certificado: fechaEmisionCertificado ? this.formatDateToISO(fechaEmisionCertificado) : null,
+      fecha_sello_vigencia: fechaSelloVigencia ? this.formatDateToISO(fechaSelloVigencia) : null,
       dias_incapacidad: response.calculo.dias_incapacidad,
       dias_reembolso: response.calculo.dias_reembolso,
       salario: response.calculo.salario,
@@ -814,6 +957,42 @@ calcularYMostrarReembolso() {
 
   confirmarYAgregar() {
     if (this.detalleCalculado) {
+      // Asegurar que los campos de fecha estén presentes desde el formulario
+      if (this.formularioManual) {
+        const fechaAtencion = this.formularioManual.get('fecha_atencion')?.value;
+        const horaAtencion = this.formularioManual.get('hora_atencion')?.value;
+        const fechaEmisionCertificado = this.formularioManual.get('fecha_emision_certificado')?.value;
+        const fechaSelloVigencia = this.formularioManual.get('fecha_sello_vigencia')?.value;
+        
+        // Calcular fecha_inicio_baja basada en hora_atencion
+        const fechaInicioBajaCalculada = this.calcularFechaInicioDesdeHora();
+        if (fechaInicioBajaCalculada) {
+          this.detalleCalculado.fecha_inicio_baja = this.formatDateToISO(fechaInicioBajaCalculada);
+        }
+        
+        // Actualizar los campos de fecha si están en el formulario
+        if (fechaAtencion) {
+          this.detalleCalculado.fecha_atencion = this.formatDateToISO(fechaAtencion);
+        }
+        if (horaAtencion) {
+          this.detalleCalculado.hora_atencion = this.formatearHoraParaBackend(horaAtencion);
+        }
+        if (fechaEmisionCertificado) {
+          this.detalleCalculado.fecha_emision_certificado = this.formatDateToISO(fechaEmisionCertificado);
+        }
+        if (fechaSelloVigencia) {
+          this.detalleCalculado.fecha_sello_vigencia = this.formatDateToISO(fechaSelloVigencia);
+        }
+      }
+      
+      // Log para depuración
+      console.log('📤 EMITIENDO DETALLE DESDE confirmarYAgregar:');
+      console.log('   • fecha_atencion:', this.detalleCalculado.fecha_atencion);
+      console.log('   • hora_atencion:', this.detalleCalculado.hora_atencion);
+      console.log('   • fecha_inicio_baja:', this.detalleCalculado.fecha_inicio_baja);
+      console.log('   • fecha_emision_certificado:', this.detalleCalculado.fecha_emision_certificado);
+      console.log('   • fecha_sello_vigencia:', this.detalleCalculado.fecha_sello_vigencia);
+      
       // Actualizar con los datos editados
       this.detalleCalculado.apellido_paterno = this.datosWorker.apellido_paterno;
       this.detalleCalculado.apellido_materno = this.datosWorker.apellido_materno;
@@ -876,6 +1055,85 @@ calcularYMostrarReembolso() {
   procesarIngresoManual() {
     // Validar campos básicos
     if (this.formularioManual.invalid) {
+      // 🔍 DEBUG: Log detallado del estado del formulario
+      console.log('❌ FORMULARIO INVÁLIDO - Análisis detallado:');
+      console.log('─'.repeat(80));
+      console.log('📋 Estado general del formulario:');
+      console.log('   • formularioManual.invalid:', this.formularioManual.invalid);
+      console.log('   • formularioManual.valid:', this.formularioManual.valid);
+      console.log('   • formularioManual.pending:', this.formularioManual.pending);
+      console.log('   • formularioManual.touched:', this.formularioManual.touched);
+      console.log('   • formularioManual.dirty:', this.formularioManual.dirty);
+      
+      console.log('\n📝 Valores de los campos:');
+      const valores = this.formularioManual.value;
+      Object.keys(valores).forEach(key => {
+        const valor = valores[key];
+        const control = this.formularioManual.get(key);
+        const estado = control ? {
+          invalid: control.invalid,
+          valid: control.valid,
+          touched: control.touched,
+          dirty: control.dirty,
+          errors: control.errors,
+          hasError: (error: string) => control.hasError(error)
+        } : 'CONTROL NO ENCONTRADO';
+        
+        console.log(`   • ${key}:`, {
+          valor: valor,
+          valorTipo: typeof valor,
+          valorVacio: valor === null || valor === undefined || valor === '',
+          estado: estado
+        });
+      });
+      
+      console.log('\n🚫 Errores por campo:');
+      Object.keys(this.formularioManual.controls).forEach(key => {
+        const control = this.formularioManual.get(key);
+        if (control && control.invalid) {
+          const errores = control.errors || {};
+          const mensajesError: string[] = [];
+          
+          if (errores['required']) {
+            mensajesError.push('❌ REQUERIDO: El campo es obligatorio');
+          }
+          if (errores['pattern']) {
+            mensajesError.push(`❌ PATRÓN: No cumple con el formato requerido`);
+            console.log(`      → Valor actual: "${control.value}"`);
+            console.log(`      → Tipo de dato: ${typeof control.value}`);
+            console.log(`      → Longitud: ${control.value ? String(control.value).length : 0} caracteres`);
+          }
+          if (errores['minlength']) {
+            mensajesError.push(`❌ LONGITUD MÍNIMA: Requiere al menos ${errores['minlength'].requiredLength} caracteres (actual: ${errores['minlength'].actualLength})`);
+          }
+          if (errores['min']) {
+            mensajesError.push(`❌ VALOR MÍNIMO: Requiere al menos ${errores['min'].min} (actual: ${errores['min'].actual})`);
+          }
+          if (errores['rangoMaternidadMinimo']) {
+            mensajesError.push(`❌ RANGO MATERNIDAD: ${errores['rangoMaternidadMinimo'].mensaje}`);
+          }
+          if (errores['rangoMaternidadMaximo']) {
+            mensajesError.push(`❌ RANGO MATERNIDAD: ${errores['rangoMaternidadMaximo'].mensaje}`);
+          }
+          
+          console.log(`   • ${key}:`);
+          console.log(`      Valor: "${control.value}"`);
+          console.log(`      Errores encontrados:`, errores);
+          mensajesError.forEach(msg => console.log(`      ${msg}`));
+          console.log(`      Estado: touched=${control.touched}, dirty=${control.dirty}`);
+        }
+      });
+      
+      console.log('\n✅ Campos válidos:');
+      Object.keys(this.formularioManual.controls).forEach(key => {
+        const control = this.formularioManual.get(key);
+        if (control && control.valid) {
+          console.log(`   ✓ ${key}:`, control.value);
+        }
+      });
+      
+      console.log('─'.repeat(80));
+      
       Swal.fire({
         title: 'Atención',
         text: 'Por favor complete todos los campos requeridos',
@@ -1005,10 +1263,18 @@ calcularYMostrarReembolso() {
     
     
     
+    // Calcular fecha_inicio basada en hora_atencion
+    const fechaInicioCalculada = this.calcularFechaInicioDesdeHora();
+    const fechaInicioFinal = fechaInicioCalculada ? this.formatDateToISO(fechaInicioCalculada) : datos.fecha_inicio;
+    
     const bajaMedicaPrueba = {
       tipo_baja: datos.tipo_baja,
-      fecha_inicio: datos.fecha_inicio,
+      fecha_inicio: fechaInicioFinal, // Usar la fecha calculada
       fecha_fin: datos.fecha_fin,
+      fecha_atencion: datos.fecha_atencion,
+      hora_atencion: datos.hora_atencion ? this.formatearHoraParaBackend(datos.hora_atencion) : null,
+      fecha_emision_certificado: datos.fecha_emision_certificado,
+      fecha_sello_vigencia: datos.fecha_sello_vigencia,
       dias_impedimento: bajaSeleccionada.DIAS_IMPEDIMENTO,
       especialidad: bajaSeleccionada.ESP_NOM,
       medico: bajaSeleccionada.MEDI_NOM,
@@ -1029,9 +1295,9 @@ calcularYMostrarReembolso() {
       dias_pagados: diasPagadosReales // ✅ Enviar días reales de la planilla
     };
     
-
   
-    this.reembolsosService.calcularReembolsoPrueba(datosWorkerPrueba, bajaMedicaPrueba, this.mes, this.gestion).subscribe({
+
+    this.reembolsosService.calcularReembolsoPrueba(datosWorkerPrueba, bajaMedicaPrueba, this.mes, this.gestion, this.codPatronal).subscribe({
       next: (response) => {
 
         
@@ -1045,6 +1311,23 @@ calcularYMostrarReembolso() {
           dias_pagados: diasPagadosReales // ✅ Mantener días reales
         };
         
+        // Obtener valores de fecha del formulario
+        const fechaAtencionManual = this.formularioManual?.get('fecha_atencion')?.value;
+        const horaAtencionManual = this.formularioManual?.get('hora_atencion')?.value;
+        const fechaEmisionCertificadoManual = this.formularioManual?.get('fecha_emision_certificado')?.value;
+        const fechaSelloVigenciaManual = this.formularioManual?.get('fecha_sello_vigencia')?.value;
+        
+        // Calcular fecha_inicio_baja basada en hora_atencion
+        const fechaInicioBajaCalculada = this.calcularFechaInicioDesdeHora();
+        const fechaInicioBajaFinal = fechaInicioBajaCalculada ? this.formatDateToISO(fechaInicioBajaCalculada) : response.calculo.fecha_inicio_baja;
+        
+        console.log('📋 VALORES DEL FORMULARIO EN calcularReembolsoManual:');
+        console.log('   • fecha_atencion:', fechaAtencionManual);
+        console.log('   • hora_atencion:', horaAtencionManual);
+        console.log('   • fecha_emision_certificado:', fechaEmisionCertificadoManual);
+        console.log('   • fecha_sello_vigencia:', fechaSelloVigenciaManual);
+        console.log('   • fecha_inicio_baja calculada:', fechaInicioBajaFinal);
+        
         this.detalleCalculado = {
           ci: response.datos_trabajador.ci,
           apellido_paterno: response.datos_trabajador.apellido_paterno,
@@ -1052,8 +1335,12 @@ calcularYMostrarReembolso() {
           nombres: response.datos_trabajador.nombres,
           matricula: response.datos_trabajador.matricula,
           tipo_incapacidad: response.calculo.tipo_incapacidad,
-          fecha_inicio_baja: response.calculo.fecha_inicio_baja,
+          fecha_inicio_baja: fechaInicioBajaFinal, // Usar la fecha calculada
           fecha_fin_baja: response.calculo.fecha_fin_baja,
+          fecha_atencion: fechaAtencionManual ? this.formatDateToISO(fechaAtencionManual) : null,
+          hora_atencion: horaAtencionManual ? this.formatearHoraParaBackend(horaAtencionManual) : null,
+          fecha_emision_certificado: fechaEmisionCertificadoManual ? this.formatDateToISO(fechaEmisionCertificadoManual) : null,
+          fecha_sello_vigencia: fechaSelloVigenciaManual ? this.formatDateToISO(fechaSelloVigenciaManual) : null,
           dias_incapacidad: response.calculo.dias_incapacidad,
           dias_reembolso: response.calculo.dias_reembolso,
           salario: response.calculo.salario,
@@ -1103,9 +1390,36 @@ calcularYMostrarReembolso() {
       },
       error: (error) => {
         console.error('❌ Error al calcular reembolso:', error);
+        
+        // Extraer mensaje de error del backend
+        let mensajeError = 'No se pudo calcular el reembolso';
+        if (error?.error?.message) {
+          mensajeError = error.error.message;
+        } else if (error?.message) {
+          mensajeError = error.message;
+        } else if (typeof error?.error === 'string') {
+          mensajeError = error.error;
+        }
+        
         Swal.fire({
-          title: 'Error',
-          text: 'No se pudo calcular el reembolso',
+          title: 'Error al Calcular Reembolso',
+          html: `
+            <div style="text-align: left;">
+              <p><strong>${mensajeError}</strong></p>
+              ${this.validacionCotizaciones && !this.validacionCotizaciones.cumple ? `
+                <hr>
+                <div style="background-color: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                  <p style="margin: 0; color: #856404;">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <strong>Validación de Cotizaciones:</strong><br>
+                    ${this.validacionCotizaciones.mensaje}
+                  </p>
+                </div>
+              ` : ''}
+            </div>
+          `,
+          icon: 'error',
+          confirmButtonText: 'Entendido',
           customClass: {
             popup: 'swal-high-zindex'
           },
@@ -1136,6 +1450,7 @@ calcularYMostrarReembolso() {
     this.detalleCalculado = null;
     this.aseguradoEncontrado = null;
     this.salarioTrabajador = null;
+    this.validacionCotizaciones = null;
     
     // Resetear estados de UI
     this.mostrarDialogBajas = false;
@@ -1204,6 +1519,77 @@ calcularYMostrarReembolso() {
     const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
     const year = date.getUTCFullYear().toString().slice(-2);
     return `${day}/${month}/${year}`;
+  }
+
+  /**
+   * Convierte una fecha a formato ISO (YYYY-MM-DD) para enviar al backend
+   */
+  formatDateToISO(dateValue: any): string {
+    if (!dateValue) return '';
+    const date = new Date(dateValue);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Formatea la hora para mostrar (HH:mm)
+   */
+  formatearHora(horaValue: any): string {
+    if (!horaValue) return '';
+    const date = new Date(horaValue);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  /**
+   * Convierte la hora del formulario a formato HH:mm para enviar al backend
+   */
+  formatearHoraParaBackend(horaValue: any): string {
+    if (!horaValue) return '';
+    const date = new Date(horaValue);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}:00`; // Formato HH:mm:ss
+  }
+
+  /**
+   * Verifica si la hora de atención es >= 20:00
+   */
+  esHoraMayorIgual20(): boolean {
+    const horaAtencion = this.formularioManual?.get('hora_atencion')?.value;
+    if (!horaAtencion) return false;
+    
+    const date = new Date(horaAtencion);
+    const hora = date.getHours();
+    return hora >= 20;
+  }
+
+  /**
+   * Calcula la fecha de inicio de baja basada en fecha_atencion y hora_atencion
+   * Si hora >= 20:00, retorna el día siguiente, sino el mismo día
+   */
+  calcularFechaInicioDesdeHora(): Date | null {
+    const fechaAtencion = this.formularioManual?.get('fecha_atencion')?.value;
+    const horaAtencion = this.formularioManual?.get('hora_atencion')?.value;
+    
+    if (!fechaAtencion || !horaAtencion) return null;
+    
+    const fecha = new Date(fechaAtencion);
+    const horaDate = new Date(horaAtencion);
+    const hora = horaDate.getHours();
+    
+    // Si la hora es >= 20:00, fecha_inicio_baja es el día siguiente
+    if (hora >= 20) {
+      const fechaSiguiente = new Date(fecha);
+      fechaSiguiente.setDate(fechaSiguiente.getDate() + 1);
+      return fechaSiguiente;
+    }
+    
+    // Si la hora es < 20:00, fecha_inicio_baja es el mismo día
+    return fecha;
   }
 
   // Obtener días totales de la baja (columna "día" después de BAJA MÉDICA)
@@ -1581,8 +1967,33 @@ calcularYMostrarReembolso() {
     const tipoBaja = this.formularioManual.get('tipo_baja')?.value;
     const fechaInicio = this.formularioManual.get('fecha_inicio')?.value;
     const fechaFin = this.formularioManual.get('fecha_fin')?.value;
+    const fechaAtencion = this.formularioManual.get('fecha_atencion')?.value;
+    const horaAtencion = this.formularioManual.get('hora_atencion')?.value;
+    const fechaEmisionCertificado = this.formularioManual.get('fecha_emision_certificado')?.value;
+    const fechaSelloVigencia = this.formularioManual.get('fecha_sello_vigencia')?.value;
     
-    if (!tipoBaja || !fechaInicio || !fechaFin) {
+    // Verificar que todos los campos básicos estén presentes (incluyendo hora_atencion)
+    if (!tipoBaja || !fechaInicio || !fechaFin || !fechaAtencion || !horaAtencion || !fechaEmisionCertificado || !fechaSelloVigencia) {
+      return false;
+    }
+    
+    // Validar que las fechas (sin hora) sean iguales
+    const normalizarFecha = (fecha: any): string => {
+      if (!fecha) return '';
+      const d = new Date(fecha);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    const fechaInicioNorm = normalizarFecha(fechaInicio);
+    const fechaAtencionNorm = normalizarFecha(fechaAtencion);
+    const fechaEmisionNorm = normalizarFecha(fechaEmisionCertificado);
+    const fechaSelloNorm = normalizarFecha(fechaSelloVigencia);
+
+    // Verificar que TODAS las 4 fechas sean iguales (sin importar la hora)
+    // La hora solo afectará el cálculo posterior, no la validación del formulario
+    if (fechaInicioNorm !== fechaAtencionNorm || 
+        fechaInicioNorm !== fechaEmisionNorm || 
+        fechaInicioNorm !== fechaSelloNorm) {
       return false;
     }
     
@@ -1612,7 +2023,9 @@ calcularYMostrarReembolso() {
   datosTrabajadorCompletos(): boolean {
     if (this.modoIngresoTrabajador === 'buscar') {
       // Si está en modo búsqueda, debe haber encontrado un trabajador con salario
-      return !!(this.aseguradoEncontrado && this.salarioTrabajador);
+      // Además, debe cumplir con las cotizaciones previas si es necesario
+      const cumpleCotizaciones = this.validacionCotizaciones?.cumple !== false;
+      return !!(this.aseguradoEncontrado && this.salarioTrabajador && cumpleCotizaciones);
     } else {
       // Si está en modo manual, verificar que todos los campos estén llenos
       const ci = this.formularioManual.get('ci')?.value;
@@ -1623,6 +2036,106 @@ calcularYMostrarReembolso() {
       const salario = this.formularioManual.get('salario')?.value;
       
       return !!(ci && nombres && apellidoPaterno && apellidoMaterno && matricula && salario);
+    }
+  }
+
+  /**
+   * Verifica si se puede calcular el reembolso (Paso 3)
+   * Incluye validación de cotizaciones previas
+   */
+  puedeCalcularReembolso(): boolean {
+    // Verificar datos básicos de incapacidad
+    const tipoBaja = this.formularioManual.get('tipo_baja')?.value;
+    const fechaInicio = this.formularioManual.get('fecha_inicio')?.value;
+    const fechaFin = this.formularioManual.get('fecha_fin')?.value;
+    
+    if (!tipoBaja || !fechaInicio || !fechaFin) {
+      console.log('🔍 puedeCalcularReembolso: Faltan datos básicos de incapacidad');
+      return false;
+    }
+
+    // Validación específica para maternidad: rango de 45-90 días
+    if (tipoBaja === 'MATERNIDAD') {
+      const diasMaternidad = this.calcularDiasMaternidad();
+      if (diasMaternidad < 45 || diasMaternidad > 90) {
+        console.log(`🔍 puedeCalcularReembolso: Maternidad fuera de rango (${diasMaternidad} días)`);
+        return false;
+      }
+    }
+
+    // Si es riesgo profesional, verificar campos adicionales
+    if (tipoBaja === 'PROFESIONAL') {
+      const fechaAccidente = this.formularioManual.get('fecha_accidente')?.value;
+      const fechaVigencia = this.formularioManual.get('fecha_vigencia')?.value;
+      const lugarAccidente = this.formularioManual.get('lugar_accidente')?.value;
+      
+      if (!fechaAccidente || !fechaVigencia || !lugarAccidente) {
+        console.log('🔍 puedeCalcularReembolso: Faltan datos de riesgo profesional');
+        return false;
+      }
+    }
+
+    // Verificar datos del trabajador según el modo de ingreso
+    if (this.modoIngresoTrabajador === 'buscar') {
+      // Modo búsqueda: debe tener trabajador encontrado, salario y cumplir cotizaciones
+      if (!this.aseguradoEncontrado) {
+        console.log('🔍 puedeCalcularReembolso: No hay asegurado encontrado');
+        return false;
+      }
+      
+      if (!this.salarioTrabajador) {
+        console.log('🔍 puedeCalcularReembolso: No hay salario del trabajador');
+        return false;
+      }
+      
+      // Verificar cotizaciones previas (excepto para PROFESIONAL)
+      if (tipoBaja !== 'PROFESIONAL') {
+        // Si hay validación de cotizaciones, debe cumplir
+        // Si no hay validación aún (null/undefined), permitir continuar (se validará en el backend)
+        if (this.validacionCotizaciones) {
+          console.log('🔍 puedeCalcularReembolso: Validación cotizaciones existe:', this.validacionCotizaciones);
+          console.log('🔍 puedeCalcularReembolso: cumple =', this.validacionCotizaciones.cumple, '(tipo:', typeof this.validacionCotizaciones.cumple, ')');
+          // Si la validación existe y no cumple (explícitamente false), bloquear
+          if (this.validacionCotizaciones.cumple === false || this.validacionCotizaciones.cumple === 0) {
+            console.log('🔍 puedeCalcularReembolso: No cumple con cotizaciones');
+            return false;
+          }
+          // Si cumple es true o cualquier otro valor truthy, permitir continuar
+          console.log('🔍 puedeCalcularReembolso: Cumple con cotizaciones ✓');
+        } else {
+          console.log('🔍 puedeCalcularReembolso: No hay validación de cotizaciones aún (se validará en backend)');
+        }
+      }
+      
+      console.log('🔍 puedeCalcularReembolso: ✅ TODOS LOS REQUISITOS CUMPLIDOS');
+      return true;
+    } else {
+      // Modo manual: verificar que todos los campos estén llenos
+      const ci = this.formularioManual.get('ci')?.value;
+      const nombres = this.formularioManual.get('nombres')?.value;
+      const apellidoPaterno = this.formularioManual.get('apellido_paterno')?.value;
+      const apellidoMaterno = this.formularioManual.get('apellido_materno')?.value;
+      const matricula = this.formularioManual.get('matricula')?.value;
+      const salario = this.formularioManual.get('salario')?.value;
+      
+      if (!ci || !nombres || !apellidoPaterno || !apellidoMaterno || !matricula || !salario) {
+        console.log('🔍 puedeCalcularReembolso: Faltan datos del trabajador en modo manual');
+        return false;
+      }
+
+      // En modo manual también verificar cotizaciones si están disponibles
+      if (tipoBaja !== 'PROFESIONAL') {
+        // Si hay validación de cotizaciones, debe cumplir
+        // Si no hay validación aún (null/undefined), permitir continuar (se validará en el backend)
+        if (this.validacionCotizaciones !== null && this.validacionCotizaciones !== undefined) {
+          // Si la validación existe y no cumple, bloquear
+          if (this.validacionCotizaciones.cumple === false) {
+            return false;
+          }
+        }
+      }
+      
+      return true;
     }
   }
 
@@ -1684,6 +2197,11 @@ calcularYMostrarReembolso() {
         if (response.status && response.data) {
           this.salarioTrabajador = response.data;
           
+          // Validar cotizaciones previas después de obtener el salario
+          // Usar el mes y gestión de la solicitud, NO la fecha de inicio de la baja
+          if (this.mes && this.gestion) {
+            this.validarCotizacionesPreviasTrabajador(matricula, this.mes, this.gestion);
+          }
           
           // Usar automáticamente los datos del trabajador
           this.usarDatosAseguradoAutomatico();
@@ -1696,5 +2214,55 @@ calcularYMostrarReembolso() {
         this.salarioTrabajador = null;
       }
     });
+  }
+
+  /**
+   * Valida las cotizaciones previas del trabajador según el tipo de incapacidad
+   */
+  private validarCotizacionesPreviasTrabajador(matricula: string, mes: string, gestion: string) {
+    const tipoBaja = this.formularioManual.get('tipo_baja')?.value;
+    
+    if (!tipoBaja || !this.codPatronal) {
+      return;
+    }
+
+    this.cargandoCotizaciones = true;
+    this.validacionCotizaciones = null;
+
+    this.reembolsosService.validarCotizacionesPrevias(
+      this.codPatronal,
+      matricula,
+      mes,
+      gestion,
+      tipoBaja
+    ).subscribe({
+      next: (response) => {
+        this.cargandoCotizaciones = false;
+        this.validacionCotizaciones = response;
+      },
+      error: (error) => {
+        this.cargandoCotizaciones = false;
+        this.validacionCotizaciones = {
+          valido: false,
+          cumple: false,
+          mensaje: 'Error al validar cotizaciones previas'
+        };
+        console.error('Error al validar cotizaciones:', error);
+      }
+    });
+  }
+
+  /**
+   * Se ejecuta cuando cambia el tipo de baja para revalidar cotizaciones
+   */
+  onTipoBajaChange() {
+    if (this.aseguradoEncontrado && this.mes && this.gestion) {
+      // Usar el mes y gestión de la solicitud, NO la fecha de inicio de la baja
+      this.validarCotizacionesPreviasTrabajador(
+        this.aseguradoEncontrado.ASE_MAT,
+        this.mes,
+        this.gestion
+      );
+    }
   }
 }

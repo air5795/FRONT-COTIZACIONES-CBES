@@ -25,6 +25,7 @@ import { PagosAportesAdminComponent } from './componentes/planillas-aportes/pago
 import { HistorialNotificacionesComponent } from './componentes/notificaciones/historial-notificaciones/historial-notificaciones.component';
 import { AuthGuard } from './guards/auth.guard';
 import { PlanillaAccessGuard } from './guards/planilla-access.guard'; 
+import { RoleGuard } from './guards/role.guard';
 import { SolicitudReembolsoComponent } from './componentes/reembolsos-incapacidades/solicitud-reembolso/solicitud-reembolso.component';
 import { EmpresasComponent } from './componentes/empresas/empresas.component';
 import { PerfilUsuarioComponent } from './componentes/perfil-usuario/perfil-usuario.component';
@@ -39,7 +40,10 @@ import { DetalleDevengadoComponent } from './componentes/liquidaciones-devengada
     imports: [
         RouterModule.forRoot([
             {
-                path: 'cotizaciones', component: AppMainComponent,
+                path: 'cotizaciones',
+                component: AppMainComponent,
+                canActivate: [AuthGuard],
+                canActivateChild: [AuthGuard],
                 children: [
                     { path: '', component: DatosEmpresaComponent },
                     // DATOS DE PERFIL DE EMPRESA ---------------------------------------------------------
@@ -55,10 +59,10 @@ import { DetalleDevengadoComponent } from './componentes/liquidaciones-devengada
                     // PLANILLAS DE APORTES -------------------------------------------------------------
                     { path: 'planillas-aportes', component: PlanillasAportesListComponent },
                     { path: 'planillas-aportes/:id', component: PlanillasAportesDetalleComponent,canActivate: [PlanillaAccessGuard] ,},
-                    { path: 'aprobar-planillas-aportes', component: PlanillasAportesAprobarComponent },
-                    { path: 'aprobar-planillas-aportes/:id',component: PlanillasAportesDetalleAprobarComponent,canActivate: [PlanillaAccessGuard] },
+                    { path: 'aprobar-planillas-aportes', component: PlanillasAportesAprobarComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
+                    { path: 'aprobar-planillas-aportes/:id',component: PlanillasAportesDetalleAprobarComponent,canActivate: [PlanillaAccessGuard, RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
                     { path: 'historial-aportes', component: HistorialAportesComponent },
-                    { path: 'pagos-aportes-admin', component: PagosAportesAdminComponent },
+                    { path: 'pagos-aportes-admin', component: PagosAportesAdminComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
                     // LIQUIDACIONES DEVENGADAS -------------------------------------------------------------
                     { path: 'devengados', component: LiquidacionesDevengadasComponent },
                     { path: 'devengados/:id', component: DetalleDevengadoComponent },
@@ -68,13 +72,13 @@ import { DetalleDevengadoComponent } from './componentes/liquidaciones-devengada
                             { path: 'historial-reembolsos', component: HistorialReembolsosComponent },
                             { path: 'historial-reembolsos/detalle/:id', component: DetallePlanillaReembolsoAdminComponent },
                     // OTROS -----------------------------------------------------------------------------
-                    { path: 'sistemas', component: SistemaComponent },
-                    { path: 'clasificadores', component: ClasificadorComponent },
+                    { path: 'sistemas', component: SistemaComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
+                    { path: 'clasificadores', component: ClasificadorComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
                     { path: 'planillas-incapacidad', component: PlanillaIncapacidadComponent },
-                    { path: 'planilla-aprobar', component: PlanillaAportesAprobarComponent },
-                    { path: 'lista-personal', component: UsuarioComponent },
-                    { path: 'perfiles', component: PerfilComponent },
-                    { path: 'restriccionesUsuario/:id', component: RestriccionComponent }, 
+                    { path: 'planilla-aprobar', component: PlanillaAportesAprobarComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
+                    { path: 'lista-personal', component: UsuarioComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
+                    { path: 'perfiles', component: PerfilComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
+                    { path: 'restriccionesUsuario/:id', component: RestriccionComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } }, 
                     
                     
                 ]

@@ -227,7 +227,7 @@ export class SessionService implements OnDestroy {
   /**
    * ✅ CORREGIDO: Verifica si el token está cerca de expirar
    */
-  private isTokenExpiringSoon(): boolean {
+  public isTokenExpiringSoon(): boolean {
     const sessionData = this.sessionDataSubject.value;
     
     if (!sessionData) {
@@ -259,6 +259,29 @@ export class SessionService implements OnDestroy {
     } catch (error) {
       return false; // ← CAMBIO: No considerar expirado en caso de error
     }
+  }
+
+  /**
+   * Intenta refrescar el token si está próximo a expirar
+   */
+  public refreshTokenIfExpiring(): Observable<boolean> {
+    // Sin sesión activa no hay nada que refrescar
+    if (!this.hasValidSession()) {
+      return of(false);
+    }
+
+    // Si falta el token, limpiar sesión
+    if (!this.sessionDataSubject.value?.token) {
+      this.clearSession();
+      return of(false);
+    }
+
+    // Si el token ya expiró, isTokenExpiringSoon se encarga de gestionarlo
+    if (this.isTokenExpiringSoon()) {
+      return this.refreshToken();
+    }
+
+    return of(true);
   }
 
 //Maneja token expirado
@@ -428,7 +451,7 @@ export class SessionService implements OnDestroy {
   /**
    * Obtiene sessionId de sessionStorage
    */
-  private getSessionId(): string | null {
+  public getSessionId(): string | null {
     try {
       const sessionId = sessionStorage.getItem('sessionId');
 

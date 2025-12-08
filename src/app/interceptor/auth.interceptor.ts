@@ -70,6 +70,11 @@ export class AuthInterceptor implements HttpInterceptor {
           // Limpiar sesión y redirigir al login
           this.sessionService.clearSession();
           window.location.href = environment.login;
+        } else if (error.status === 403) {
+          // Sin permisos, enviar a ruta de denegado
+          this.router.navigate(['/denegado']);
+        } else if (error.status === 0) {
+          // Error de red/timeout: no limpiar sesión pero propagar
         }
         
         return throwError(() => error);

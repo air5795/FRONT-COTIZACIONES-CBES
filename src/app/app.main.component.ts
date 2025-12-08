@@ -31,11 +31,6 @@ export class AppMainComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.router.navigate([], {
-      queryParams: {},
-      replaceUrl: true,
-    });
-
     this.sessionService.initSession().subscribe({
       next: (data) => {
         this.sessionData = data;

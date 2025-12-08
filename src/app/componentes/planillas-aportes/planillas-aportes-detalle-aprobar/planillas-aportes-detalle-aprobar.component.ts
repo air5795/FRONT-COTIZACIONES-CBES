@@ -47,9 +47,10 @@ export class PlanillasAportesDetalleAprobarComponent implements OnInit { // Aseg
       { label: 'OBSERVAR PLANILLA', value: 3 } 
     ];
 
-    altas: any[] = [];
-    bajasNoEncontradas: any[] = [];
-    bajasPorRetiro: any[] = []; 
+    altas: any[] = [];                  // Altas reales - completamente nuevos
+    renovaciones: any[] = [];           // Renovaciones - tenían retiro pero renovaron
+    bajasNoEncontradas: any[] = [];     // Bajas por no encontrado
+    bajasPorRetiro: any[] = [];         // Bajas por retiro en mes actual 
 
     displayPdfModal: boolean = false;
     pdfSrc: string = '';
@@ -287,10 +288,18 @@ obtenerComparacionPlanillas() {
 
   this.planillasService.compararPlanillas(cod_patronal, gestion, mesAnterior, mesActual).subscribe({
     next: (data) => {
-      console.log("Respuesta del backend:", data);
-      this.altas = data.altas;
-      this.bajasNoEncontradas = data.bajas.noEncontradas; // Bajas por trabajador no encontrado
-      this.bajasPorRetiro = data.bajas.porRetiro; // Bajas por fecha de retiro
+      console.log("📊 Respuesta del backend:", data);
+      
+      // Separar altas reales y renovaciones
+      this.altas = data.altas || [];                           // Altas reales (completamente nuevos)
+      this.renovaciones = data.renovaciones || [];             // Renovaciones (reingresos)
+      this.bajasNoEncontradas = data.bajas.noEncontradas || []; // Bajas por no encontrado
+      this.bajasPorRetiro = data.bajas.porRetiro || [];        // Bajas por retiro
+      
+      console.log(`✅ Altas reales: ${this.altas.length}`);
+      console.log(`🔄 Renovaciones: ${this.renovaciones.length}`);
+      console.log(`❌ Bajas no encontradas: ${this.bajasNoEncontradas.length}`);
+      console.log(`❌ Bajas por retiro: ${this.bajasPorRetiro.length}`);
     },
     error: (err) => {
       console.error("Error al comparar planillas:", err);

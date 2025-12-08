@@ -254,9 +254,10 @@
 
 
 .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-    background-color: #be4242;
+    background-color: #dbdbdb;
     color: #03533f;
     border-radius: 10px 10px 0 0;
+    border:1px solid #a9a9a9
     
   }
 
@@ -268,50 +269,6 @@
     border-radius: 10px 10px 0 0; 
   }
   
-  .p-tabview .p-tabview-nav li:nth-child(1).p-highlight .p-tabview-nav-link {
-    background-color: #e9e9e9; 
-    color: #03533f;
-    border: 1px solid #cfcfcf;
-   
-  }
-
-  .p-tabview .p-tabview-nav li:nth-child(2).p-highlight .p-tabview-nav-link {
-    background-color: #d5effc; 
-    color: #032f53;
-    border: 1px solid #cfcfcf;
-  }
-  
-  .p-tabview .p-tabview-nav li:nth-child(3).p-highlight .p-tabview-nav-link {
-    background-color: #ffe6e6; 
-    color: #dc3545;
-    border: 1px solid #cfcfcf;
-  }
-
-  
-  .p-tabview .p-tabview-nav li:nth-child(4).p-highlight .p-tabview-nav-link {
-    background-color: #e6ffe6; 
-    color: #28a781;
-    border: 1px solid #cfcfcf;
-  }
-
-  .p-tabview .p-tabview-nav li:nth-child(5).p-highlight .p-tabview-nav-link {
-    background-color: #28a796; 
-    color: #e9fff5;
-    border: 1px solid #cfcfcf;
-  }
-
-  .p-tabview .p-tabview-nav li:nth-child(6).p-highlight .p-tabview-nav-link {
-    background-color: #28a796; 
-    color: #e9fff5;
-    border: 1px solid #cfcfcf;
-  }
-
-  .p-tabview .p-tabview-nav li:nth-child(7).p-highlight .p-tabview-nav-link {
-    background-color: #f0feff; 
-    color: #488488;
-    border: 1px solid #cfcfcf;
-  }
-
 
 
 

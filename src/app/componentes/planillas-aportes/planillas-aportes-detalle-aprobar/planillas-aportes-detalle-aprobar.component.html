@@ -442,78 +442,116 @@ type="button">
     <div class="dashboard-container" >
       <!-- Contenedor principal de dos secciones -->
       <div class="content-grid" style="display: grid; grid-template-columns: 4fr 4fr; background-color: #f5f5f5;">
-        <!-- Panel izquierdo: Tarjetas de información -->
-        <div class="summary-panel">
-          <!-- Diseño de tarjetas -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; padding: 15px; background-color: #f5f5f5;">
+        <!-- Panel izquierdo: Tarjetas de información (apiladas verticalmente) -->
+        <div class="summary-panel" style="display: flex; flex-direction: column; gap: 8px; padding: 15px; background-color: #f5f5f5;">
+          
+          <!-- Sección Resumen -->
+          <div style="margin-bottom: 8px;">
+            <!-- Título Resumen -->
+            <div style="padding: 8px 5px; margin-bottom: 6px; border-bottom: 2px solid #00796b;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="pi pi-file-check" style="color: #00796b; font-size: 1.1rem;"></i>
+                <span style="color: #00796b; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px;">RESUMEN DE PLANILLA CARGADA</span>
+              </div>
+            </div>
+            
             <!-- Tarjeta: Total Registros -->
-            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
-              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Registros</span>
-                  <i class="pi pi-users" style="color: #00796b; font-size: 1.5rem;"></i>
+            <div style="background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-left: 4px solid #00796b;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="pi pi-users" style="color: #00796b; font-size: 1.8rem;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #00796b; font-size: 0.85rem;">Total Registros</div>
+                  <div style="color: #616161; font-size: 0.75rem;">Empleados registrados</div>
                 </div>
               </div>
-              <div style="padding: 20px; text-align: center;">
-                <div style="font-size: 2.2rem; font-weight: 700; color: #00695c;">
-                  {{ resumenData?.planilla?.total_trabaj }}
-                </div>
-                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Empleados registrados</div>
+              <div style="font-size: 1.8rem; font-weight: 700; color: #00695c;">
+                {{ resumenData?.planilla?.total_trabaj }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección ALTAS -->
+          <div style="margin-top: 8px;">
+            <!-- Título ALTAS -->
+            <div style="padding: 8px 5px; margin-bottom: 6px; border-bottom: 2px solid #4caf50;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="pi pi-arrow-circle-up" style="color: #4caf50; font-size: 1.1rem;"></i>
+                <span style="color: #4caf50; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px;">ALTAS</span>
               </div>
             </div>
             
-            <!-- Tarjeta: Total Altas -->
-            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
-              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Altas</span>
-                  <i class="pi pi-user-plus" style="color: #00796b; font-size: 1.5rem;"></i>
+            <!-- Tarjeta: Altas Reales -->
+            <div style="background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-left: 4px solid #4caf50; margin-bottom: 4px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="pi pi-user-plus" style="color: #4caf50; font-size: 1.8rem;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #4caf50; font-size: 0.85rem;">Altas Reales</div>
+                  <div style="color: #616161; font-size: 0.75rem;">Completamente nuevos</div>
                 </div>
               </div>
-              <div style="padding: 20px; text-align: center;">
-                <div style="font-size: 2.2rem; font-weight: 700; color: #4caf50; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  {{ altas.length }}
-                  <i class="pi pi-arrow-up" style="font-size: 1.2rem;"></i>
+              <div style="font-size: 1.8rem; font-weight: 700; color: #4caf50; display: flex; align-items: center; gap: 5px;">
+                {{ altas.length }}
+                <i class="pi pi-arrow-up" style="font-size: 1rem;"></i>
+              </div>
+            </div>
+
+            <!-- Tarjeta: Renovaciones -->
+            <div style="background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-left: 4px solid #009688;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="pi pi-refresh" style="color: #009688; font-size: 1.8rem;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #009688; font-size: 0.85rem;">Renovaciones</div>
+                  <div style="color: #616161; font-size: 0.75rem;">Reingresos después de retiro</div>
                 </div>
-                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Nuevas incorporaciones</div>
+              </div>
+              <div style="font-size: 1.8rem; font-weight: 700; color: #009688; display: flex; align-items: center; gap: 5px;">
+                {{ renovaciones.length }}
+                <i class="pi pi-replay" style="font-size: 1rem;"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección BAJAS -->
+          <div style="margin-top: 8px;">
+            <!-- Título BAJAS -->
+            <div style="padding: 8px 5px; margin-bottom: 6px; border-bottom: 2px solid #f44336;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="pi pi-arrow-circle-down" style="color: #f44336; font-size: 1.1rem;"></i>
+                <span style="color: #f44336; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px;">BAJAS</span>
               </div>
             </div>
             
-            <!-- Tarjeta: Total Bajas por Retiro -->
-            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
-              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">Total Bajas</span>
-                  <i class="pi pi-user-minus" style="color: #00796b; font-size: 1.5rem;"></i>
+            <!-- Tarjeta: Bajas por Retiro -->
+            <div style="background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-left: 4px solid #f44336; margin-bottom: 4px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="pi pi-user-minus" style="color: #f44336; font-size: 1.8rem;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #f44336; font-size: 0.85rem;">Bajas por Retiro</div>
+                  <div style="color: #616161; font-size: 0.75rem;">Retiros en el mes actual</div>
                 </div>
               </div>
-              <div style="padding: 20px; text-align: center;">
-                <div style="font-size: 2.2rem; font-weight: 700; color: #f44336; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  {{ bajasPorRetiro.length }}
-                  <i class="pi pi-arrow-down" style="font-size: 1.2rem;"></i>
-                </div>
-                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Retiros en el mes actual</div>
+              <div style="font-size: 1.8rem; font-weight: 700; color: #f44336; display: flex; align-items: center; gap: 5px;">
+                {{ bajasPorRetiro.length }}
+                <i class="pi pi-arrow-down" style="font-size: 1rem;"></i>
               </div>
             </div>
             
             <!-- Tarjeta: No encontrados -->
-            <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
-              <div style="padding: 15px;  border-bottom: 2px solid #80cbc4;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span style="font-weight: 600; color: #00796b; font-size: 1rem;">No Encontrados</span>
-                  <i class="pi pi-exclamation-triangle" style="color: #00796b; font-size: 1.5rem;"></i>
+            <div style="background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-left: 4px solid #ff9800;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="pi pi-exclamation-triangle" style="color: #ff9800; font-size: 1.8rem;"></i>
+                <div>
+                  <div style="font-weight: 600; color: #ff9800; font-size: 0.85rem;">No Encontrados</div>
+                  <div style="color: #616161; font-size: 0.75rem;">Trabajadores no encontrados</div>
                 </div>
               </div>
-              <div style="padding: 20px; text-align: center;">
-                <div style="font-size: 2.2rem; font-weight: 700; color: #ff9800; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  {{ bajasNoEncontradas.length }}
-                  <i class="pi pi-question-circle" style="font-size: 1.2rem;"></i>
-                </div>
-                <div style="color: #616161; font-size: 0.9rem; margin-top: 5px;">Trabajadores no encontrados</div>
+              <div style="font-size: 1.8rem; font-weight: 700; color: #ff9800; display: flex; align-items: center; gap: 5px;">
+                {{ bajasNoEncontradas.length }}
+                <i class="pi pi-question-circle" style="font-size: 1rem;"></i>
               </div>
             </div>
-            
           </div>
+          
         </div>
         
         <!-- Panel derecho: Tabla de resumen por regional -->
@@ -783,6 +821,80 @@ currentPageReportTemplate="Mostrando registros del {first} al {last} de un total
         </p-table>
 
   </p-tabPanel>
+
+  <!-- Nueva pestaña para Renovaciones -->
+  <p-tabPanel header="Renovaciones" leftIcon="pi pi-refresh">
+    <div style="display: flex; align-items: center; justify-content: space-between;  background-color: #e3f2fd; padding: 5px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="pi pi-replay" style="color: #2196f3; font-size: 1.5rem;"></i>
+        <span style="font-size: 1.25rem; font-weight: bold; color: #5f5f5f;">Trabajadores que Renovaron (Reingresos)</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button pButton style="border: 1px;" label="Exportar a Excel" class="p-button-outlined p-button-plain" icon="pi pi-file-excel" (click)="recargar()"></button>
+        <button pButton style="border: 1px;" label="Exportar a Pdf" class="p-button-outlined p-button-plain" icon="pi pi-file-pdf" (click)="recargar()"></button>
+        <button pButton type="button" class="p-button p-button-sm" style="display: flex; align-items: center; gap: 15px; padding: 7px 10px; font-size: large; background-color: #1976d2;">
+          <i class="pi pi-users"></i> <span>{{ renovaciones.length }}</span>
+        </button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="renovaciones"
+      [paginator]="true"
+      [rows]="15"
+      [totalRecords]="renovaciones.length"
+      [rowsPerPageOptions]="[5, 10, 15, 20]"
+      [pageLinks]="5"
+      responsiveLayout="scroll"
+      styleClass="p-datatable-sm p-datatable-striped"
+      [style]="{'font-size': '12px', 'border': '1px solid #dee2e6'}"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando registros del {first} al {last} de un total de {totalRecords} registros"
+    >
+      <!-- Encabezado -->
+      <ng-template pTemplate="header">
+        <tr style="background-color: #e3f2fd;">
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nro</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">CI</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Nombre Completo</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Cargo</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Haber Básico</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Total Ganado</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Ingreso</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Fecha de Retiro Anterior</th>
+          <th style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">Regional</th>
+        </tr>
+      </ng-template>
+
+      <!-- Cuerpo -->
+      <ng-template pTemplate="body" let-trabajador let-i="rowIndex">
+        <tr style="background-color: #e3f2fd;">
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.nro }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.ci }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }} {{ trabajador.nombres }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.cargo }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.haber_basico | number:'1.2-2' }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.salario | number:'1.2-2' }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_ingreso }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.regional }}</td>
+        </tr>
+      </ng-template>
+
+      <!-- Mensaje cuando no hay datos -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9" style="text-align: center; padding: 20px; background-color: #fff;">
+            <div class="no-data-message">
+              <i class="pi pi-info-circle" style="font-size: 2.5rem; color: #888;"></i>
+              <p style="margin-top: 10px; font-size: 1.2rem; color: #888;">No hay renovaciones en esta planilla.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+
   <p-tabPanel header="Pagos" leftIcon="pi pi-money-bill" *ngIf="planillaInfo?.planilla?.estado === 2">
     <app-pagos-aportes [idPlanilla]="idPlanilla"></app-pagos-aportes>
   </p-tabPanel>

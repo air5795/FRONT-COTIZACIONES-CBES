@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/api';
 import { LocalService } from '../../servicios/local/local.service';
 import { SessionService } from '../../servicios/auth/session.service';
 
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { GoogleMapsLoaderService } from '../../servicios/empresa/google-maps-loader.service';
 
@@ -35,12 +35,18 @@ export class DatosEmpresaComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private gmapsLoader: GoogleMapsLoaderService
+    private gmapsLoader: GoogleMapsLoaderService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.validarRolUsuario();
   
+    if (this.isAdmin) {
+      this.router.navigate(['/cotizaciones/panel-admin']);
+      return;
+    }
+
     if (!this.isAdmin) {
       // ✅ Cargar Google Maps con loading=async
       this.gmapsLoader.load('AIzaSyDC5fxZ3Qfi2cFfEADgiRM9xWRgvBlJMqY')

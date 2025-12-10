@@ -127,6 +127,7 @@ import { PlanillaIncapacidadComponent } from './componentes/empresa/planilla-inc
 import { PlanillaAportesComponent } from './componentes/empresa/planilla-aportes/planilla-aportes.component';
 import { PlanillaAportesAprobarComponent } from './componentes/empresa/planilla-aportes/planilla-aportes-aprobar.component';
 import { DatosEmpresaComponent } from './componentes/datos-empresa/datos-empresa.component';
+import { PanelAdminComponent } from './componentes/datos-empresa/panel-admin.component';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PlanillasAportesComponent } from './componentes/planillas-aportes/planillas-aportes.component';
 import { PlanillasAportesListComponent } from './componentes/planillas-aportes/planillas-aportes-list/planillas-aportes-list.component';
@@ -282,6 +283,7 @@ registerLocaleData(localeEs);
     PlanillaAportesComponent,
     PlanillaAportesAprobarComponent,
     DatosEmpresaComponent,
+    PanelAdminComponent,
     PlanillasAportesComponent,
     PlanillasAportesListComponent,
     PlanillasAportesDetalleComponent,

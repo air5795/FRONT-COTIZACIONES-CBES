@@ -1,0 +1,131 @@
+<div class="grid dashboard panel-admin two-columns">
+
+  <div class="col-12">
+    <div class="admin-header">
+      <div class="header-text">
+        <h2>Dashboard administrativo</h2>
+        <p>Bienvenido, {{ userName }}</p>
+      </div>
+      <button pButton type="button" icon="pi pi-refresh" label="Actualizar" (click)="cargarDatos()" [disabled]="cargando"></button>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="panel-card parent-card">
+      <div class="grid two-columns inner">
+
+        <!-- Columna 1: Planillas de aportes -->
+        <div class="col-12 lg:col-6 columna">
+          <div class="grid cards-grid">
+            <div class="col-6" *ngFor="let card of cards | slice:0:2">
+              <div class="stat-card">
+                <div class="icon" [style.background]="card.bg" [style.color]="card.color">
+                  <i [class]="card.icon"></i>
+                </div>
+                <div>
+                  <p class="label">{{ card.label }}</p>
+                  <p class="value">{{ resumen[card.key] | number:'1.0-0' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna 2: Reembolsos -->
+        <div class="col-12 lg:col-6 columna">
+          <div class="grid cards-grid">
+            <div class="col-6" *ngFor="let card of cards | slice:2:4">
+              <div class="stat-card">
+                <div class="icon" [style.background]="card.bg" [style.color]="card.color">
+                  <i [class]="card.icon"></i>
+                </div>
+                <div>
+                  <p class="label">{{ card.label }}</p>
+                  <p class="value">{{ resumen[card.key] | number:'1.0-0' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico de planillas (ocupa 2 columnas) -->
+        <div class="col-12">
+          <div class="panel-card chart-card">
+            <div class="panel-title">
+              <div class="title-text">
+                <i class="pi pi-chart-bar"></i>
+                <span>Últimas planillas declaradas</span>
+              </div>
+              <p class="hint">Tooltip muestra el tipo de planilla</p>
+            </div>
+            <div class="chart-wrapper">
+              <p-chart type="bar" [data]="chartPlanillasData" [options]="chartPlanillasOptions" style="width: 100%; height: 500px;"></p-chart>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalle rápido planillas -->
+        <div class="col-12 lg:col-6 columna">
+          <div class="panel-card">
+            <div class="panel-title">
+              <div class="title-text">
+                <i class="pi pi-list"></i>
+                <span>Detalle rápido planillas</span>
+              </div>
+              <p class="hint">Últimas planillas con tipo y fecha</p>
+            </div>
+
+            <div class="list-wrapper">
+              <div class="list-item" *ngFor="let planilla of ultimasPlanillas">
+                <div class="left">
+                  <p class="empresa">{{ planilla.empresa }}</p>
+                  <p class="meta">
+                    <span class="badge-soft">{{ planilla.tipoPlanilla }}</span>
+                    <span class="code">{{ planilla.codPatronal }}</span>
+                    <span class="date">{{ planilla.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </p>
+                </div>
+                <div class="right">
+                  <button pButton type="button" class="p-button-text p-button-sm" label="Ver" (click)="verPlanilla(planilla)"></button>
+                </div>
+              </div>
+              <p *ngIf="!ultimasPlanillas.length" class="empty">Sin planillas recientes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalle rápido reembolsos -->
+        <div class="col-12 lg:col-6 columna">
+          <div class="panel-card">
+            <div class="panel-title">
+              <div class="title-text">
+                <i class="pi pi-list"></i>
+                <span>Detalle rápido reembolsos</span>
+              </div>
+              <p class="hint">Últimas solicitudes con fecha</p>
+            </div>
+
+            <div class="list-wrapper">
+              <div class="list-item" *ngFor="let sol of ultimasReembolsosFiltradas">
+                <div class="left">
+                  <p class="empresa">{{ sol.empresa }}</p>
+                  <p class="meta">
+                    <span class="badge-soft">Estado {{ sol.estado }}</span>
+                    <span class="code">{{ sol.codPatronal }}</span>
+                    <span class="date">{{ sol.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </p>
+                </div>
+                <div class="right">
+                  <button pButton type="button" class="p-button-text p-button-sm" label="Ver" (click)="verReembolso(sol)"></button>
+                </div>
+              </div>
+              <p *ngIf="!ultimasReembolsosFiltradas.length" class="empty">Sin solicitudes recientes</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+

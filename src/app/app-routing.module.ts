@@ -16,6 +16,7 @@ import { PlanillaIncapacidadComponent } from './componentes/empresa/planilla-inc
 import { PlanillaAportesComponent } from './componentes/empresa/planilla-aportes/planilla-aportes.component';
 import { PlanillaAportesAprobarComponent } from './componentes/empresa/planilla-aportes/planilla-aportes-aprobar.component';
 import { DatosEmpresaComponent } from './componentes/datos-empresa/datos-empresa.component';
+import { PanelAdminComponent } from './componentes/datos-empresa/panel-admin.component';
 import { PlanillasAportesListComponent } from './componentes/planillas-aportes/planillas-aportes-list/planillas-aportes-list.component';
 import { PlanillasAportesDetalleComponent } from './componentes/planillas-aportes/planillas-aportes-detalle/planillas-aportes-detalle.component';
 import { PlanillasAportesAprobarComponent } from './componentes/planillas-aportes/planillas-aportes-aprobar/planillas-aportes-aprobar.component';
@@ -48,6 +49,7 @@ import { DetalleDevengadoComponent } from './componentes/liquidaciones-devengada
                     { path: '', component: DatosEmpresaComponent },
                     // DATOS DE PERFIL DE EMPRESA ---------------------------------------------------------
                     { path: 'datos-empresa', component: DatosEmpresaComponent },
+                    { path: 'panel-admin', component: PanelAdminComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN_COTIZACIONES_DESARROLLO', 'ADMIN_COTIZACIONES'] } },
                     // NOTIFICACIONES ---------------------------------------------------------
                     { path: 'historial-notificaciones', component: HistorialNotificacionesComponent },
                     // EMPRESAS ---------------------------------------------------------

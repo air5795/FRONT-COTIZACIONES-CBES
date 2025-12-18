@@ -211,5 +211,9 @@ export class PanelAdminComponent implements OnInit {
   verReembolso(sol: UltimaReembolso) {
     this.router.navigate(['/cotizaciones/historial-reembolsos/detalle', sol.id]);
   }
+
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
 }
 

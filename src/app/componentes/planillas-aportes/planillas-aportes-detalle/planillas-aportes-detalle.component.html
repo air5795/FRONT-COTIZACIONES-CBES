@@ -920,7 +920,7 @@ currentPageReportTemplate="Mostrando registros del {first} al {last} de un total
           <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.haber_basico | number:'1.2-2' }}</td>
           <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.salario | number:'1.2-2' }}</td>
           <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_ingreso }}</td>
-          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro }}</td>
+          <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.fecha_retiro_anterior || 'N/A' }}</td>
           <td style="text-align: center; padding: 5px; border: 1px solid #dee2e6;">{{ trabajador.regional }}</td>
         </tr>
       </ng-template>

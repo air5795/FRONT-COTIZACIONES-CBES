@@ -191,8 +191,9 @@ export class BuscarTrabajadorComponent {
   }
 
   /**
-   * Verifica si las fechas son iguales (método auxiliar para validación y mensajes)
-   * Las 4 fechas (fecha_inicio, fecha_atencion, fecha_emision_certificado, fecha_sello_vigencia) deben ser iguales
+   * Verifica si las fechas son válidas según las nuevas reglas:
+   * - Las 3 fechas (fecha_inicio, fecha_atencion, fecha_emision_certificado) deben ser iguales
+   * - fecha_sello_vigencia puede tener entre 0 y 4 días de diferencia respecto a las otras 3
    * La hora solo afectará el cálculo posterior, no la validación del formulario
    */
   validarFechasIguales(): boolean {
@@ -220,10 +221,71 @@ export class BuscarTrabajadorComponent {
     const fechaEmisionNorm = normalizarFecha(fechaEmisionCertificado);
     const fechaSelloNorm = normalizarFecha(fechaSelloVigencia);
 
-    // Verificar que TODAS las 4 fechas sean iguales (sin importar la hora)
-    return fechaInicioNorm === fechaAtencionNorm && 
-           fechaInicioNorm === fechaEmisionNorm && 
-           fechaInicioNorm === fechaSelloNorm;
+    // Verificar que las 3 fechas principales sean iguales
+    if (fechaInicioNorm !== fechaAtencionNorm || fechaInicioNorm !== fechaEmisionNorm) {
+      return false;
+    }
+
+    // Validar que fecha_sello_vigencia esté dentro del rango de 4 días
+    const fechaBase = new Date(fechaInicio);
+    const fechaSello = new Date(fechaSelloVigencia);
+    
+    // Normalizar las fechas a medianoche para evitar problemas con horas
+    fechaBase.setHours(0, 0, 0, 0);
+    fechaSello.setHours(0, 0, 0, 0);
+    
+    // Calcular diferencia en días
+    const diferenciaTiempo = fechaSello.getTime() - fechaBase.getTime();
+    const diasDiferencia = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24));
+    
+    // La fecha de sello debe estar entre 0 y 4 días después de la fecha base
+    return diasDiferencia >= 0 && diasDiferencia <= 4;
+  }
+
+  /**
+   * Obtiene el mensaje de error para las validaciones de fecha
+   */
+  getMensajeErrorFechas(): string {
+    const fechaInicio = this.formularioManual.get('fecha_inicio')?.value;
+    const fechaAtencion = this.formularioManual.get('fecha_atencion')?.value;
+    const fechaEmisionCertificado = this.formularioManual.get('fecha_emision_certificado')?.value;
+    const fechaSelloVigencia = this.formularioManual.get('fecha_sello_vigencia')?.value;
+
+    if (!fechaInicio || !fechaAtencion || !fechaEmisionCertificado || !fechaSelloVigencia) {
+      return 'Complete todas las fechas requeridas';
+    }
+
+    const normalizarFecha = (fecha: any): Date => {
+      const d = new Date(fecha);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+
+    const fInicio = normalizarFecha(fechaInicio);
+    const fAtencion = normalizarFecha(fechaAtencion);
+    const fEmision = normalizarFecha(fechaEmisionCertificado);
+    const fSello = normalizarFecha(fechaSelloVigencia);
+
+    // Verificar las 3 fechas principales
+    if (fInicio.getTime() !== fAtencion.getTime()) {
+      return 'La fecha de atención debe ser igual a la fecha de inicio';
+    }
+    if (fInicio.getTime() !== fEmision.getTime()) {
+      return 'La fecha de emisión del certificado debe ser igual a la fecha de inicio';
+    }
+
+    // Verificar fecha de sello vigencia
+    const diferenciaTiempo = fSello.getTime() - fInicio.getTime();
+    const diasDiferencia = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24));
+
+    if (diasDiferencia < 0) {
+      return 'La fecha de sello de vigencia no puede ser anterior a la fecha de inicio';
+    }
+    if (diasDiferencia > 4) {
+      return `La fecha de sello de vigencia excede el rango permitido (${diasDiferencia} días). Máximo permitido: 4 días`;
+    }
+
+    return '';
   }
 
   // Getter para verificar si el tipo de incapacidad es PROFESIONAL
@@ -1679,7 +1741,13 @@ calcularYMostrarReembolso() {
       return;
     }
 
-    const valorBusqueda = this.buscadorAsegurado.get('valor_busqueda')?.value;
+    let valorBusqueda = this.buscadorAsegurado.get('valor_busqueda')?.value;
+    
+    // Convertir matrícula a mayúsculas si es el tipo de búsqueda
+    if (this.tipoBusqueda === 'matricula' && valorBusqueda) {
+      valorBusqueda = valorBusqueda.toUpperCase();
+    }
+    
     this.cargandoBusquedaAsegurado = true;
 
     const busquedaObservable = this.tipoBusqueda === 'ci' 
@@ -1977,23 +2045,8 @@ calcularYMostrarReembolso() {
       return false;
     }
     
-    // Validar que las fechas (sin hora) sean iguales
-    const normalizarFecha = (fecha: any): string => {
-      if (!fecha) return '';
-      const d = new Date(fecha);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    };
-
-    const fechaInicioNorm = normalizarFecha(fechaInicio);
-    const fechaAtencionNorm = normalizarFecha(fechaAtencion);
-    const fechaEmisionNorm = normalizarFecha(fechaEmisionCertificado);
-    const fechaSelloNorm = normalizarFecha(fechaSelloVigencia);
-
-    // Verificar que TODAS las 4 fechas sean iguales (sin importar la hora)
-    // La hora solo afectará el cálculo posterior, no la validación del formulario
-    if (fechaInicioNorm !== fechaAtencionNorm || 
-        fechaInicioNorm !== fechaEmisionNorm || 
-        fechaInicioNorm !== fechaSelloNorm) {
+    // Validar que las fechas cumplan con las nuevas reglas usando validarFechasIguales()
+    if (!this.validarFechasIguales()) {
       return false;
     }
     

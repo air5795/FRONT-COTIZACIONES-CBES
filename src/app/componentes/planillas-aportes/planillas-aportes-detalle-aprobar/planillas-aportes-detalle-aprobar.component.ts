@@ -151,6 +151,19 @@ export class PlanillasAportesDetalleAprobarComponent implements OnInit { // Aseg
       });
     }
 
+    // Método para manejar cuando se actualiza la liquidación desde el componente hijo
+    onLiquidacionActualizada(): void {
+      console.log('🔄 Recibido evento de liquidación actualizada - Recargando información de planilla');
+      this.obtenerInformacionPlanilla().then(() => {
+        console.log('✅ Información de planilla recargada:', {
+          valido_cotizacion: this.planillaInfo?.planilla?.valido_cotizacion,
+          fecha_liquidacion: this.planillaInfo?.planilla?.fecha_liquidacion
+        });
+      }).catch(err => {
+        console.error('❌ Error al recargar información de planilla:', err);
+      });
+    }
+
 /* OBTENER DETALLES BUSQUEDA Y PAGINACION *************************************************************************************************** */
 
   obtenerDetalles() {

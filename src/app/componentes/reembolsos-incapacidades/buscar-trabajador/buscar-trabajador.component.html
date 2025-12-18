@@ -210,42 +210,48 @@
           </div>
         </div>
 
-        <!-- Mensaje de validación de fechas iguales -->
+        <!-- Mensaje de validación de fechas -->
         <div class="form-hints-container form-hints-error" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && !validarFechasIguales()">
           <small class="p-error">
             <i class="pi pi-exclamation-triangle"></i>
-            <strong>Las fechas deben ser iguales:</strong> Fecha de Inicio, Fecha de Atención, Fecha Emisión Certificado y Fecha Sello Vigencia deben tener el mismo valor.
+            <strong>Error en las fechas:</strong> {{ getMensajeErrorFechas() }}
+          </small>
+        </div>
+
+        <!-- Mensaje informativo sobre el rango de fecha de sello vigencia (más discreto) -->
+        <div class="form-hints-container" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_atencion')?.value && formularioManual.get('fecha_emision_certificado')?.value && formularioManual.get('fecha_sello_vigencia')?.value && validarFechasIguales()" style="opacity: 0.7;">
+          <small class="p-hint" style="font-size: 0.75rem; color: #6c757d;">
+            <i class="pi pi-check-circle" style="font-size: 0.7rem;"></i>
+            Fechas validadas correctamente
           </small>
         </div>
         
-        <!-- Mensaje informativo sobre el ajuste de fecha según la hora -->
-        <div class="form-hints-container" *ngIf="formularioManual.get('hora_atencion')?.value && formularioManual.get('fecha_atencion')?.value && validarFechasIguales()">
-          <small class="p-hint">
-            <i class="pi pi-info-circle"></i>
-            <span *ngIf="esHoraMayorIgual20()" class="text-warning">
-              <strong>Nota:</strong> La hora de atención es {{ formatearHora(formularioManual.get('hora_atencion')?.value) }} (>= 20:00). 
-              En el cálculo, la fecha de inicio de baja será ajustada al día siguiente: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }}.
+        <!-- Mensaje informativo sobre el ajuste de fecha según la hora (más discreto) -->
+        <div class="form-hints-container" *ngIf="formularioManual.get('hora_atencion')?.value && formularioManual.get('fecha_atencion')?.value && validarFechasIguales()" style="opacity: 0.7;">
+          <small class="p-hint" style="font-size: 0.75rem; color: #6c757d;">
+            <i class="pi pi-info-circle" style="font-size: 0.7rem;"></i>
+            <span *ngIf="esHoraMayorIgual20()">
+              Hora: {{ formatearHora(formularioManual.get('hora_atencion')?.value) }} - Inicio de baja: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }} (día siguiente)
             </span>
-            <span *ngIf="!esHoraMayorIgual20()" class="text-success">
-              <strong>Nota:</strong> La hora de atención es {{ formatearHora(formularioManual.get('hora_atencion')?.value) }} (< 20:00). 
-              La fecha de inicio de baja será la misma: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }}.
+            <span *ngIf="!esHoraMayorIgual20()">
+              Hora: {{ formatearHora(formularioManual.get('hora_atencion')?.value) }} - Inicio de baja: {{ calcularFechaInicioDesdeHora() | date:'dd/MM/yyyy' }}
             </span>
           </small>
         </div>
 
-        <!-- Mensajes informativos debajo de las fechas -->
-        <div class="form-hints-container" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value">
-          <small class="p-hint" *ngIf="formularioManual.get('tipo_baja')?.value !== 'MATERNIDAD'">
-            <i class="pi pi-info-circle"></i> Los días de impedimento se calcularán automáticamente
+        <!-- Mensajes informativos debajo de las fechas (más discretos) -->
+        <div class="form-hints-container" *ngIf="formularioManual.get('fecha_inicio')?.value && formularioManual.get('fecha_fin')?.value" style="opacity: 0.65;">
+          <small class="p-hint" *ngIf="formularioManual.get('tipo_baja')?.value !== 'MATERNIDAD'" style="font-size: 0.75rem; color: #6c757d;">
+            <i class="pi pi-info-circle" style="font-size: 0.7rem;"></i> Días de impedimento: cálculo automático
           </small>
-          <small class="p-hint" *ngIf="formularioManual.get('tipo_baja')?.value === 'MATERNIDAD'">
-            <i class="pi pi-info-circle"></i> Para maternidad: período debe ser entre 45 y 90 días
+          <small class="p-hint" *ngIf="formularioManual.get('tipo_baja')?.value === 'MATERNIDAD'" style="font-size: 0.8rem;">
+            <i class="pi pi-info-circle"></i> Maternidad: 45-90 días
             <span class="dias-maternidad-info">
               <i class="pi pi-calendar text-primary"></i> 
-              <strong>Días calculados: {{ calcularDiasMaternidad() }} días</strong>
-              <span *ngIf="calcularDiasMaternidad() < 45" class="text-danger"> (Mínimo: 45 días)</span>
-              <span *ngIf="calcularDiasMaternidad() > 90" class="text-danger"> (Máximo: 90 días)</span>
-              <span *ngIf="calcularDiasMaternidad() >= 45 && calcularDiasMaternidad() <= 90" class="text-success"> ✓ Rango válido</span>
+              <strong>{{ calcularDiasMaternidad() }} días</strong>
+              <span *ngIf="calcularDiasMaternidad() < 45" class="text-danger"> (Mínimo: 45)</span>
+              <span *ngIf="calcularDiasMaternidad() > 90" class="text-danger"> (Máximo: 90)</span>
+              <span *ngIf="calcularDiasMaternidad() >= 45 && calcularDiasMaternidad() <= 90" class="text-success"> ✓</span>
             </span>
           </small>
         </div>
@@ -346,7 +352,8 @@
           Paso 2: Buscar Trabajador
         </h6>
         
-        <!-- Opciones de ingreso -->
+        <!-- Opciones de ingreso (COMENTADO - Solo se usa búsqueda en sistema) -->
+        <!-- 
         <div class="mb-3">
           <p-button 
             label="Buscar en Sistema" 
@@ -363,43 +370,100 @@
             styleClass="p-button-sm">
           </p-button>
         </div>
+        -->
 
-        <!-- Buscador de Asegurados -->
-        <div *ngIf="modoIngresoTrabajador === 'buscar'">
-          <form [formGroup]="buscadorAsegurado" (ngSubmit)="buscarAsegurado()">
-            <div class="p-inputgroup mb-3">
-              <p-dropdown 
-                formControlName="tipo_busqueda"
-                [options]="[
-                    {label: 'CI', value: 'ci'},
-                    {label: 'Matrícula', value: 'matricula'}
-                ]"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Buscar por..."
-                (onChange)="cambiarTipoBusqueda($event.value)"
-                styleClass="p-inputgroup-addon"
-                [style]="{'width': '200px'}">
-              </p-dropdown>
-              <input 
-                type="text" 
-                pInputText 
-                formControlName="valor_busqueda"
-                [placeholder]="tipoBusqueda === 'ci' ? 'Ej: 12345678' : 'Ej: 61-5204 AAA'"
-                class="p-inputtext">
-              <button 
-                type="submit" 
-                pButton 
-                pRipple 
-                icon="pi pi-search"
-                class="p-button-primary"
-                [loading]="cargandoBusquedaAsegurado"
-                [disabled]="buscadorAsegurado.invalid || !fechasCompletas()">
-              </button>
+        <!-- Buscador de Asegurados (Siempre visible) -->
+        <div>
+          <!-- Descripción amigable del buscador -->
+          <div class="busqueda-info mb-3" style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #007bff;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="pi pi-info-circle" style="color: #007bff; font-size: 1.2rem;"></i>
+              <div>
+                <strong style="color: #495057;">¿Cómo buscar al trabajador?</strong>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #6c757d;">
+                  Seleccione el tipo de búsqueda (CI o Matrícula) e ingrese el valor correspondiente
+                </p>
+              </div>
             </div>
-            <small class="text-muted" *ngIf="!fechasCompletas()">
-              <i class="pi pi-info-circle mr-1"></i>
-              Complete las fechas de inicio y fin antes de buscar
+          </div>
+
+          <form [formGroup]="buscadorAsegurado" (ngSubmit)="buscarAsegurado()">
+            <!-- Selector de tipo de búsqueda mejorado -->
+            <div class="form-field mb-3">
+              <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                <i class="pi pi-search"></i> Tipo de búsqueda *
+              </label>
+              <div class="p-buttonset" style="display: flex; gap: 10px;">
+                <button 
+                  type="button"
+                  pButton 
+                  pRipple
+                  label="Cédula de Identidad (CI)" 
+                  icon="pi pi-id-card"
+                  [class]="tipoBusqueda === 'ci' ? 'p-button-primary' : 'p-button-outlined'"
+                  (click)="cambiarTipoBusqueda('ci')"
+                  class="flex-1">
+                </button>
+                <button 
+                  type="button"
+                  pButton 
+                  pRipple
+                  label="Matrícula CNS" 
+                  icon="pi pi-bookmark"
+                  [class]="tipoBusqueda === 'matricula' ? 'p-button-primary' : 'p-button-outlined'"
+                  (click)="cambiarTipoBusqueda('matricula')"
+                  class="flex-1">
+                </button>
+              </div>
+            </div>
+
+            <!-- Input de búsqueda con máscara -->
+            <div class="form-field mb-3">
+              <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                <i class="pi" [ngClass]="tipoBusqueda === 'ci' ? 'pi-id-card' : 'pi-bookmark'"></i> 
+                {{ tipoBusqueda === 'ci' ? 'Número de Cédula de Identidad' : 'Número de Matrícula' }} *
+              </label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon" style="min-width: 120px; font-weight: 600;">
+                  <i class="pi" [ngClass]="tipoBusqueda === 'ci' ? 'pi-id-card' : 'pi-bookmark'" style="margin-right: 8px;"></i>
+                  {{ tipoBusqueda === 'ci' ? 'CI' : 'Matrícula' }}
+                </span>
+                <input 
+                  *ngIf="tipoBusqueda === 'ci'"
+                  type="text" 
+                  pInputText 
+                  formControlName="valor_busqueda"
+                  placeholder="Ej: 12345678"
+                  class="p-inputtext"
+                  style="font-size: 1rem;">
+                <p-inputMask
+                  *ngIf="tipoBusqueda === 'matricula'"
+                  formControlName="valor_busqueda"
+                  mask="99-9999 aaa"
+                  placeholder="95-6011 CMM"
+                  [style]="{'width': '100%', 'font-size': '1rem'}"
+                  [autoClear]="false">
+                </p-inputMask>
+                <button 
+                  type="submit" 
+                  pButton 
+                  pRipple 
+                  label="Buscar"
+                  icon="pi pi-search"
+                  class="p-button-primary"
+                  [loading]="cargandoBusquedaAsegurado"
+                  [disabled]="buscadorAsegurado.invalid || !fechasCompletas()">
+                </button>
+              </div>
+              <small class="text-muted" style="display: block; margin-top: 5px;">
+                <i class="pi pi-info-circle" style="font-size: 0.7rem;"></i>
+                {{ tipoBusqueda === 'ci' ? 'Ingrese el número de CI sin guiones ni puntos' : 'Formato: XX-XXXX AAA (Ej: 95-6011 CMM)' }}
+              </small>
+            </div>
+
+            <small class="text-muted" *ngIf="!fechasCompletas()" style="display: block; padding: 10px; background-color: #fff3cd; border-radius: 4px; color: #856404;">
+              <i class="pi pi-exclamation-triangle mr-1"></i>
+              Complete las fechas de inicio y fin en el paso anterior antes de buscar
             </small>
           </form>
 

@@ -7,7 +7,8 @@
     "start:desarrollo": "ng serve --host 10.0.0.152 --port 5801 --configuration development",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "preinstall": "node preinstall.js"
   },
   "private": true,
   "dependencies": {

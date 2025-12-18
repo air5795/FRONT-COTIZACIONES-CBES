@@ -1,5 +1,5 @@
 // src/app/components/liquidaciones-aportes/liquidaciones-aportes.component.ts
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { PlanillasAportesService } from '../../../servicios/planillas-aportes/planillas-aportes.service';
 import { SessionService } from '../../../servicios/auth/session.service';
 import { MessageService, Message } from 'primeng/api';
@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
 export class LiquidacionesAportesComponent implements OnInit, OnDestroy {
 
   @Input() idPlanilla!: number;
+  @Output() liquidacionActualizada = new EventEmitter<void>();
   planilla: any = null;
   loading: boolean = false;
   errorMessage: string | undefined = undefined;
@@ -457,11 +458,23 @@ public mostrarMensajesSegunContexto(response: any) {
 // ✅ Manejar respuesta exitosa
 public manejarRespuestaExitosa(response: any, mensajeBase: string) {
   
+  // Actualizar inmediatamente el estado local con la respuesta
   this.planilla = response;
   this.datosDesdeDB = true;
   this.esEmpresaPublicaConLiquidacionPreliminar = false;
   
-  // Mostrar SweetAlert de éxito y recargar solo los datos de liquidación
+  // Actualizar el estado de validación si viene en la respuesta
+  if (response.valido_cotizacion || response.validado_por) {
+    this.liquidacionValidada = true;
+    this.validadoPor = response.valido_cotizacion || response.validado_por;
+    console.log('✅ Liquidación validada actualizada:', this.validadoPor);
+  }
+  
+  // Emitir evento para notificar al componente padre que la liquidación se actualizó
+  this.liquidacionActualizada.emit();
+  console.log('📡 Evento liquidacionActualizada emitido al componente padre');
+  
+  // Mostrar SweetAlert de éxito
   Swal.fire({
     title: '¡Éxito!',
     text: mensajeBase,
@@ -473,7 +486,7 @@ public manejarRespuestaExitosa(response: any, mensajeBase: string) {
       document.querySelector('.swal2-container')?.setAttribute('style', 'z-index: 9999 !important;');
     },
   }).then(() => {
-    // Recargar solo los datos de liquidación sin refrescar la página
+    // Recargar los datos de liquidación para asegurar sincronización
     this.loadAportes();
   });
   
@@ -481,7 +494,7 @@ public manejarRespuestaExitosa(response: any, mensajeBase: string) {
   this.loading = false;
   this.resetearVariablesModal();
   
-  console.log('✅ Proceso completado exitosamente - Recargando datos de liquidación');
+  console.log('✅ Proceso completado exitosamente - Estado local actualizado inmediatamente');
 }
 
 // ❌ Manejar errores
@@ -590,6 +603,10 @@ public confirmarValidacionLiquidacion() {
           validadoPor: this.validadoPor
         });
       }
+      
+      // Emitir evento para notificar al componente padre
+      this.liquidacionActualizada.emit();
+      console.log('📡 Evento liquidacionActualizada emitido al componente padre (validación)');
       
       this.loading = false;
       

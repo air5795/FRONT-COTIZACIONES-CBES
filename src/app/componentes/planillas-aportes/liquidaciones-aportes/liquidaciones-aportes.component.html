@@ -155,8 +155,27 @@
 </p-dialog>
 
 
-  <!-- También asegúrate de que este indicador solo sea visible para administradores -->
-<div *ngIf="esAdministrador && esEmpresaPublicaConLiquidacionPreliminar" 
+  <!-- Loading mientras se carga la información -->
+<div *ngIf="loading && esAdministrador" 
+     style="background-color: #e3f2fd; 
+            border: 1px solid #90caf9; 
+            border-radius: 4px; 
+            padding: 12px; 
+            margin: 15px 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;">
+  <i class="pi pi-spin pi-spinner" style="color: #1976d2; font-size: 1.5rem;"></i>
+  <div style="flex: 1;">
+    <strong style="color: #1565c0;">Cargando información de liquidación...</strong>
+    <p style="margin: 5px 0 0 0; color: #1976d2; font-size: 0.9rem;"> 
+      Por favor espere mientras se verifica el estado de la liquidación.
+    </p>
+  </div>
+</div>
+
+  <!-- Banner para empresa pública con liquidación preliminar -->
+<div *ngIf="!loading && esAdministrador && esEmpresaPublicaConLiquidacionPreliminar" 
      style="background-color: #fff3cd; 
             border: 1px solid #ffeaa7; 
             border-radius: 4px; 
